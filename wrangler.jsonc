@@ -3,12 +3,17 @@
   "name": "gidoku-com",
   "main": "./dist/index.js",
   "compatibility_date": "2025-12-09",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
+  "compatibility_flags": ["nodejs_compat"],
   "assets": {
     "directory": "./dist"
-  }
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "gidoku-db",
+      "database_id": "49c64334-1ca7-4841-9b35-9d5a33ec2cd4"
+    }
+  ]
   // "vars": {
   //   "MY_VAR": "my-variable"
   // },
