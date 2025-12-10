@@ -1,4 +1,5 @@
 import type { D1Database, KVNamespace } from "@cloudflare/workers-types";
+import type { User } from "./database";
 
 export interface Env {
   // Cloudflare Bindings
@@ -20,3 +21,19 @@ export interface Env {
   // アプリケーション設定
   APP_URL: string; // アプリケーションのベースURL（例: https://gidoku.com）
 }
+
+/**
+ * コンテキスト変数型
+ */
+export interface Variables {
+  userId: string;
+  user: User;
+}
+
+/**
+ * Honoのコンテキスト型
+ */
+export type HonoContext = {
+  Bindings: Env;
+  Variables: Variables;
+};
