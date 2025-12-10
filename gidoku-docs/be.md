@@ -899,12 +899,6 @@ export interface Env {
 - ビジネスロジックが複雑化した
   → `BookApplicationService` などを追加
 
-### Transaction 層の追加
-
-- D1 がトランザクションをサポート
-- 複数テーブルの整合性が重要になった
-  → `TransactionManager` を追加
-
 ### クラスベースへの移行
 
 - テストが複雑になった
@@ -951,6 +945,6 @@ describe("BookRepository", () => {
 
 - **シンプル**: 関数ベース、必要最小限のレイヤー
 - **型安全**: Hono RPC で完全な型推論
-- **拡張可能**: 段階的に Service/Transaction 層を追加可能
+- **拡張可能**: 段階的に Service 層を厚くすることが可能
 - **テスト容易**: 純粋関数中心の設計
 - **Workers 最適化**: エッジ環境での効率的な実行
