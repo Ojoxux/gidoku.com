@@ -1,4 +1,4 @@
-# gidoku.com バックエンド設計書
+# gidoku.com バックエンド
 
 ## 概要
 
@@ -8,6 +8,7 @@
 
 - **関数ベース**: クラスではなく関数で構成（シンプル、テスト容易）
 - **Hono RPC**: 型安全な API 通信
+- **arktype バリデーション**: 高速で型安全なバリデーション（Zod の 10 倍以上高速）
 - **段階的拡張**: 複雑になったら適宜 Service 層を追加
 - **Cloudflare Workers 最適化**: エッジ環境での効率的な実行
 
@@ -25,30 +26,35 @@ app/
 │   │   ├── tags.ts           # タグ関連API
 │   │   ├── users.ts          # ユーザー関連API
 │   │   ├── auth.ts           # 認証API
+│   │   ├── schemas/          # バリデーションスキーマ
+│   │   │   ├── book.ts
+│   │   │   ├── tag.ts
+│   │   │   ├── user.ts
+│   │   │   ├── auth.ts
+│   │   │   └── index.ts
 │   │   └── index.ts          # RPC型エクスポート
 │   │
 │   ├── db/                   # データベース層
 │   │   ├── client.ts         # D1クライアント初期化
 │   │   ├── schema.ts         # テーブル定義・マイグレーション
 │   │   └── repositories/     # データアクセス関数
-│   │       ├── book.ts
-│   │       ├── tag.ts
-│   │       ├── user.ts
-│   │       └── bookTag.ts
+│   │       ├── book.ts       # ✅ 実装済み
+│   │       ├── tag.ts        # ✅ 実装済み
+│   │       ├── user.ts       # ✅ 実装済み
+│   │       ├── bookTag.ts    # ✅ 実装済み
+│   │       └── index.ts      # ✅ 実装済み
 │   │
 │   ├── services/             # 外部連携・複雑なロジック
 │   │   ├── rakuten.ts        # 楽天ブックスAPI
 │   │   └── oauth.ts          # OAuth処理
 │   │
-│   ├── domain/               # ドメインロジック（必要な部分のみ）
-│   │   └── Book.ts           # 進捗計算などのロジック
-│   │
 │   └── lib/                  # ユーティリティ
-│       ├── auth.ts           # 認証ヘルパー
-│       ├── session.ts        # セッション管理
-│       ├── validation.ts     # バリデーション
-│       ├── errors.ts         # エラーハンドリング
-│       └── utils.ts          # 汎用ヘルパー
+│       ├── auth.ts           # ✅ 認証ヘルパー（実装済み）
+│       ├── session.ts        # ✅ セッション管理（実装済み）
+│       ├── validation.ts     # ✅ バリデーション（実装済み）
+│       ├── errors.ts         # ✅ エラーハンドリング（実装済み）
+│       ├── response.ts       # ✅ レスポンス形式（実装済み）
+│       └── utils.ts          # ✅ 汎用ヘルパー（実装済み）
 │
 └── types/
     ├── api.ts                # RPC型定義
@@ -855,6 +861,9 @@ CREATE INDEX IF NOT EXISTS idx_tags_user_id ON tags(user_id);
 
 ```typescript
 // types/env.ts
+import type { D1Database, KVNamespace } from "@cloudflare/workers-types";
+import type { User } from "./database";
+
 export interface Env {
   DB: D1Database; // Cloudflare D1
   KV: KVNamespace; // セッション管理用
@@ -864,7 +873,20 @@ export interface Env {
   GOOGLE_CLIENT_ID: string; // Google OAuth
   GOOGLE_CLIENT_SECRET: string;
   SESSION_SECRET: string; // セッション暗号化
+  APP_URL: string; // アプリケーションのベースURL
 }
+
+// Honoのコンテキスト変数型
+export interface Variables {
+  userId: string;
+  user: User;
+}
+
+// Honoのコンテキスト型
+export type HonoContext = {
+  Bindings: Env;
+  Variables: Variables;
+};
 ```
 
 ## 実装の優先順位
@@ -872,22 +894,25 @@ export interface Env {
 ### フェーズ 1: 基礎インフラ（1-2 日）
 
 1. ✅ DB スキーマ作成
-2. ✅ Repository 層（user, book）
+2. ✅ Repository 層（user, book, tag, bookTag）
 3. ✅ 認証ミドルウェア
 4. ✅ エラーハンドリング
+5. ✅ セッション管理
+6. ✅ バリデーションスキーマ
+7. ✅ レスポンス形式の統一
 
 ### フェーズ 2: コア機能（2-3 日）
 
-1. ✅ 書籍 CRUD API
-2. ✅ タグ管理 API
-3. ✅ OAuth 連携（GitHub/Google）
-4. ✅ 楽天 API 連携
+1. 🔲 書籍 CRUD API
+2. 🔲 タグ管理 API
+3. 🔲 OAuth 連携（GitHub/Google）
+4. 🔲 楽天 API 連携
 
 ### フェーズ 3: 追加機能（1-2 日）
 
-1. ✅ 公開プロフィール API
-2. ✅ 統計情報 API
-3. ✅ 検索・フィルタリング
+1. 🔲 公開プロフィール API
+2. 🔲 統計情報 API
+3. 🔲 検索・フィルタリング
 
 ## 将来の拡張ポイント
 
