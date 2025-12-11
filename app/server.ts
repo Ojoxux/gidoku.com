@@ -1,8 +1,11 @@
-import { showRoutes } from 'hono/dev'
-import { createApp } from 'honox/server'
+import { showRoutes } from "hono/dev";
+import { createApp } from "honox/server";
+import api from "./server/api";
 
-const app = createApp()
+const app = createApp();
 
-showRoutes(app)
+app.route("/api", api);
 
-export default app
+showRoutes(app);
+
+export default app;
