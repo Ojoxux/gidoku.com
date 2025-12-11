@@ -14,14 +14,12 @@ pnpm install
 
 ```bash
 cp .dev.vars.example .dev.vars
-
-# 以下の値を設定してください：
-- **RAKUTEN_APP_ID**: [楽天ウェブサービス](https://webservice.rakuten.co.jp/)でアプリケーション ID を取得
-- **GITHUB_CLIENT_ID / SECRET**: [GitHub Developer Settings](https://github.com/settings/developers)で OAuth アプリを作成
-  - Callback URL: `http://localhost:5173/api/auth/github/callback`
-- **GOOGLE_CLIENT_ID / SECRET**: [Google Cloud Console](https://console.cloud.google.com/apis/credentials)で OAuth 2.0 クライアントを作成
-  - Callback URL: `http://localhost:5173/api/auth/google/callback`
 ```
+
+#### 以下の値を設定してください：
+- **RAKUTEN_APP_ID**
+- **GITHUB_CLIENT_ID / SECRET / CallbackURL**
+- **GOOGLE_CLIENT_ID / SECRET / CallbackURL**
 
 ### 3. データベースのセットアップ
 
