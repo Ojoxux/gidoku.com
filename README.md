@@ -10,55 +10,37 @@
 pnpm install
 ```
 
-### 2. データベースのセットアップ
-
-#### ローカル開発環境
+### 2. 環境変数の設定
 
 ```bash
-# セットアップ手順を確認
-pnpm run db:setup
+cp .dev.vars.example .dev.vars
 
-# マイグレーションを実行
-pnpm run db:migrate:local
-
-# サンプルデータを投入（オプション）
-pnpm exec wrangler d1 execute gidoku-db --local --file=migrations/seed.sql
+# 以下の値を設定してください：
+- **RAKUTEN_APP_ID**: [楽天ウェブサービス](https://webservice.rakuten.co.jp/)でアプリケーション ID を取得
+- **GITHUB_CLIENT_ID / SECRET**: [GitHub Developer Settings](https://github.com/settings/developers)で OAuth アプリを作成
+  - Callback URL: `http://localhost:5173/api/auth/github/callback`
+- **GOOGLE_CLIENT_ID / SECRET**: [Google Cloud Console](https://console.cloud.google.com/apis/credentials)で OAuth 2.0 クライアントを作成
+  - Callback URL: `http://localhost:5173/api/auth/google/callback`
 ```
 
-#### 本番環境
+### 3. データベースのセットアップ
+
+#### ローカル開発環境（自動完了済み ✅）
 
 ```bash
-# D1データベースを作成（初回のみ）
-pnpm exec wrangler d1 create gidoku-db
-
-# wrangler.jsonc にdatabase_idを設定
-
-# マイグレーションを実行
-pnpm run db:migrate:prod
+# マイグレーションは既に実行済みです
+# 確認したい場合：
+pnpm exec wrangler d1 execute gidoku-db --local --command="SELECT name FROM sqlite_master WHERE type='table'"
 ```
 
-### 3. 環境変数の設定
+#### 本番環境（自動完了済み ✅）
 
-`wrangler.jsonc` に以下を追加：
-
-```jsonc
-{
-  "vars": {
-    "APP_URL": "http://localhost:5173",
-    "RAKUTEN_APP_ID": "your-rakuten-app-id"
-  },
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "gidoku-db",
-      "database_id": "your-database-id"
-    }
-  ]
-  // 本番環境ではシークレットを使用
-  // wrangler secret put GITHUB_CLIENT_SECRET
-  // wrangler secret put GOOGLE_CLIENT_SECRET
-  // wrangler secret put SESSION_SECRET
-}
+```bash
+# D1データベースとKVネームスペースは既に作成・設定済みです
+# wrangler.jsonc に以下が設定されています：
+# - D1 Database: gidoku-db
+# - KV Namespace: KV
+# - マイグレーションも実行済み
 ```
 
 ### 4. 開発サーバーの起動
@@ -68,6 +50,30 @@ pnpm run dev
 ```
 
 ブラウザで http://localhost:5173 を開く
+
+## 本番環境へのデプロイ
+
+### シークレットの設定
+
+```bash
+# GitHub OAuth
+wrangler secret put GITHUB_CLIENT_SECRET
+
+# Google OAuth
+wrangler secret put GOOGLE_CLIENT_SECRET
+
+# セッションシークレット
+wrangler secret put SESSION_SECRET
+
+# 楽天API（varsでも可）
+wrangler secret put RAKUTEN_APP_ID
+```
+
+### デプロイ
+
+```bash
+pnpm run deploy
+```
 
 ## 開発コマンド
 
