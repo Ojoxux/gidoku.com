@@ -68,3 +68,4 @@ console.log(
 );
 console.log("# 本番で実行（注意！）");
 console.log("wrangler d1 execute gidoku-db --file=migrations/seed.sql\n");
+
