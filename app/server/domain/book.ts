@@ -62,3 +62,4 @@ export function shouldSetFinishedAt(
 ): boolean {
   return newStatus === "completed" && oldStatus !== "completed";
 }
+

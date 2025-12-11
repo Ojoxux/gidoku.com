@@ -178,3 +178,4 @@ function parsePageCount(size: string): number {
   return match ? parseInt(match[1], 10) : 0;
 }
 
+

@@ -15,3 +15,4 @@ SESSION_SECRET=your_random_secret_key_min_32_chars
 # Application URL
 APP_URL=http://localhost:5173
 
+

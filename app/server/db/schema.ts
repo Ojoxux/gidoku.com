@@ -244,3 +244,4 @@ export async function seedDatabase(db: D1Database): Promise<void> {
     .bind("book-2", "tag-2")
     .run();
 }
+
