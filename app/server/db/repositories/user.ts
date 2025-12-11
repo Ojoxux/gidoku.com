@@ -241,3 +241,4 @@ export async function deleteById(
     throw new DatabaseError("Failed to delete user", error);
   }
 }
+

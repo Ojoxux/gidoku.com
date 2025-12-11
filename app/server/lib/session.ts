@@ -104,3 +104,4 @@ export async function deleteAllUserSessions(
   );
   await Promise.all(deletePromises);
 }
+
