@@ -1,4 +1,4 @@
-import type { FC } from "hono/jsx";
+import type { FC, ReactNode } from "hono/jsx";
 
 interface InputProps {
   type?: "text" | "email" | "password" | "number" | "search";
@@ -75,9 +75,10 @@ interface LabelProps {
   for: string;
   required?: boolean;
   class?: string;
+  children?: ReactNode;
 }
 
-export const Label: FC<LabelProps & { children: any }> = ({
+export const Label: FC<LabelProps> = ({
   for: htmlFor,
   required = false,
   class: className = "",
@@ -88,7 +89,7 @@ export const Label: FC<LabelProps & { children: any }> = ({
       for={htmlFor}
       class={`block text-xs font-medium text-zinc-500 mb-1 uppercase tracking-wide ${className}`}
     >
-      {children}
+      {children ?? ""}
       {required && <span class="text-red-500 ml-1">*</span>}
     </label>
   );
