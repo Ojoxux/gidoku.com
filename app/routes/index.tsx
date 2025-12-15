@@ -1,11 +1,10 @@
 import { createRoute } from "honox/factory";
 import { getPageUser, getSidebarExpanded } from "../lib/page-auth";
 import { Layout } from "../components/layout/Layout";
-import { BookList } from "../components/book/BookList";
+import ReadingBooksCarousel from "../islands/ReadingBooksCarousel";
 import { Card, CardBody } from "../components/ui/Card";
 import { bookRepo } from "../server/db/repositories";
 import { BookCover } from "../components/book/BookCover";
-import { ProgressBar } from "../components/ui/ProgressBar";
 import type { Book } from "../types/database";
 
 export default createRoute(async (c) => {
@@ -203,134 +202,7 @@ export default createRoute(async (c) => {
               </a>
             </div>
 
-            <div class="grid md:grid-cols-[1.5fr_1fr] gap-8">
-              {/* 最新の読書本 */}
-              <a
-                href={`/books/${formattedReadingBooks[0].id}`}
-                class="group bg-white border border-zinc-200 rounded-none p-6 sm:p-8 flex flex-col sm:flex-row gap-6 sm:gap-8 hover:border-zinc-900 transition-colors duration-300"
-              >
-                <div class="shrink-0 mx-auto sm:mx-0 shadow-sm rounded-sm overflow-hidden bg-zinc-100">
-                  <BookCover
-                    src={formattedReadingBooks[0].thumbnailUrl}
-                    alt={formattedReadingBooks[0].title}
-                    size="lg"
-                  />
-                </div>
-                <div class="flex flex-col justify-center flex-1 min-w-0">
-                  <div class="mb-6">
-                    <h3
-                      class="text-2xl font-bold text-zinc-900 mb-2 line-clamp-2 leading-tight group-hover:underline decoration-2 underline-offset-4"
-                      style={{ fontFamily: '"Arial", sans-serif' }}
-                    >
-                      {formattedReadingBooks[0].title}
-                    </h3>
-                    <p
-                      class="text-zinc-500 text-sm line-clamp-1"
-                      style={{ fontFamily: '"Arial", sans-serif' }}
-                    >
-                      {formattedReadingBooks[0].authors.join(", ")}
-                    </p>
-                  </div>
-
-                  {formattedReadingBooks[0].pageCount > 0 && (
-                    <div class="space-y-3">
-                      <div class="flex justify-between text-xs font-bold uppercase tracking-wider text-zinc-900">
-                        <span style={{ fontFamily: '"Arial", sans-serif' }}>
-                          Progress
-                        </span>
-                        <span style={{ fontFamily: '"Arial", sans-serif' }}>
-                          {Math.round(
-                            (formattedReadingBooks[0].currentPage /
-                              formattedReadingBooks[0].pageCount) *
-                              100
-                          )}
-                          %
-                        </span>
-                      </div>
-                      <div class="h-2 w-full bg-zinc-100 overflow-hidden">
-                        <div
-                          class="h-full bg-zinc-900 transition-all duration-500 ease-out"
-                          style={{
-                            width: `${Math.min(
-                              100,
-                              (formattedReadingBooks[0].currentPage /
-                                formattedReadingBooks[0].pageCount) *
-                                100
-                            )}%`,
-                          }}
-                        />
-                      </div>
-                      <p
-                        class="text-xs text-zinc-500 text-right pt-1"
-                        style={{ fontFamily: '"Arial", sans-serif' }}
-                      >
-                        {formattedReadingBooks[0].currentPage} /{" "}
-                        {formattedReadingBooks[0].pageCount} pages
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </a>
-
-              {/* 他に読んでいる本のリスト */}
-              {formattedReadingBooks.length > 1 && (
-                <div class="flex flex-col border-t border-zinc-100">
-                  {formattedReadingBooks.slice(1, 4).map((book) => (
-                    <a
-                      href={`/books/${book.id}`}
-                      class="flex items-center gap-4 py-4 border-b border-zinc-100 hover:bg-zinc-50 transition-colors group px-2"
-                    >
-                      <div class="shrink-0 w-10 h-14 bg-zinc-100 rounded-sm shadow-sm overflow-hidden opacity-90 group-hover:opacity-100 transition-opacity">
-                        <BookCover
-                          src={book.thumbnailUrl}
-                          alt={book.title}
-                          size="sm"
-                        />
-                      </div>
-                      <div class="flex-1 min-w-0">
-                        <h4
-                          class="font-bold text-sm text-zinc-900 truncate group-hover:underline decoration-1 underline-offset-2"
-                          style={{ fontFamily: '"Arial", sans-serif' }}
-                        >
-                          {book.title}
-                        </h4>
-                        <div class="flex items-center gap-3 mt-2">
-                          <div class="flex-1 h-1 bg-zinc-100 overflow-hidden">
-                            <div
-                              class="h-full bg-zinc-400"
-                              style={{
-                                width: `${Math.min(
-                                  100,
-                                  (book.currentPage / book.pageCount) * 100
-                                )}%`,
-                              }}
-                            />
-                          </div>
-                          <span
-                            class="text-[10px] font-bold text-zinc-500 tabular-nums"
-                            style={{ fontFamily: '"Arial", sans-serif' }}
-                          >
-                            {Math.round(
-                              (book.currentPage / book.pageCount) * 100
-                            )}
-                            %
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  ))}
-                  {formattedReadingBooks.length > 4 && (
-                    <a
-                      href="/books?status=reading"
-                      class="text-xs font-medium text-zinc-500 hover:text-zinc-900 text-center py-4"
-                      style={{ fontFamily: '"Arial", sans-serif' }}
-                    >
-                      +{formattedReadingBooks.length - 4} more books
-                    </a>
-                  )}
-                </div>
-              )}
-            </div>
+            <ReadingBooksCarousel books={formattedReadingBooks} />
           </section>
         )}
 
