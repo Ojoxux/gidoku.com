@@ -82,7 +82,7 @@ export default createRoute(async (c) => {
               />
             </div>
 
-            <div class="space-y-3">
+            <div class="space-y-3 flex flex-col items-center">
               <StatusToggle bookId={book.id} currentStatus={book.status} />
 
               {book.rakuten_affiliate_url && (

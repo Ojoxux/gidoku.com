@@ -14,7 +14,10 @@ export const Card: FC<PropsWithChildren<CardProps>> = ({
 
   if (href) {
     return (
-      <a href={href} class={`${baseClass} block hover:border-zinc-300 hover:shadow-sm transition-all duration-200`}>
+      <a
+        href={href}
+        class={`${baseClass} block hover:border-zinc-300 hover:shadow-sm transition-all duration-200`}
+      >
         {children}
       </a>
     );
@@ -46,7 +49,9 @@ export const CardFooter: FC<PropsWithChildren<{ class?: string }>> = ({
   class: className = "",
 }) => {
   return (
-    <div class={`px-6 py-4 border-t border-zinc-100 bg-zinc-50/50 rounded-b-xl ${className}`}>
+    <div
+      class={`px-6 py-4 border-t border-zinc-100 bg-zinc-50/50 rounded-b-xl ${className}`}
+    >
       {children}
     </div>
   );

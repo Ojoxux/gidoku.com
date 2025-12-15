@@ -17,7 +17,9 @@ export const EmptyState: FC<PropsWithChildren<EmptyStateProps>> = ({
   return (
     <div class="text-center py-12">
       {children}
-      <h3 class="mt-4 text-lg font-bold tracking-tight text-zinc-900">{title}</h3>
+      <h3 class="mt-4 text-lg font-bold tracking-tight text-zinc-900">
+        {title}
+      </h3>
       {description && (
         <p class="mt-2 text-zinc-500 max-w-sm mx-auto">{description}</p>
       )}

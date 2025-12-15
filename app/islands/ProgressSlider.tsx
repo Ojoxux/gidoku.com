@@ -20,7 +20,8 @@ export default function ProgressSlider({
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const percentage = totalPages > 0 ? Math.round((currentPage / totalPages) * 100) : 0;
+  const percentage =
+    totalPages > 0 ? Math.round((currentPage / totalPages) * 100) : 0;
 
   const handleUpdate = async () => {
     if (currentPage === initialPage) return;
@@ -50,11 +51,7 @@ export default function ProgressSlider({
   };
 
   if (totalPages === 0) {
-    return (
-      <p class="text-sm text-zinc-500">
-        ページ数が設定されていません
-      </p>
-    );
+    return <p class="text-sm text-zinc-500">ページ数が設定されていません</p>;
   }
 
   return (
@@ -76,7 +73,9 @@ export default function ProgressSlider({
             min="0"
             max={totalPages}
             value={currentPage}
-            onInput={(e) => setCurrentPage(Number((e.target as HTMLInputElement).value))}
+            onInput={(e) =>
+              setCurrentPage(Number((e.target as HTMLInputElement).value))
+            }
             class="absolute w-full h-full opacity-0 z-10 cursor-pointer"
           />
           <div class="w-full h-2 bg-zinc-100 rounded-full overflow-hidden absolute top-1/2 -translate-y-1/2">
@@ -85,9 +84,12 @@ export default function ProgressSlider({
               style={{ width: `${percentage}%` }}
             />
           </div>
-          <div 
+          <div
             class="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-zinc-900 rounded-full shadow transition-transform duration-200 pointer-events-none"
-            style={{ left: `${percentage}%`, transform: 'translate(-50%, -50%)' }}
+            style={{
+              left: `${percentage}%`,
+              transform: "translate(-50%, -50%)",
+            }}
           />
         </div>
       </div>
@@ -96,7 +98,11 @@ export default function ProgressSlider({
         <div class="flex gap-2">
           {[-10, 10, 50].map((step) => (
             <button
-              onClick={() => setCurrentPage(Math.max(0, Math.min(totalPages, currentPage + step)))}
+              onClick={() =>
+                setCurrentPage(
+                  Math.max(0, Math.min(totalPages, currentPage + step))
+                )
+              }
               class="px-3 py-1.5 text-xs font-medium text-zinc-600 bg-white border border-zinc-200 rounded-md hover:bg-zinc-50 hover:text-zinc-900 hover:border-zinc-300 transition-colors"
             >
               {step > 0 ? `+${step}` : step}
@@ -106,7 +112,9 @@ export default function ProgressSlider({
 
         <div class="flex items-center gap-3">
           {saved && (
-            <span class="text-sm text-zinc-500 animate-fade-in">保存しました</span>
+            <span class="text-sm text-zinc-500 animate-fade-in">
+              保存しました
+            </span>
           )}
           <button
             onClick={handleUpdate}

@@ -25,7 +25,9 @@ export const ProgressBar: FC<ProgressBarProps> = ({
       </div>
       {showLabel && (
         <div class="flex justify-between text-[10px] uppercase tracking-wide font-medium text-zinc-500 mt-2">
-          <span>{current} / {total} PAGE</span>
+          <span>
+            {current} / {total} PAGE
+          </span>
           <span>{percentage}%</span>
         </div>
       )}
