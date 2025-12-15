@@ -99,7 +99,7 @@ app.get(
       setCookie(c, "session_id", sessionId, SESSION_COOKIE_OPTIONS);
 
       // フロントエンドへリダイレクト
-      return c.redirect(`${c.env.APP_URL}/dashboard`);
+      return c.redirect(`${c.env.APP_URL}/`);
     } catch (error) {
       console.error("OAuth error:", error);
       return c.redirect(`${c.env.APP_URL}/login?error=auth_failed`);
