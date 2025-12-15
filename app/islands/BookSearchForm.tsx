@@ -33,7 +33,7 @@ export default function BookSearchForm() {
 
     try {
       const res = await fetch(
-        `/api/search/books?q=${encodeURIComponent(query)}`
+        `/api/search/books?query=${encodeURIComponent(query)}`
       );
       const data = (await res.json()) as ApiResponse<SearchResult[]>;
 
