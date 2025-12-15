@@ -1,5 +1,5 @@
 import { createRoute } from "honox/factory";
-import { requirePageAuth } from "../lib/page-auth";
+import { requirePageAuth, getSidebarExpanded } from "../lib/page-auth";
 import { Layout } from "../components/layout/Layout";
 import { Input, Textarea, Label } from "../components/ui/Input";
 import { Button } from "../components/ui/Button";
@@ -11,9 +11,10 @@ export default createRoute(async (c) => {
     return authResult;
   }
   const user = authResult;
+  const sidebarExpanded = getSidebarExpanded(c);
 
   return c.render(
-    <Layout user={user} title="設定">
+    <Layout user={user} title="設定" sidebarExpanded={sidebarExpanded}>
       <div class="space-y-12">
         {/* Header */}
         <div class="border-b border-zinc-900 pb-8">

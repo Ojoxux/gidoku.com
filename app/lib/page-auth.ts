@@ -38,3 +38,15 @@ export async function requirePageAuth(c: Context): Promise<User | Response> {
   }
   return user;
 }
+
+/**
+ * サイドバーの展開状態を Cookie から取得
+ */
+export function getSidebarExpanded(c: Context): boolean {
+  try {
+    const value = getCookie(c, "sidebar_expanded");
+    return value === "true";
+  } catch {
+    return false;
+  }
+}

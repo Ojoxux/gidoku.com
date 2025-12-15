@@ -7,21 +7,23 @@ import Sidebar from "../../islands/Sidebar";
 interface LayoutProps {
   user?: User | null;
   title?: string;
+  sidebarExpanded?: boolean;
 }
 
 export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
   children,
   user,
   title,
+  sidebarExpanded = false,
 }) => {
   return (
     <>
       {title && <title>{title} | gidoku</title>}
-      {user && <Sidebar />}
+      {user && <Sidebar initialExpanded={sidebarExpanded} />}
       <div
         id="main-layout"
         class={`min-h-screen bg-zinc-50/30 text-zinc-900 transition-all duration-300 ease-in-out ${
-          user ? "pl-[112px]" : ""
+          user ? (sidebarExpanded ? "pl-[288px]" : "pl-[112px]") : ""
         }`}
       >
         <Header user={user} />

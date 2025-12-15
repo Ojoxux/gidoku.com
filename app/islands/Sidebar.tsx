@@ -1,7 +1,15 @@
 import { useState, useEffect } from "hono/jsx/dom";
 
-export default function Sidebar() {
-  const [isExpanded, setIsExpanded] = useState(false);
+const SIDEBAR_STORAGE_KEY = "sidebar-expanded";
+const SIDEBAR_COOKIE_NAME = "sidebar_expanded";
+
+interface SidebarProps {
+  initialExpanded?: boolean;
+}
+
+export default function Sidebar({ initialExpanded = false }: SidebarProps) {
+  // SSR で渡された初期値（Cookie から読み取った値）を使う
+  const [isExpanded, setIsExpanded] = useState(initialExpanded);
 
   useEffect(() => {
     const mainContent = document.getElementById("main-layout");
@@ -94,7 +102,13 @@ export default function Sidebar() {
     >
       {/* Toggle Button */}
       <button
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={() => {
+          const newState = !isExpanded;
+          setIsExpanded(newState);
+          // localStorage と Cookie の両方に保存
+          localStorage.setItem(SIDEBAR_STORAGE_KEY, JSON.stringify(newState));
+          document.cookie = `${SIDEBAR_COOKIE_NAME}=${newState}; path=/; max-age=31536000`; // 1年間有効
+        }}
         class="absolute -right-3 top-8 w-6 h-6 bg-white rounded-full shadow-md flex items-center justify-center text-zinc-400 hover:text-zinc-600 hover:scale-110 transition-all cursor-pointer z-50 border border-zinc-50"
       >
         <svg
