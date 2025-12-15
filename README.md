@@ -17,28 +17,40 @@ cp .dev.vars.example .dev.vars
 ```
 
 #### 以下の値を設定してください：
+
 - **RAKUTEN_APP_ID**
 - **GITHUB_CLIENT_ID / SECRET / CallbackURL**
 - **GOOGLE_CLIENT_ID / SECRET / CallbackURL**
 
 ### 3. データベースのセットアップ
 
-#### ローカル開発環境（自動完了済み ✅）
+#### ローカル開発環境
+
+初回起動時は、マイグレーションを実行してデータベースを作成します：
 
 ```bash
-# マイグレーションは既に実行済みです
-# 確認したい場合：
+pnpm run db:migrate:local
+```
+
+テーブルが作成されたか確認：
+
+```bash
 pnpm exec wrangler d1 execute gidoku-db --local --command="SELECT name FROM sqlite_master WHERE type='table'"
 ```
 
-#### 本番環境（自動完了済み ✅）
+（オプション）サンプルデータを投入：
 
 ```bash
-# D1データベースとKVネームスペースは既に作成・設定済みです
-# wrangler.jsonc に以下が設定されています：
-# - D1 Database: gidoku-db
-# - KV Namespace: KV
-# - マイグレーションも実行済み
+pnpm exec wrangler d1 execute gidoku-db --local --file=migrations/seed.sql
+```
+
+#### 本番環境
+
+本番環境の D1 データベースと KV ネームスペースは `wrangler.jsonc` に設定済みです。
+初回デプロイ前に、本番データベースのマイグレーションを実行してください：
+
+```bash
+pnpm run db:migrate:prod
 ```
 
 ### 4. 開発サーバーの起動
