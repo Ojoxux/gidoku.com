@@ -90,7 +90,7 @@ export default function Sidebar() {
       class={`fixed left-4 top-4 bottom-4 bg-white z-50 transition-all duration-300 ease-in-out flex flex-col rounded-[32px] ${
         isExpanded ? "w-64" : "w-20"
       }`}
-      style="box-shadow: 0 0 40px rgba(0, 0, 0, 0.15)"
+      style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.15)"
     >
       {/* Toggle Button */}
       <button
