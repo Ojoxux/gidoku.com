@@ -1,5 +1,5 @@
 import { createRoute } from "honox/factory";
-import { requirePageAuth } from "../../../lib/page-auth";
+import { requirePageAuth, getSidebarExpanded } from "../../../lib/page-auth";
 import { Layout } from "../../../components/layout/Layout";
 import { Input, Textarea, Label } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
@@ -11,6 +11,7 @@ export default createRoute(async (c) => {
     return authResult;
   }
   const user = authResult;
+  const sidebarExpanded = getSidebarExpanded(c);
 
   const id = c.req.param("id")!;
 
@@ -24,7 +25,7 @@ export default createRoute(async (c) => {
   const authors = JSON.parse(book.authors) as string[];
 
   return c.render(
-    <Layout user={user} title={`${book.title}を編集`}>
+    <Layout user={user} title={`${book.title}を編集`} sidebarExpanded={sidebarExpanded}>
       <div class="max-w-8xl mx-auto space-y-8">
         <div class="border-b border-zinc-100 pb-6">
           <a

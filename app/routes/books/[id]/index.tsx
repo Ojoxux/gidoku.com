@@ -1,5 +1,5 @@
 import { createRoute } from "honox/factory";
-import { requirePageAuth } from "../../../lib/page-auth";
+import { requirePageAuth, getSidebarExpanded } from "../../../lib/page-auth";
 import { Layout } from "../../../components/layout/Layout";
 import { StatusBadge, Badge } from "../../../components/ui/Badge";
 import { BookCover } from "../../../components/book/BookCover";
@@ -15,6 +15,7 @@ export default createRoute(async (c) => {
     return authResult;
   }
   const user = authResult;
+  const sidebarExpanded = getSidebarExpanded(c);
 
   const id = c.req.param("id")!;
 
@@ -29,7 +30,7 @@ export default createRoute(async (c) => {
   const authors = JSON.parse(book.authors) as string[];
 
   return c.render(
-    <Layout user={user} title={book.title}>
+    <Layout user={user} title={book.title} sidebarExpanded={sidebarExpanded}>
       <div class="max-w-8xl mx-auto space-y-12">
         {/* Navigation */}
         <div class="flex items-center justify-between border-b border-zinc-100 pb-6">

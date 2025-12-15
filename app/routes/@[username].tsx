@@ -1,5 +1,5 @@
 import { createRoute } from "honox/factory";
-import { getPageUser } from "../lib/page-auth";
+import { getPageUser, getSidebarExpanded } from "../lib/page-auth";
 import { Layout } from "../components/layout/Layout";
 import { UserProfile } from "../components/user/UserProfile";
 import { UserStats } from "../components/user/UserStats";
@@ -9,6 +9,7 @@ import { userRepo, bookRepo } from "../server/db/repositories";
 
 export default createRoute(async (c) => {
   const currentUser = await getPageUser(c);
+  const sidebarExpanded = getSidebarExpanded(c);
   const username = c.req.param("username")!;
 
   // ユーザーを検索
@@ -17,7 +18,7 @@ export default createRoute(async (c) => {
     profileUser = await userRepo.findByUsername(c.env.DB, username);
   } catch {
     return c.render(
-      <Layout user={currentUser} title="ユーザーが見つかりません">
+      <Layout user={currentUser} title="ユーザーが見つかりません" sidebarExpanded={sidebarExpanded}>
         <div class="text-center py-12">
           <h1 class="text-2xl font-bold text-gray-900 mb-4">
             ユーザーが見つかりません
@@ -72,7 +73,7 @@ export default createRoute(async (c) => {
     }));
 
   return c.render(
-    <Layout user={currentUser} title={`${profileUser.name}の本棚`}>
+    <Layout user={currentUser} title={`${profileUser.name}の本棚`} sidebarExpanded={sidebarExpanded}>
       <div class="space-y-8">
         <UserProfile
           username={profileUser.username}

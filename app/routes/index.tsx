@@ -1,5 +1,5 @@
 import { createRoute } from "honox/factory";
-import { getPageUser } from "../lib/page-auth";
+import { getPageUser, getSidebarExpanded } from "../lib/page-auth";
 import { Layout } from "../components/layout/Layout";
 import { BookList } from "../components/book/BookList";
 import { Card, CardBody } from "../components/ui/Card";
@@ -10,6 +10,7 @@ import type { Book } from "../types/database";
 
 export default createRoute(async (c) => {
   const user = await getPageUser(c);
+  const sidebarExpanded = getSidebarExpanded(c);
 
   // 未ログインの場合はランディングページ
   if (!user) {
@@ -152,7 +153,7 @@ export default createRoute(async (c) => {
   const formattedReadingBooks = formatBooks(readingBooks);
 
   return c.render(
-    <Layout user={user} title="ホーム">
+    <Layout user={user} title="ホーム" sidebarExpanded={sidebarExpanded}>
       <div class="space-y-16">
         {/* ヘッダーセクション */}
         <div class="flex flex-col md:flex-row gap-12 items-end border-b border-zinc-900 pb-12">

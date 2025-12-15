@@ -1,5 +1,5 @@
 import { createRoute } from "honox/factory";
-import { requirePageAuth } from "../../lib/page-auth";
+import { requirePageAuth, getSidebarExpanded } from "../../lib/page-auth";
 import { Layout } from "../../components/layout/Layout";
 import { BookCover } from "../../components/book/BookCover";
 import { Button } from "../../components/ui/Button";
@@ -12,6 +12,7 @@ export default createRoute(async (c) => {
     return authResult;
   }
   const user = authResult;
+  const sidebarExpanded = getSidebarExpanded(c);
 
   const status = c.req.query("status") as BookStatus | undefined;
   const search = c.req.query("search");
@@ -50,7 +51,7 @@ export default createRoute(async (c) => {
   ];
 
   return c.render(
-    <Layout user={user} title="My Books">
+    <Layout user={user} title="My Books" sidebarExpanded={sidebarExpanded}>
       <div class="space-y-12">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-zinc-900 pb-8">
           <div>
