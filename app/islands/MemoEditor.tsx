@@ -56,11 +56,9 @@ export default function MemoEditor({ bookId, initialMemo }: MemoEditorProps) {
           Markdown 対応
         </div>
       </div>
-      
+
       <div class="flex items-center justify-end gap-3">
-        {saved && (
-          <span class="text-sm text-zinc-500">保存しました</span>
-        )}
+        {saved && <span class="text-sm text-zinc-500">保存しました</span>}
         <button
           onClick={handleSave}
           disabled={saving || memo === initialMemo}

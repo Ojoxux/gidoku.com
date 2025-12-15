@@ -18,7 +18,10 @@ const statusOptions: { value: BookStatus; label: string }[] = [
   { value: "completed", label: "読了" },
 ];
 
-export default function StatusToggle({ bookId, currentStatus }: StatusToggleProps) {
+export default function StatusToggle({
+  bookId,
+  currentStatus,
+}: StatusToggleProps) {
   const [status, setStatus] = useState<BookStatus>(currentStatus);
   const [saving, setSaving] = useState(false);
 
@@ -48,7 +51,7 @@ export default function StatusToggle({ bookId, currentStatus }: StatusToggleProp
   };
 
   return (
-    <div class="flex gap-1 p-1 bg-zinc-100 rounded-lg inline-flex">
+    <div class="items-center inline-flex gap-1 p-1 bg-zinc-100 rounded-lg">
       {statusOptions.map((option) => (
         <button
           key={option.value}

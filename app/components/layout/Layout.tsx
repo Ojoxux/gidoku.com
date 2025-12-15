@@ -18,9 +18,11 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
     <>
       {title && <title>{title} | gidoku</title>}
       {user && <Sidebar />}
-      <div 
+      <div
         id="main-layout"
-        class={`min-h-screen bg-zinc-50/30 text-zinc-900 transition-all duration-300 ease-in-out ${user ? 'pl-[112px]' : ''}`}
+        class={`min-h-screen bg-zinc-50/30 text-zinc-900 transition-all duration-300 ease-in-out ${
+          user ? "pl-[112px]" : ""
+        }`}
       >
         <Header user={user} />
         <main class="py-8 sm:py-12">
