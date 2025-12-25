@@ -14,103 +14,66 @@ export default createRoute(async (c) => {
   // 未ログインの場合はランディングページ
   if (!user) {
     return c.render(
-      <Layout>
-        <div class="max-w-4xl mx-auto px-6 py-24 sm:py-32 text-center">
-          <div class="mb-8 flex justify-center">
-            <span class="w-16 h-16 rounded-2xl bg-zinc-900 text-white flex items-center justify-center text-4xl font-serif italic">
-              g
-            </span>
-          </div>
-          <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-900 mb-8">
-            技術書を読む、
-            <br class="sm:hidden" />
-            記録する、
-            <br class="sm:hidden" />
-            成長する。
-          </h1>
-          <p class="text-lg text-zinc-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-            積読を消化し、学習の軌跡を可視化しましょう。
-            <br class="hidden sm:inline" />
-            gidokuは、エンジニアのためのミニマルな読書管理ツールです。
-          </p>
-          <a
-            href="/login"
-            class="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-zinc-900 rounded-full hover:bg-zinc-800 transition-all hover:scale-105 shadow-lg shadow-zinc-900/10"
-          >
-            無料で始める
-          </a>
+      <div class="relative h-screen w-full overflow-hidden bg-[#fdfdfd] text-zinc-900 selection:bg-zinc-900 selection:text-white font-sans">
+        {/* ヘッダー */}
+        <header class="absolute top-0 left-0 right-0 z-50 flex items-center justify-center w-full py-8">
+          <nav class="flex items-center gap-2 px-2 py-2 bg-white/80 backdrop-blur-md border border-zinc-200/60 rounded-full shadow-sm shadow-zinc-200/20">
+            <div class="pl-4 pr-2">
+              <span class="italic text-xl font-bold tracking-tight" style={{ fontFamily: '"Apple Garamond", "Garamond", serif' }}>gidoku</span>
+            </div>
+            <div class="w-px h-4 bg-zinc-200 mx-1"></div>
+            <a
+              href="/login"
+              class="px-5 py-2 text-sm font-medium text-white bg-zinc-900 rounded-full hover:bg-zinc-800 transition-all hover:shadow-lg hover:shadow-zinc-900/20"
+            >
+              ログイン
+            </a>
+          </nav>
+        </header>
 
-          <div class="mt-32 grid md:grid-cols-3 gap-12 text-left">
-            <div class="space-y-4">
-              <div class="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-900">
-                <svg
-                  class="w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                  />
+        {/* ヒーローセクション */}
+        <main class="flex flex-col items-center justify-center h-full w-full px-6 relative">
+          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-tr from-zinc-100 to-transparent rounded-full blur-3xl opacity-60 -z-10 pointer-events-none"></div>
+
+          <div class="space-y-10 text-center max-w-3xl mx-auto z-10">
+             <div class="space-y-2">
+                <h1 class="text-6xl sm:text-8xl md:text-9xl font-medium tracking-tighter leading-[0.9] text-zinc-900">
+                  <span class="block" style={{ fontFamily: '"Apple Garamond", "Garamond", serif' }}>
+                    Read<span class="text-zinc-300">.</span>
+                  </span>
+                  <span class="block" style={{ fontFamily: '"Apple Garamond", "Garamond", serif' }}>
+                    Record<span class="text-zinc-300">.</span>
+                  </span>
+                  <span class="block" style={{ fontFamily: '"Apple Garamond", "Garamond", serif' }}>
+                    Grow<span class="text-zinc-300">.</span>
+                  </span>
+                </h1>
+             </div>
+
+            <p class="text-lg sm:text-xl text-zinc-500 max-w-lg mx-auto leading-relaxed font-light">
+              技術書の積読を消化し、学習の軌跡を可視化する。<br class="hidden sm:inline" />
+              エンジニアのための、ミニマルな読書管理ツール。
+            </p>
+
+            <div class="pt-4">
+               <a
+                href="/login"
+                class="group inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-medium text-zinc-900 bg-white border border-zinc-200 rounded-full hover:bg-zinc-50 hover:border-zinc-300 transition-all shadow-sm hover:shadow-md"
+              >
+                <span>無料で始める</span>
+                <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
-              </div>
-              <h3 class="text-base font-bold text-zinc-900">
-                スマートな蔵書管理
-              </h3>
-              <p class="text-sm text-zinc-600 leading-relaxed">
-                楽天ブックスAPI連携により、タイトルやISBNから瞬時に書籍を登録。面倒な入力作業から解放されます。
-              </p>
-            </div>
-            <div class="space-y-4">
-              <div class="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-900">
-                <svg
-                  class="w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                  />
-                </svg>
-              </div>
-              <h3 class="text-base font-bold text-zinc-900">進捗の可視化</h3>
-              <p class="text-sm text-zinc-600 leading-relaxed">
-                ページ単位で読書の進み具合を記録。積読・読書中・読了のステータス管理で、学習のモチベーションを維持します。
-              </p>
-            </div>
-            <div class="space-y-4">
-              <div class="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-900">
-                <svg
-                  class="w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
-                  />
-                </svg>
-              </div>
-              <h3 class="text-base font-bold text-zinc-900">
-                プロフィール公開
-              </h3>
-              <p class="text-sm text-zinc-600 leading-relaxed">
-                あなたの技術書コレクションをプロフィールとして公開。学習履歴をアピールし、同じ興味を持つ人と繋がれます。
-              </p>
+              </a>
             </div>
           </div>
+        </main>
+        
+        {/* フッター */}
+        <div class="absolute bottom-6 left-0 right-0 text-center text-xs text-zinc-400 font-medium tracking-wide">
+          &copy; 2025 gidoku.com
         </div>
-      </Layout>
+      </div>
     );
   }
 
