@@ -20,7 +20,12 @@
       "id": "ff87f54f4b8844168840502656699f37",
       "preview_id": "fe6ec6f0a8c548509522d4fd958bb9fa"
     }
-  ]
+  ],
+  "vars": {
+    "GITHUB_CLIENT_ID": "Ov23li1W8sYXe7C1fWlR",
+    "GOOGLE_CLIENT_ID": "494336925174-ovnmt0b3ssdfqfvgtm1n28va40oau4n1.apps.googleusercontent.com",
+    "APP_URL": "https://gidoku.com"
+  }
   // "r2_buckets": [
   //   {
   //     "binding": "MY_BUCKET",
