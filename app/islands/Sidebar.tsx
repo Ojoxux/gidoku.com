@@ -131,7 +131,7 @@ export default function Sidebar({ initialExpanded = false }: SidebarProps) {
       <div class="h-24 flex items-center justify-center">
         <a href="/" class="flex items-center gap-2">
           <span
-            class="w-10 h-10 rounded-xl bg-zinc-900 text-white flex items-center justify-center text-2xl pb-0.5 shadow-lg shadow-zinc-900/20"
+            class="w-10 h-10 rounded-xl bg-zinc-900 text-white flex items-center justify-center text-2xl pb-0.5"
             style={{ fontFamily: '"Apple Garamond", "Garamond", serif' }}
           >
             g
