@@ -1,43 +1,4 @@
 @import 'tailwindcss';
 
-@font-face {
-  font-family: 'Apple Garamond';
-  src: url('/fonts/AppleGaramond.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Apple Garamond';
-  src: url('/fonts/AppleGaramond-Italic.ttf') format('truetype');
-  font-weight: 400;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: 'Apple Garamond';
-  src: url('/fonts/AppleGaramond-Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Apple Garamond';
-  src: url('/fonts/AppleGaramond-BoldItalic.ttf') format('truetype');
-  font-weight: 700;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: 'Apple Garamond';
-  src: url('/fonts/AppleGaramond-Light.ttf') format('truetype');
-  font-weight: 300;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Apple Garamond';
-  src: url('/fonts/AppleGaramond-LightItalic.ttf') format('truetype');
-  font-weight: 300;
-  font-style: italic;
-}
+/* Google Fonts - Cormorant Garamond */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
