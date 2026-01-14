@@ -16,9 +16,11 @@
   },
   "private": true,
   "dependencies": {
+    "@lordicon/element": "^2.0.1",
     "arktype": "^2.0.0-rc.19",
     "hono": "^4.10.7",
-    "honox": "^0.1.51"
+    "honox": "^0.1.51",
+    "lottie-web": "^5.13.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250214.0",
