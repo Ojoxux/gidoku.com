@@ -23,59 +23,20 @@ export default function Sidebar({ initialExpanded = false }: SidebarProps) {
     {
       href: "/",
       label: "ホーム",
-      icon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-          <polyline points="9 22 9 12 15 12 15 22" />
-        </svg>
-      ),
+      iconSrc: "/icons/home-icon.json",
+      targetClass: "nav-home",
     },
     {
       href: "/books",
       label: "自分の本棚",
-      icon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-        </svg>
-      ),
+      iconSrc: "/icons/book-icon.json",
+      targetClass: "nav-books",
     },
     {
       href: "/settings",
       label: "設定",
-      icon: (
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <circle cx="12" cy="12" r="3" />
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-        </svg>
-      ),
+      iconSrc: "/icons/setting-icon.json",
+      targetClass: "nav-settings",
     },
   ];
 
@@ -100,35 +61,8 @@ export default function Sidebar({ initialExpanded = false }: SidebarProps) {
       }`}
       style="box-shadow: 0 0 10px rgba(0, 0, 0, 0.15)"
     >
-      {/* Toggle Button */}
-      <button
-        onClick={() => {
-          const newState = !isExpanded;
-          setIsExpanded(newState);
-          // localStorage と Cookie の両方に保存
-          localStorage.setItem(SIDEBAR_STORAGE_KEY, JSON.stringify(newState));
-          document.cookie = `${SIDEBAR_COOKIE_NAME}=${newState}; path=/; max-age=31536000`; // 1年間有効
-        }}
-        class="absolute -right-3 top-8 w-6 h-6 bg-white rounded-full shadow-md flex items-center justify-center text-zinc-400 hover:text-zinc-600 hover:scale-110 transition-all cursor-pointer z-50 border border-zinc-50"
-      >
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="3"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class={`transition-transform duration-300 ${
-            isExpanded ? "rotate-180" : ""
-          }`}
-        >
-          <path d="M9 18l6-6-6-6" />
-        </svg>
-      </button>
-
-      <div class="h-24 flex items-center justify-center">
+      {/* Header with Logo and Toggle Button */}
+      <div class={`h-24 flex items-center px-3 ${isExpanded ? "justify-between" : "justify-center"}`}>
         <a href="/" class="flex items-center gap-2">
           <span
             class="w-10 h-10 rounded-xl bg-zinc-900 text-white flex items-center justify-center text-2xl pb-0.5"
@@ -145,21 +79,83 @@ export default function Sidebar({ initialExpanded = false }: SidebarProps) {
             </span>
           )}
         </a>
+        {isExpanded && (
+          <button
+            onClick={() => {
+              const newState = !isExpanded;
+              setIsExpanded(newState);
+              localStorage.setItem(SIDEBAR_STORAGE_KEY, JSON.stringify(newState));
+              document.cookie = `${SIDEBAR_COOKIE_NAME}=${newState}; path=/; max-age=31536000`;
+            }}
+            class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-500 hover:bg-zinc-200 hover:text-zinc-700 transition-all cursor-pointer"
+            title="サイドバーを閉じる"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M11 19l-7-7 7-7" />
+              <path d="M18 5v14" />
+            </svg>
+          </button>
+        )}
       </div>
+
+      {/* Toggle Button when collapsed - shown below logo */}
+      {!isExpanded && (
+        <div class="flex justify-center px-3 -mt-2">
+          <button
+            onClick={() => {
+              const newState = !isExpanded;
+              setIsExpanded(newState);
+              localStorage.setItem(SIDEBAR_STORAGE_KEY, JSON.stringify(newState));
+              document.cookie = `${SIDEBAR_COOKIE_NAME}=${newState}; path=/; max-age=31536000`;
+            }}
+            class="w-14 h-10 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-500 hover:bg-zinc-200 hover:text-zinc-700 transition-all cursor-pointer"
+            title="サイドバーを開く"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M13 5l7 7-7 7" />
+              <path d="M6 5v14" />
+            </svg>
+          </button>
+        </div>
+      )}
 
       <nav class="flex-1 py-4 flex flex-col gap-2 px-3">
         {navItems.map((item) => (
           <a
             href={item.href}
-            class={`flex items-center gap-4 px-3 py-3.5 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 rounded-2xl transition-all group ${
+            class={`${item.targetClass} flex items-center gap-4 px-3 py-3.5 hover:bg-zinc-50 rounded-2xl transition-all group ${
               isExpanded ? "justify-start" : "justify-center"
             }`}
           >
-            <span class="min-w-[24px] group-hover:scale-110 transition-transform duration-200">
-              {item.icon}
+            <span class="min-w-[28px] flex items-center justify-center">
+              <lord-icon
+                src={item.iconSrc}
+                trigger="hover"
+                target={`.${item.targetClass}`}
+                colors="primary:#71717a"
+                style="width:28px;height:28px"
+              />
             </span>
             {isExpanded && (
-              <span class="font-medium whitespace-nowrap overflow-hidden text-sm">
+              <span class="font-medium whitespace-nowrap overflow-hidden text-sm text-zinc-500 group-hover:text-zinc-900">
                 {item.label}
               </span>
             )}

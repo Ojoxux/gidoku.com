@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@lordicon/element':
+        specifier: ^2.0.1
+        version: 2.0.1
       arktype:
         specifier: ^2.0.0-rc.19
         version: 2.1.28
@@ -17,6 +20,9 @@ importers:
       honox:
         specifier: ^0.1.51
         version: 0.1.52(hono@4.10.7)(miniflare@4.20251202.1)(wrangler@4.53.0(@cloudflare/workers-types@4.20251209.0))
+      lottie-web:
+        specifier: ^5.13.0
+        version: 5.13.0
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20250214.0
@@ -630,6 +636,12 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
+  '@lordicon/element@2.0.1':
+    resolution: {integrity: sha512-jPW7NauDi6QoLEMHZRu9Za/08wsQEC5grV7yo7QBzQZCtmTbAf78pIiK/bWtsbkClfyetpeozRK+Fr8DS1UVEA==}
+
+  '@lordicon/web@1.0.0':
+    resolution: {integrity: sha512-ffFZGtMpAJiYjFYiWOoPMCZt5Toacu7cvycC9yk8wDhc5WtXxnzhjaxHlZ3qM5PLYJlAF2dYeIUqcJCkH2f+dw==}
+
   '@poppinss/colors@4.1.5':
     resolution: {integrity: sha512-FvdDqtcRCtz6hThExcFOgW0cWX+xwSMWcRuQe5ZEb2m7cVQOAVZOIMt+/v9RxGiD9/OY16qJBXK4CVKWAPalBw==}
 
@@ -1193,6 +1205,9 @@ packages:
   lightningcss@1.30.2:
     resolution: {integrity: sha512-utfs7Pr5uJyyvDETitgsaqSyjCb2qNRAtuqUeWIAKztsOYdcACf2KtARYXg2pSvhkt+9NfoaNY7fxjl6nuMjIQ==}
     engines: {node: '>= 12.0.0'}
+
+  lottie-web@5.13.0:
+    resolution: {integrity: sha512-+gfBXl6sxXMPe8tKQm7qzLnUy5DUPJPKIyRHwtpCpyUEYjHYRJC/5gjUvdkuO2c3JllrPtHXH5UJJK8LRYl5yQ==}
 
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
@@ -1802,6 +1817,12 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
+  '@lordicon/element@2.0.1':
+    dependencies:
+      '@lordicon/web': 1.0.0
+
+  '@lordicon/web@1.0.0': {}
+
   '@poppinss/colors@4.1.5':
     dependencies:
       kleur: 4.1.5
@@ -2327,6 +2348,8 @@ snapshots:
       lightningcss-linux-x64-musl: 1.30.2
       lightningcss-win32-arm64-msvc: 1.30.2
       lightningcss-win32-x64-msvc: 1.30.2
+
+  lottie-web@5.13.0: {}
 
   magic-string@0.30.21:
     dependencies:

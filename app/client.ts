@@ -1,3 +1,6 @@
-import { createClient } from 'honox/client'
+import { createClient } from "honox/client";
+import { defineElement } from "@lordicon/element";
 
-createClient()
+defineElement();
+
+createClient();
