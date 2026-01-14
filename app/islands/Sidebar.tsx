@@ -66,7 +66,9 @@ export default function Sidebar({ initialExpanded = false }: SidebarProps) {
                 class={`text-3xl tracking-tight text-white whitespace-nowrap transition-opacity duration-300 ${
                   isExpanded ? "opacity-100 delay-150" : "opacity-0"
                 }`}
-                style={{ fontFamily: '"Apple Garamond", "Garamond", serif' }}
+                style={{
+                  fontFamily: '"Cormorant Garamond", "Garamond", serif',
+                }}
               >
                 gidoku
               </span>

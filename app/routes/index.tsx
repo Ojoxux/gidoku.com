@@ -19,7 +19,7 @@ export default createRoute(async (c) => {
         <header class="absolute top-0 left-0 right-0 z-50 flex items-center justify-center w-full py-8">
           <nav class="flex items-center gap-2 px-2 py-2 bg-white/80 backdrop-blur-md border border-zinc-200/60 rounded-full shadow-sm shadow-zinc-200/20">
             <div class="pl-4 pr-2">
-              <span class="italic text-xl font-bold tracking-tight" style={{ fontFamily: '"Apple Garamond", "Garamond", serif' }}>gidoku</span>
+              <span class="italic text-xl font-bold tracking-tight" style={{ fontFamily: '"Cormorant Garamond", "Garamond", serif' }}>gidoku</span>
             </div>
             <div class="w-px h-4 bg-zinc-200 mx-1"></div>
             <a
@@ -38,13 +38,13 @@ export default createRoute(async (c) => {
           <div class="space-y-10 text-center max-w-3xl mx-auto z-10">
              <div class="space-y-2">
                 <h1 class="text-6xl sm:text-8xl md:text-9xl font-medium tracking-tighter leading-[0.9] text-zinc-900">
-                  <span class="block" style={{ fontFamily: '"Apple Garamond", "Garamond", serif' }}>
+                  <span class="block" style={{ fontFamily: '"Cormorant Garamond", "Garamond", serif' }}>
                     Read<span class="text-zinc-300">.</span>
                   </span>
-                  <span class="block" style={{ fontFamily: '"Apple Garamond", "Garamond", serif' }}>
+                  <span class="block" style={{ fontFamily: '"Cormorant Garamond", "Garamond", serif' }}>
                     Record<span class="text-zinc-300">.</span>
                   </span>
-                  <span class="block" style={{ fontFamily: '"Apple Garamond", "Garamond", serif' }}>
+                  <span class="block" style={{ fontFamily: '"Cormorant Garamond", "Garamond", serif' }}>
                     Grow<span class="text-zinc-300">.</span>
                   </span>
                 </h1>
@@ -124,14 +124,14 @@ export default createRoute(async (c) => {
               <span style={{ fontFamily: '"Arial", sans-serif' }}>Hello,</span>{" "}
               <span
                 class="border-b-[3px] md:border-b-4 border-zinc-900 pb-1"
-                style={{ fontFamily: '"Apple Garamond", "Garamond", serif' }}
+                style={{ fontFamily: '"Cormorant Garamond", "Garamond", serif' }}
               >
                 {user.name}
               </span>
               .
               <br />
               <span
-                style={{ fontFamily: '"Apple Garamond", "Garamond", serif' }}
+                style={{ fontFamily: '"Cormorant Garamond", "Garamond", serif' }}
               >
                 You have
               </span>{" "}
