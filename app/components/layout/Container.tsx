@@ -16,10 +16,12 @@ const sizeStyles: Record<string, string> = {
 export const Container: FC<PropsWithChildren<ContainerProps>> = ({
   children,
   class: className = "",
-  size = "lg",
+  size = "xl",
 }) => {
   return (
-    <div class={`${sizeStyles[size]} mx-auto px-4 sm:px-6 lg:px-8 ${className}`}>
+    <div
+      class={`${sizeStyles[size]} mx-auto px-4 sm:px-6 lg:px-8 ${className}`}
+    >
       {children}
     </div>
   );

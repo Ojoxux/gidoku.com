@@ -19,17 +19,33 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
   return (
     <>
       {title && <title>{title} | gidoku</title>}
-      {user && <Sidebar initialExpanded={sidebarExpanded} />}
-      <div
-        id="main-layout"
-        class={`min-h-screen bg-zinc-50/30 text-zinc-900 transition-all duration-300 ease-in-out ${
-          user ? (sidebarExpanded ? "pl-[288px]" : "pl-[112px]") : ""
-        }`}
-      >
-        <Header user={user} />
-        <main class="py-8 sm:py-12">
-          <Container>{children}</Container>
-        </main>
+      <div class="min-h-screen flex bg-zinc-900 text-zinc-900">
+        {user && <Sidebar initialExpanded={sidebarExpanded} />}
+
+        <div
+          id="main-layout"
+          class="flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300 ease-in-out"
+        >
+          {user ? (
+            <div class="flex-1 p-1 overflow-hidden">
+              <div class="bg-white rounded-2xl shadow-sm border border-zinc-200/60 h-full flex flex-col overflow-hidden relative">
+                <Header user={user} />
+                <main class="flex-1 overflow-y-auto">
+                  <div class="py-6 sm:py-8">
+                    <Container>{children}</Container>
+                  </div>
+                </main>
+              </div>
+            </div>
+          ) : (
+            <div class="flex-1 flex flex-col overflow-y-auto">
+              <Header user={user} />
+              <main class="flex-1 py-8 sm:py-12">
+                <Container>{children}</Container>
+              </main>
+            </div>
+          )}
+        </div>
       </div>
     </>
   );
