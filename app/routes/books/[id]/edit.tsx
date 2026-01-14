@@ -26,28 +26,43 @@ export default createRoute(async (c) => {
 
   return c.render(
     <Layout user={user} title={`${book.title}を編集`} sidebarExpanded={sidebarExpanded}>
-      <div class="max-w-8xl mx-auto space-y-8">
-        <div class="border-b border-zinc-100 pb-6">
-          <a
-            href={`/books/${id}`}
-            class="text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors mb-4 inline-block"
-          >
-            ← キャンセルして戻る
-          </a>
-          <h1 class="text-3xl font-bold text-zinc-900">書籍情報を編集</h1>
+      <div class="max-w-4xl mx-auto space-y-8">
+        <div class="pb-4 border-b border-zinc-100">
+          <div class="flex items-center gap-2 mb-4">
+            <a
+              href={`/books/${id}`}
+              class="text-sm font-bold text-zinc-500 hover:text-blue-600 transition-colors inline-flex items-center"
+            >
+              <svg
+                class="w-4 h-4 mr-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              キャンセルして戻る
+            </a>
+          </div>
+          <h1 class="text-3xl font-bold text-zinc-900 tracking-tight">書籍情報を編集</h1>
         </div>
 
-        <form id="edit-form" class="space-y-8">
+        <form id="edit-form" class="bg-white rounded-2xl p-8 shadow-sm ring-1 ring-zinc-100 space-y-8">
           <div class="space-y-6">
             <div>
-              <Label for="title" required>
+              <Label for="title" required class="mb-2 block text-sm font-bold text-zinc-700">
                 タイトル
               </Label>
-              <Input name="title" required value={book.title} />
+              <Input name="title" required value={book.title} class="rounded-xl border-zinc-200 bg-zinc-50 focus:bg-white transition-colors" />
             </div>
 
             <div>
-              <Label for="authors" required>
+              <Label for="authors" required class="mb-2 block text-sm font-bold text-zinc-700">
                 著者
               </Label>
               <Input
@@ -55,50 +70,54 @@ export default createRoute(async (c) => {
                 required
                 value={authors.join(", ")}
                 placeholder="著者名（複数の場合はカンマ区切り）"
+                class="rounded-xl border-zinc-200 bg-zinc-50 focus:bg-white transition-colors"
               />
             </div>
 
             <div class="grid grid-cols-2 gap-6">
               <div>
-                <Label for="publisher">出版社</Label>
-                <Input name="publisher" value={book.publisher || ""} />
+                <Label for="publisher" class="mb-2 block text-sm font-bold text-zinc-700">出版社</Label>
+                <Input name="publisher" value={book.publisher || ""} class="rounded-xl border-zinc-200 bg-zinc-50 focus:bg-white transition-colors" />
               </div>
               <div>
-                <Label for="isbn">ISBN</Label>
-                <Input name="isbn" value={book.isbn || ""} />
+                <Label for="isbn" class="mb-2 block text-sm font-bold text-zinc-700">ISBN</Label>
+                <Input name="isbn" value={book.isbn || ""} class="rounded-xl border-zinc-200 bg-zinc-50 focus:bg-white transition-colors" />
               </div>
             </div>
 
             <div class="grid grid-cols-2 gap-6">
               <div>
-                <Label for="pageCount">ページ数</Label>
-                <Input type="number" name="pageCount" value={book.page_count} />
+                <Label for="pageCount" class="mb-2 block text-sm font-bold text-zinc-700">ページ数</Label>
+                <Input type="number" name="pageCount" value={book.page_count} class="rounded-xl border-zinc-200 bg-zinc-50 focus:bg-white transition-colors" />
               </div>
               <div>
-                <Label for="publishedDate">出版日</Label>
+                <Label for="publishedDate" class="mb-2 block text-sm font-bold text-zinc-700">出版日</Label>
                 <Input
                   name="publishedDate"
                   value={book.published_date || ""}
                   placeholder="YYYY-MM-DD"
+                  class="rounded-xl border-zinc-200 bg-zinc-50 focus:bg-white transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <Label for="description">概要</Label>
+              <Label for="description" class="mb-2 block text-sm font-bold text-zinc-700">概要</Label>
               <Textarea
                 name="description"
                 value={book.description || ""}
                 rows={6}
+                class="rounded-xl border-zinc-200 bg-zinc-50 focus:bg-white transition-colors"
               />
             </div>
 
             <div>
-              <Label for="thumbnailUrl">表紙画像URL</Label>
+              <Label for="thumbnailUrl" class="mb-2 block text-sm font-bold text-zinc-700">表紙画像URL</Label>
               <Input
                 name="thumbnailUrl"
                 value={book.thumbnail_url || ""}
                 placeholder="https://..."
+                class="rounded-xl border-zinc-200 bg-zinc-50 focus:bg-white transition-colors"
               />
             </div>
           </div>
@@ -106,12 +125,13 @@ export default createRoute(async (c) => {
           <div class="flex items-center justify-end gap-4 pt-6 border-t border-zinc-100">
             <a
               href={`/books/${id}`}
-              class="text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors"
+              class="text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors px-4 py-2"
             >
               キャンセル
             </a>
             <Button
               type="button"
+              class="rounded-full px-8 py-2.5 font-bold shadow-sm"
               onClick={`
                 const form = document.getElementById('edit-form');
                 const btn = this;
