@@ -21,7 +21,7 @@ export default createRoute(async (c) => {
             <div class="space-y-2">
               <h1
                 class="text-8xl tracking-tight text-zinc-900 mb-6"
-                style={{ fontFamily: '"Apple Garamond", "Garamond", serif' }}
+                style={{ fontFamily: '"Cormorant Garamond", "Garamond", serif' }}
               >
                 gidoku
               </h1>
