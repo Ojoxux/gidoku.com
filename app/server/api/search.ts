@@ -6,11 +6,15 @@ import { rakutenSearchSchema, isbnSearchSchema } from "./schemas";
 import type { RakutenSearchInput, IsbnSearchInput } from "./schemas/auth";
 import { successResponse } from "../lib/response";
 import * as rakutenService from "../services/rakuten";
+import { searchRateLimiter } from "../lib/rate-limit";
 
 const app = new Hono<HonoContext>();
 
 // 認証ミドルウェア適用
 app.use("*", authMiddleware);
+
+// 検索APIにRate Limiting適用（外部API呼び出しのため厳しめにする）
+app.use("*", searchRateLimiter);
 
 /**
  * 楽天ブックス検索
