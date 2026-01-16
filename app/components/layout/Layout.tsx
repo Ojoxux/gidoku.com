@@ -19,7 +19,7 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
   return (
     <>
       {title && <title>{title} | gidoku</title>}
-      <div class="min-h-screen flex bg-zinc-900 text-zinc-900">
+      <div class="min-h-screen flex bg-zinc-950 text-zinc-900 selection:bg-blue-500/20">
         {user && <Sidebar initialExpanded={sidebarExpanded} />}
 
         <div
@@ -27,8 +27,8 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
           class="flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300 ease-in-out"
         >
           {user ? (
-            <div class="flex-1 p-1 overflow-hidden">
-              <div class="bg-white rounded-2xl shadow-sm border border-zinc-200/60 h-full flex flex-col overflow-hidden relative">
+            <div class="flex-1 p-2 sm:p-3 overflow-hidden">
+              <div class="bg-white rounded-[20px] shadow-2xl border border-white/10 h-full flex flex-col overflow-hidden relative isolate">
                 <Header user={user} />
                 <main class="flex-1 overflow-y-auto">
                   <div class="py-6 sm:py-8">

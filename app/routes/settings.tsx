@@ -15,34 +15,36 @@ export default createRoute(async (c) => {
 
   return c.render(
     <Layout user={user} title="設定" sidebarExpanded={sidebarExpanded}>
-      <div class="space-y-12">
+      <div class="max-w-4xl mx-auto space-y-12">
         {/* Header */}
-        <div class="border-b border-zinc-900 pb-8">
-          <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-zinc-900 mb-2">
+        <div class="border-b border-zinc-100 pb-8">
+          <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-zinc-900 mb-2">
             設定
           </h1>
           <p class="text-zinc-500">プロフィールとアカウント設定の管理</p>
         </div>
 
         {/* Profile Section */}
-        <section class="grid md:grid-cols-[200px_1fr] gap-8 md:gap-12">
+        <section class="grid md:grid-cols-[240px_1fr] gap-8 md:gap-12 items-start">
           <div>
-            <h2 class="text-xl font-bold text-zinc-900 mb-2">プロフィール</h2>
-            <p class="text-sm text-zinc-500">
+            <h2 class="text-lg font-bold text-zinc-900 mb-2">プロフィール</h2>
+            <p class="text-sm text-zinc-500 leading-relaxed">
               公開プロフィールに表示される情報です。
+              <br />
+              他のユーザーも閲覧できます。
             </p>
           </div>
 
-          <form id="profile-form" class="space-y-8">
-            <div class="flex items-start gap-6">
+          <form id="profile-form" class="bg-white rounded-2xl p-8 shadow-sm ring-1 ring-zinc-100 space-y-8">
+            <div class="flex items-center gap-6 pb-6 border-b border-zinc-50">
               <Avatar
                 src={user.avatar_url}
                 alt={user.name}
                 size="xl"
-                class="w-20 h-20"
+                class="w-20 h-20 ring-4 ring-zinc-50"
               />
-              <div class="pt-2">
-                <p class="text-sm font-medium text-zinc-900 mb-1">
+              <div class="flex-1">
+                <p class="text-sm font-bold text-zinc-900 mb-1">
                   プロフィール画像
                 </p>
                 <p class="text-xs text-zinc-500">
@@ -54,36 +56,37 @@ export default createRoute(async (c) => {
 
             <div class="space-y-6">
               <div>
-                <Label for="username">ユーザーID</Label>
-                <div class="flex rounded-lg shadow-sm">
-                  <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-zinc-200 bg-zinc-50 text-zinc-500 sm:text-sm">
+                <Label for="username" class="mb-2 block text-sm font-bold text-zinc-700">ユーザーID</Label>
+                <div class="flex rounded-xl shadow-sm ring-1 ring-zinc-200 overflow-hidden">
+                  <span class="inline-flex items-center px-4 border-r border-zinc-200 bg-zinc-50 text-zinc-500 text-sm font-medium">
                     gidoku.com/@
                   </span>
                   <Input
                     name="username"
                     value={user.username}
-                    class="rounded-l-none"
+                    class="rounded-none border-0 focus:ring-0 bg-white"
                   />
                 </div>
               </div>
 
               <div>
-                <Label for="name">表示名</Label>
-                <Input name="name" value={user.name} />
+                <Label for="name" class="mb-2 block text-sm font-bold text-zinc-700">表示名</Label>
+                <Input name="name" value={user.name} class="rounded-xl border-zinc-200 bg-zinc-50 focus:bg-white transition-colors" />
               </div>
 
               <div>
-                <Label for="bio">自己紹介</Label>
-                <Textarea name="bio" value={user.bio || ""} rows={4} />
-                <p class="mt-2 text-xs text-zinc-500">
+                <Label for="bio" class="mb-2 block text-sm font-bold text-zinc-700">自己紹介</Label>
+                <Textarea name="bio" value={user.bio || ""} rows={4} class="rounded-xl border-zinc-200 bg-zinc-50 focus:bg-white transition-colors" />
+                <p class="mt-2 text-xs text-zinc-500 font-medium">
                   簡単な自己紹介を書いてください。
                 </p>
               </div>
             </div>
 
-            <div class="flex justify-end pt-4">
+            <div class="flex justify-end pt-4 border-t border-zinc-50">
               <Button
                 type="button"
+                class="rounded-full px-6 py-2.5 font-bold shadow-sm"
                 onClick={`
                   const form = document.getElementById('profile-form');
                   const btn = this;
@@ -124,32 +127,32 @@ export default createRoute(async (c) => {
           </form>
         </section>
 
-        <hr class="border-zinc-200" />
+        <hr class="border-zinc-100" />
 
         {/* Account Section */}
-        <section class="grid md:grid-cols-[200px_1fr] gap-8 md:gap-12">
+        <section class="grid md:grid-cols-[240px_1fr] gap-8 md:gap-12 items-start">
           <div>
-            <h2 class="text-xl font-bold text-zinc-900 mb-2">アカウント</h2>
-            <p class="text-sm text-zinc-500">
+            <h2 class="text-lg font-bold text-zinc-900 mb-2">アカウント</h2>
+            <p class="text-sm text-zinc-500 leading-relaxed">
               アカウントの基本情報と連携設定。
             </p>
           </div>
 
-          <div class="space-y-8">
+          <div class="bg-white rounded-2xl p-8 shadow-sm ring-1 ring-zinc-100 space-y-8">
             <div class="grid gap-6">
               <div>
-                <Label for="email">メールアドレス</Label>
+                <Label for="email" class="mb-2 block text-sm font-bold text-zinc-700">メールアドレス</Label>
                 <Input
                   name="email"
                   value={user.email}
                   disabled
-                  class="bg-zinc-50"
+                  class="bg-zinc-50/50 rounded-xl border-zinc-200 text-zinc-500 cursor-not-allowed"
                 />
               </div>
 
               <div>
-                <Label for="provider">連携アカウント</Label>
-                <div class="flex items-center gap-3 p-3 border border-zinc-200 rounded-lg bg-zinc-50">
+                <Label for="provider" class="mb-2 block text-sm font-bold text-zinc-700">連携アカウント</Label>
+                <div class="flex items-center gap-3 p-4 border border-zinc-200 rounded-xl bg-zinc-50/50">
                   {user.provider === "github" ? (
                     // GitHub icon
                     <svg
@@ -180,18 +183,18 @@ export default createRoute(async (c) => {
                       />
                     </svg>
                   )}
-                  <span class="text-sm font-medium text-zinc-900">
+                  <span class="text-sm font-bold text-zinc-700">
                     {user.provider === "github" ? "GitHub" : "Google"}で連携済み
                   </span>
                 </div>
               </div>
             </div>
 
-            <div class="pt-6">
+            <div class="pt-6 border-t border-zinc-50">
               <Button
                 type="button"
                 variant="danger"
-                class="bg-red-50 text-red-600 hover:bg-red-100 shadow-none border border-red-100"
+                class="bg-red-50 text-red-600 hover:bg-red-100 shadow-none border border-red-100 rounded-full px-6 font-bold"
                 onClick={`
                   if (confirm('ログアウトしますか？')) {
                     fetch('/api/auth/logout', {
