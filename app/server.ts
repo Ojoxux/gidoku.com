@@ -1,17 +1,17 @@
 import { showRoutes } from "hono/dev";
 import { createApp } from "honox/server";
-import { secureHeaders } from "hono/secure-headers";
+import { secureHeaders, NONCE } from "hono/secure-headers";
 import { csrf } from "hono/csrf";
 import api from "./server/api";
 
 const app = createApp();
 
-// セキュリティヘッダー設定
+// セキュリティヘッダー設定（nonceベースCSP）
 app.use(
   secureHeaders({
     contentSecurityPolicy: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: [NONCE, "'self'", "'strict-dynamic'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "https:"],
@@ -20,6 +20,11 @@ app.use(
         "https://api.github.com",
         "https://accounts.google.com",
       ],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      frameAncestors: ["'none'"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: [],
     },
   })
 );
