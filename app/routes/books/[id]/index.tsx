@@ -118,13 +118,6 @@ export default createRoute(async (c) => {
           <div class="space-y-12">
             {/* Header Info */}
             <div class="space-y-6">
-              <div class="flex flex-wrap gap-2">
-                <StatusBadge status={book.status} />
-                {tags.map((tag) => (
-                  <Badge key={tag.id} class="bg-zinc-100 text-zinc-600 border-zinc-200">{tag.name}</Badge>
-                ))}
-              </div>
-
               <div>
                 <h1 class="text-3xl md:text-5xl font-bold text-zinc-900 leading-tight mb-4 tracking-tight">
                   {book.title}
@@ -133,7 +126,8 @@ export default createRoute(async (c) => {
                   <p class="font-medium text-zinc-800">{authors.join(", ")}</p>
                   {book.publisher && (
                     <p class="text-sm text-zinc-500">
-                      {book.publisher} <span class="mx-1">・</span> {book.published_date}
+                      {book.publisher} <span class="mx-1">・</span>{" "}
+                      {book.published_date}
                     </p>
                   )}
                 </div>
@@ -165,12 +159,16 @@ export default createRoute(async (c) => {
               <div class="pt-8 border-t border-zinc-100">
                 <dl class="grid grid-cols-2 sm:grid-cols-4 gap-6 text-sm">
                   <div>
-                    <dt class="text-zinc-400 mb-1 font-bold text-xs uppercase tracking-wider">ISBN</dt>
+                    <dt class="text-zinc-400 mb-1 font-bold text-xs uppercase tracking-wider">
+                      ISBN
+                    </dt>
                     <dd class="font-mono text-zinc-900">{book.isbn}</dd>
                   </div>
                   {book.page_count > 0 && (
                     <div>
-                      <dt class="text-zinc-400 mb-1 font-bold text-xs uppercase tracking-wider">ページ数</dt>
+                      <dt class="text-zinc-400 mb-1 font-bold text-xs uppercase tracking-wider">
+                        ページ数
+                      </dt>
                       <dd class="font-mono text-zinc-900">
                         {book.page_count}ページ
                       </dd>
@@ -184,7 +182,7 @@ export default createRoute(async (c) => {
             <section class="pt-8 border-t border-zinc-100">
               <h2 class="text-xl font-bold text-zinc-900 mb-6">読書メモ</h2>
               <div class="bg-[#fbfbfd] rounded-2xl p-1 shadow-inner">
-                 <MemoEditor bookId={book.id} initialMemo={book.memo || ""} />
+                <MemoEditor bookId={book.id} initialMemo={book.memo || ""} />
               </div>
             </section>
           </div>
