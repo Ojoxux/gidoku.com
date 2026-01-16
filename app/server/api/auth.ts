@@ -48,14 +48,12 @@ app.get(
     const provider = c.req.param("provider") as OAuthProvider;
     const { code, state } = getValidated<OAuthCallbackInput>(c, "query");
 
-    // state検証
-    if (state) {
-      const savedProvider = await c.env.KV.get(`oauth_state:${state}`);
-      if (savedProvider !== provider) {
-        return errorResponse(c, "Invalid state", "INVALID_STATE", 400);
-      }
-      await c.env.KV.delete(`oauth_state:${state}`);
+    // state検証（CSRF対策）
+    const savedProvider = await c.env.KV.get(`oauth_state:${state}`);
+    if (savedProvider !== provider) {
+      return errorResponse(c, "Invalid state", "INVALID_STATE", 400);
     }
+    await c.env.KV.delete(`oauth_state:${state}`);
 
     try {
       // アクセストークン取得
