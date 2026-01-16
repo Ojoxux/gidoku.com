@@ -1,4 +1,5 @@
 import type { D1Database, KVNamespace } from "@cloudflare/workers-types";
+import type { SecureHeadersVariables } from "hono/secure-headers";
 import type { User } from "./database";
 
 export interface Env {
@@ -20,12 +21,16 @@ export interface Env {
 
   // アプリケーション設定
   APP_URL: string; // アプリケーションのベースURL（例: https://gidoku.com）
+
+  // 環境
+  ENVIRONMENT?: "development" | "production";
 }
 
 /**
  * コンテキスト変数型
+ * SecureHeadersVariablesを含めてCSP nonceを対応させる
  */
-export interface Variables {
+export interface Variables extends SecureHeadersVariables {
   userId: string;
   user: User;
 }
