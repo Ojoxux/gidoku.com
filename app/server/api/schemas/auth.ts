@@ -10,7 +10,7 @@ export const oauthProviderSchema = type("'github' | 'google'");
  */
 export const oauthCallbackSchema = type({
   code: "string >= 1",
-  "state?": "string",
+  state: "string >= 1",
 });
 
 /**
