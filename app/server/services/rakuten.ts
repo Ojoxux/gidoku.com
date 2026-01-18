@@ -39,12 +39,14 @@ const RAKUTEN_API_BASE = "https://app.rakuten.co.jp/services/api/BooksBook/Searc
 export async function searchBooks(
   query: string,
   applicationId: string,
-  limit: number = 20
-): Promise<BookSearchResult[]> {
+  limit: number = 20,
+  page: number = 1
+): Promise<{ results: BookSearchResult[]; hits: number; pageCount: number}> { // 戻り値を変更
   const url = new URL(RAKUTEN_API_BASE);
   url.searchParams.set("applicationId", applicationId);
   url.searchParams.set("title", query);
   url.searchParams.set("hits", String(Math.min(limit, 30)));
+  url.searchParams.set("page", String(page)); // 追加
   url.searchParams.set("format", "json");
 
   try {
@@ -59,7 +61,11 @@ export async function searchBooks(
 
     const data: RakutenBookResponse = await response.json();
 
-    return data.Items.map((item) => mapRakutenItem(item.Item));
+    return {
+      results: data.Items.map((item) => mapRakutenItem(item.Item)),
+      hits: data.hits,
+      pageCount: data.pageCount,
+    } 
   } catch (error) {
     if (error instanceof ExternalApiError) throw error;
     throw new ExternalApiError("Failed to fetch from Rakuten API", "Rakuten", error);

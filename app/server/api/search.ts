@@ -17,15 +17,52 @@ app.use("*", authMiddleware);
  * GET /api/search/books
  */
 app.get("/books", validator("query", rakutenSearchSchema), async (c) => {
-  const { query, limit } = getValidated<RakutenSearchInput>(c, "query");
 
-  const results = await rakutenService.searchBooks(
+  // 直接クエリパラメータを取得（バリデーションはスキーマで行う）
+  const rawQuery = c.req.query();
+  const query = rawQuery.query;
+  const limit = rawQuery.limit ? parseInt(rawQuery.limit, 10) : undefined;
+  const page = rawQuery.page ? parseInt(rawQuery.page, 10) : undefined;
+
+  // バリデーション（手動）
+  if (!query || query.length === 0 || query.length > 100) {
+    return c.json({ success: false, error: { message: "検索クエリが無効です" } }, 400);
+  }
+
+  // デバッグ: 生のクエリパラメータを確認
+  console.log("生のクエリパラメータ:", c.req.query());
+  console.log("URL:", c.req.url);
+  
+  // デバッグ: バリデーション後の値を確認
+  console.log("バリデーション後 - query:", query);
+  console.log("バリデーション後 - limit:", limit);
+  console.log("バリデーション後 - page:", page);
+
+  // queryがundefinedの場合はエラーを返す
+  if (!query) {
+    return c.json({ success: false, error: { message: "検索クエリが指定されていません" } }, 400);
+  }
+
+  const { results, hits, pageCount} = await rakutenService.searchBooks(
     query,
     c.env.RAKUTEN_APP_ID,
-    limit ?? 20
+    limit ?? 20,
+    page ?? 1
   );
 
-  return successResponse(c, results);
+  // デバック用ログ
+  console.log("検索クエリ:", query);
+  console.log("検索結果数:", results.length);
+  console.log("総件数:", hits);
+  console.log("総ページ数:", pageCount);
+  console.log("現在のページ:", page ?? 1);
+
+  return successResponse(c, {
+    results,
+    hits,
+    pageCount,
+    currentPage: page ?? 1,
+  });
 });
 
 /**
