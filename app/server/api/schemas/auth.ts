@@ -19,6 +19,7 @@ export const oauthCallbackSchema = type({
 export const rakutenSearchSchema = type({
   query: "1 <= string <= 100",
   "limit?": "1 <= (number % 1) <= 30",
+  "page?": "number >= 1", // 追加
 });
 
 /**
