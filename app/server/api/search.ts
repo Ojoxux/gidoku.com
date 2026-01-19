@@ -29,15 +29,6 @@ app.get("/books", validator("query", rakutenSearchSchema), async (c) => {
     return c.json({ success: false, error: { message: "検索クエリが無効です" } }, 400);
   }
 
-  // デバッグ: 生のクエリパラメータを確認
-  console.log("生のクエリパラメータ:", c.req.query());
-  console.log("URL:", c.req.url);
-  
-  // デバッグ: バリデーション後の値を確認
-  console.log("バリデーション後 - query:", query);
-  console.log("バリデーション後 - limit:", limit);
-  console.log("バリデーション後 - page:", page);
-
   // queryがundefinedの場合はエラーを返す
   if (!query) {
     return c.json({ success: false, error: { message: "検索クエリが指定されていません" } }, 400);
@@ -49,13 +40,6 @@ app.get("/books", validator("query", rakutenSearchSchema), async (c) => {
     limit ?? 20,
     page ?? 1
   );
-
-  // デバック用ログ
-  console.log("検索クエリ:", query);
-  console.log("検索結果数:", results.length);
-  console.log("総件数:", hits);
-  console.log("総ページ数:", pageCount);
-  console.log("現在のページ:", page ?? 1);
 
   return successResponse(c, {
     results,

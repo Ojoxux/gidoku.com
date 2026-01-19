@@ -49,11 +49,8 @@ export default function BookSearchForm() {
       );
       const data = (await res.json()) as ApiResponse<SearchResponse>;
 
-      if (data.success && data.data) {
-        console.log("検索結果：", data.data); // デバック用
-        setResults(data.data.results);
-        // pageCountが0の場合は1ページのみと判断
-        const totalPages = data.data.pageCount > 0 ? data.data.pageCount : 1;
+      if (data.success && data.data) {        
+        setResults(data.data.results);        
         setHasMore(data.data.currentPage < data.data.pageCount);
         setCurrentPage(data.data.currentPage);
       } else {
