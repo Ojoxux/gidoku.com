@@ -45,7 +45,7 @@ export async function searchBooks(
   const url = new URL(RAKUTEN_API_BASE);
   url.searchParams.set("applicationId", applicationId);
   url.searchParams.set("title", query);
-  url.searchParams.set("hits", String(Math.min(limit, 30)));
+  url.searchParams.set("hits", String(Math.min(limit, 10)));
   url.searchParams.set("page", String(page)); // 追加
   url.searchParams.set("format", "json");
 
