@@ -25,4 +25,4 @@ jobs:
         run: pnpm install
 
       - name: Run tests
-        run: mkdir -p dist && pnpm test
+        run: pnpm test
