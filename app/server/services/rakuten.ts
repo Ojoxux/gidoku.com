@@ -178,7 +178,9 @@ function parsePageCount(size: string): number {
   return match ? parseInt(match[1], 10) : 0;
 }
 
-/* --- 出版日の最新順での並び替え --- */
+/**
+ * 出版日の最新順での並び替え
+ */
 
 function parsePublishedDate(publishedDate: string): Date | null {
   if (!publishedDate) return null;
@@ -195,6 +197,9 @@ function parsePublishedDate(publishedDate: string): Date | null {
   );
 }
 
+/**
+ * 本の配列を、出版日が新しい順に並び替え
+ */
 export function sortByPublishedDateDesc(
   books: BookSearchResult[]
 ): BookSearchResult[] {
