@@ -7,7 +7,7 @@ export default defineWorkersProject({
     setupFiles: ['./app/test/setup.ts'],
     poolOptions: {
       workers: {
-        wrangler: { configPath: './wrangler.test.jsonc' },
+        wrangler: { configPath: './wrangler.jsonc' },
         miniflare: {
           d1Databases: ['DB'],
           kvNamespaces: ['KV'],
