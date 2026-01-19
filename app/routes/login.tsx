@@ -9,7 +9,7 @@ const techIcons = [
   "https://cdn.simpleicons.org/react/61DAFB",
   "https://cdn.simpleicons.org/python/3776AB",
   "https://cdn.simpleicons.org/go/00ADD8",
-  "https://cdn.simpleicons.org/rust/000000",
+  "https://cdn.simpleicons.org/rust/ffffff",
   "https://cdn.simpleicons.org/docker/2496ED",
   "https://cdn.simpleicons.org/kubernetes/326CE5",
   "https://cdn.simpleicons.org/git/F05032",
