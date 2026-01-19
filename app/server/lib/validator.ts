@@ -22,7 +22,14 @@ export function validator<T>(
         data = await c.req.json();
         break;
       case "query":
-        data = c.req.query();
+        const numericKeys = new Set(["limit", "page", "offset"]);
+        data = Object.fromEntries(
+          Object.entries(c.req.query()).map(([key, value]) => {
+            if (!numericKeys.has(key) || value == null) return [key, value];
+            const num = Number(value);
+            return [key, !isNaN(num) && isFinite(num) && String(num) === String(value).trim() ? num : value];
+          })
+        );
         break;
       case "param":
         data = c.req.param();

@@ -19,26 +19,40 @@ interface ApiResponse<T = unknown> {
   error?: { message: string };
 }
 
+interface SearchResponse {
+  results: SearchResult[];
+  hits: number;
+  pageCount: number;
+  currentPage: number;
+}
+
 export default function BookSearchForm() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+
 
   const handleSearch = async () => {
     if (!query.trim()) return;
 
     setLoading(true);
     setError(null);
+    setCurrentPage(1);
 
     try {
       const res = await fetch(
-        `/api/search/books?query=${encodeURIComponent(query)}`
+        `/api/search/books?query=${encodeURIComponent(query)}&page=1`
       );
-      const data = (await res.json()) as ApiResponse<SearchResult[]>;
+      const data = (await res.json()) as ApiResponse<SearchResponse>;
 
-      if (data.success) {
-        setResults(data.data || []);
+      if (data.success && data.data) {        
+        setResults(data.data.results);        
+        setHasMore(data.data.currentPage < data.data.pageCount);
+        setCurrentPage(data.data.currentPage);
       } else {
         setError(data.error?.message || "検索に失敗しました");
       }
@@ -46,6 +60,32 @@ export default function BookSearchForm() {
       setError("検索中にエラーが発生しました");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLoadMore = async () => {
+    if (loadingMore || !hasMore) return;
+
+    setLoadingMore(true);
+    const nextPage = currentPage + 1;
+
+    try {
+      const res = await fetch(
+        `/api/search/books?query=${encodeURIComponent(query)}&page=${nextPage}`
+      );
+      const data = (await res.json()) as ApiResponse<SearchResponse>;
+
+      if (data.success && data.data) {
+        setResults((prev) => [...prev, ...data.data!.results]);
+        setCurrentPage(nextPage);
+        setHasMore(nextPage < data.data!.pageCount);
+      } else {
+        setError(data.error?.message || "読み込みに失敗しました");
+      }
+    } catch {
+      setError("読み込み中にエラーが発生しました");
+    } finally {
+      setLoadingMore(false);
     }
   };
 
@@ -117,7 +157,7 @@ export default function BookSearchForm() {
           {loading ? "検索中..." : "検索"}
         </button>
       </div>
-
+      
       {error && (
         <div class="p-4 bg-red-50 border border-red-100 rounded-lg text-red-600 text-sm flex items-center gap-2">
           <svg
@@ -186,6 +226,18 @@ export default function BookSearchForm() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {hasMore && (
+        <div class="flex justify-center pt-4">
+          <button
+            onClick={handleLoadMore}
+            disabled={loadingMore}
+            class="px-6 py-3 bg-zinc-100 text-zinc-900 font-bold rounded-lg hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {loadingMore ? "読み込み中..." : "もっと見る"}
+          </button>
         </div>
       )}
 

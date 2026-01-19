@@ -21,12 +21,20 @@ app.use("*", searchRateLimiter);
  * GET /api/search/books
  */
 app.get("/books", validator("query", rakutenSearchSchema), async (c) => {
-  const { query, limit } = getValidated<RakutenSearchInput>(c, "query");
 
-  const results = await rakutenService.searchBooks(
+  // バリデーション済みのデータを取得
+  const { query, limit, page } = getValidated<RakutenSearchInput>(c, "query");
+
+  // queryがundefinedの場合はエラーを返す
+  if (!query) {
+    return c.json({ success: false, error: { message: "検索クエリが指定されていません" } }, 400);
+  }
+
+  const { results, hits, pageCount} = await rakutenService.searchBooks(
     query,
     c.env.RAKUTEN_APP_ID,
-    limit ?? 20
+    limit ?? 20,
+    page ?? 1
   );
 
   const sortedResults =
