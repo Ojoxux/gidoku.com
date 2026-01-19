@@ -30,17 +30,21 @@ app.get("/books", validator("query", rakutenSearchSchema), async (c) => {
     return c.json({ success: false, error: { message: "検索クエリが指定されていません" } }, 400);
   }
 
-  const { results, hits, pageCount} = await rakutenService.searchBooks(
+  const { results, hits, pageCount } = await rakutenService.searchBooks(
     query,
     c.env.RAKUTEN_APP_ID,
     limit ?? 20,
     page ?? 1
   );
 
-  const sortedResults =
-    rakutenService.sortByPublishedDateDesc(results);
+  const sortedResults = rakutenService.sortByPublishedDateDesc(results);
 
-  return successResponse(c, sortedResults);
+  return successResponse(c, {
+    results: sortedResults,
+    hits,
+    pageCount,
+    currentPage: page ?? 1,
+  });
 });
 
 /**
