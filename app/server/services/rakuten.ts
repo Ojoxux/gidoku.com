@@ -178,7 +178,7 @@ function parsePageCount(size: string): number {
   return match ? parseInt(match[1], 10) : 0;
 }
 
-/* --- IGNORE --- */
+/* --- 出版日の最新順での並び替え --- */
 
 function parsePublishedDate(publishedDate: string): Date | null {
   if (!publishedDate) return null;
@@ -198,15 +198,16 @@ function parsePublishedDate(publishedDate: string): Date | null {
 export function sortByPublishedDateDesc(
   books: BookSearchResult[]
 ): BookSearchResult[] {
-  return [...books].sort((a, b) => {
-    const dateA = parsePublishedDate(a.publishedDate);
-    const dateB = parsePublishedDate(b.publishedDate);
+  return [...books].sort((before, after) => {
+    const beforeDate = parsePublishedDate(before.publishedDate);
+    const afterDate = parsePublishedDate(after.publishedDate);
 
-    if (!dateA && !dateB) return 0;
-    if (!dateA) return 1;
-    if (!dateB) return -1;
+    if (!beforeDate && !afterDate) return 0;
+    if (!beforeDate) return 1;
+    if (!afterDate) return -1;
 
-    return dateB.getTime() - dateA.getTime();
+    return afterDate.getTime() - beforeDate.getTime();
   });
 }
+
 
