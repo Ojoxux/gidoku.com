@@ -49,19 +49,13 @@ export default createRoute(async (c) => {
       <div class="relative min-h-screen w-full overflow-hidden bg-white text-zinc-900 selection:bg-zinc-900 selection:text-white font-sans">
         {/* 背景装飾 */}
         <div class="absolute inset-0 -z-10 h-full w-full bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[16px_16px] mask-[radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
-        <div class="absolute top-0 right-0 -z-10 h-[500px] w-[500px] bg-blue-50/50 rounded-full blur-3xl opacity-50 translate-x-1/2 -translate-y-1/2"></div>
-        <div class="absolute bottom-0 left-0 -z-10 h-[500px] w-[500px] bg-orange-50/50 rounded-full blur-3xl opacity-50 -translate-x-1/2 translate-y-1/2"></div>
 
         {/* ヘッダー */}
         <header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-center w-full py-6 px-6">
-          <nav class="flex items-center justify-between w-full max-w-6xl mx-auto bg-white/80 backdrop-blur-xl border border-zinc-200/60 rounded-2xl px-6 py-3.5 shadow-lg shadow-zinc-900/5">
+          <nav class="flex items-center justify-between w-full max-w-6xl mx-auto bg-white/80 backdrop-blur-xl border border-zinc-200/60 rounded-full px-6 py-3.5 shadow-lg shadow-zinc-900/5">
             {/* Logo */}
             <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 bg-zinc-900 rounded-lg flex items-center justify-center">
-                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
-              </div>
+              <img src="/favicon128.ico" alt="gidoku" class="w-8 h-8 rounded-lg" />
               <span class="text-xl font-bold tracking-tight text-zinc-900">
                 gidoku
               </span>
@@ -71,15 +65,9 @@ export default createRoute(async (c) => {
             <div class="flex items-center gap-2">
               <a
                 href="/login"
-                class="px-4 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-all"
+                class="px-6 py-2.5 text-sm font-medium text-white bg-zinc-900 rounded-full hover:bg-zinc-800 transition-all shadow-sm hover:shadow-md"
               >
                 ログイン
-              </a>
-              <a
-                href="/login"
-                class="px-5 py-2 text-sm font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-all shadow-sm hover:shadow-md"
-              >
-                始める
               </a>
             </div>
           </nav>
@@ -90,10 +78,34 @@ export default createRoute(async (c) => {
           <div class="max-w-6xl mx-auto w-full grid lg:grid-cols-2 gap-12 lg:gap-20 items-center h-full">
             <div class="space-y-8 text-center lg:text-left order-2 lg:order-1 z-10 pointer-events-none">
               <div class="space-y-4 pointer-events-auto">
-                <h1 class="text-6xl sm:text-7xl lg:text-8xl font-medium tracking-tighter leading-[0.9] text-zinc-900">
-                  Read. Record.
+                <style>{`
+                  @keyframes fadeInBlack {
+                    from { color: #a1a1aa; }
+                    to { color: #18181b; }
+                  }
+                  @keyframes fadeInGreen {
+                    from { color: #a1a1aa; }
+                    to { color: #059669; }
+                  }
+                  .animate-read {
+                    color: #a1a1aa;
+                    animation: fadeInBlack 0.6s ease-out 0.5s forwards;
+                  }
+                  .animate-record {
+                    color: #a1a1aa;
+                    animation: fadeInBlack 0.6s ease-out 1.3s forwards;
+                  }
+                  .animate-grow {
+                    color: #a1a1aa;
+                    animation: fadeInGreen 0.6s ease-out 2.1s forwards;
+                  }
+                `}</style>
+                <h1 class="text-6xl sm:text-7xl lg:text-8xl font-mono font-semibold tracking-tight leading-[1.2]">
+                  <span class="animate-read">Read;</span>
                   <br />
-                  <span class="text-zinc-400">Grow.</span>
+                  <span class="animate-record">Record;</span>
+                  <br />
+                  <span class="animate-grow">Grow;</span>
                 </h1>
               </div>
 
@@ -128,9 +140,6 @@ export default createRoute(async (c) => {
 
             {/* Icon Cloud with Book */}
             <div class="flex items-center justify-center order-1 lg:order-2 h-[500px] lg:h-[700px] w-full max-w-[700px] mx-auto relative -mt-20 lg:-mt-32">
-              {/* Subtle glow effect behind sphere */}
-              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-zinc-200/30 rounded-full blur-3xl" />
-
               {/* Icon Cloud */}
               <div class="relative z-10">
                 <IconCloud images={techIcons} width={700} height={700} />
