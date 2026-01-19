@@ -18,16 +18,8 @@ app.use("*", authMiddleware);
  */
 app.get("/books", validator("query", rakutenSearchSchema), async (c) => {
 
-  // 直接クエリパラメータを取得（バリデーションはスキーマで行う）
-  const rawQuery = c.req.query();
-  const query = rawQuery.query;
-  const limit = rawQuery.limit ? parseInt(rawQuery.limit, 10) : undefined;
-  const page = rawQuery.page ? parseInt(rawQuery.page, 10) : undefined;
-
-  // バリデーション（手動）
-  if (!query || query.length === 0 || query.length > 100) {
-    return c.json({ success: false, error: { message: "検索クエリが無効です" } }, 400);
-  }
+  // バリデーション済みのデータを取得
+  const { query, limit, page } = getValidated<RakutenSearchInput>(c, "query");
 
   // queryがundefinedの場合はエラーを返す
   if (!query) {
