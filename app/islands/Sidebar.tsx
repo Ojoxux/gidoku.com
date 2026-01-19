@@ -58,7 +58,7 @@ export default function Sidebar({ initialExpanded = false }: SidebarProps) {
         isExpanded ? "w-64" : "w-20"
       }`}
     >
-      <div class="h-16 flex items-center justify-between px-4 shrink-0">
+      <div class="h-16 flex items-center justify-between px-4 shrink-0 mt-3 ml-2">
         {isExpanded ? (
           <>
             <a href="/" class="flex items-center min-w-0 overflow-hidden">
