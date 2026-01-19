@@ -1,10 +1,13 @@
 import type {
   Book,
   BookInput,
+  BookResponse,
   Tag,
   TagInput,
+  TagResponse,
   User,
   UserInput,
+  UserResponse,
   BookStatus,
 } from "../../types/database";
 import type { CreateBookInput, UpdateBookInput } from "../api/schemas/book";
@@ -70,26 +73,7 @@ export function toBookUpdateInput(
 /**
  * DB形式のBookをAPI形式に変換
  */
-export function toBookResponse(book: Book): {
-  id: string;
-  userId: string;
-  rakutenBooksId: string | null;
-  title: string;
-  authors: string[];
-  publisher: string | null;
-  publishedDate: string | null;
-  isbn: string | null;
-  pageCount: number;
-  description: string | null;
-  thumbnailUrl: string | null;
-  rakutenAffiliateUrl: string | null;
-  status: BookStatus;
-  currentPage: number;
-  memo: string | null;
-  finishedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-} {
+export function toBookResponse(book: Book): BookResponse {
   return {
     id: book.id,
     userId: book.user_id,
@@ -130,12 +114,7 @@ export function toTagInput(
 /**
  * DB形式のTagをAPI形式に変換
  */
-export function toTagResponse(tag: Tag): {
-  id: string;
-  userId: string;
-  name: string;
-  createdAt: string;
-} {
+export function toTagResponse(tag: Tag): TagResponse {
   return {
     id: tag.id,
     userId: tag.user_id,
@@ -147,17 +126,7 @@ export function toTagResponse(tag: Tag): {
 /**
  * DB形式のUserをAPI形式に変換
  */
-export function toUserResponse(user: User): {
-  id: string;
-  username: string;
-  email: string;
-  name: string;
-  bio: string | null;
-  avatarUrl: string | null;
-  provider: "github" | "google";
-  createdAt: string;
-  updatedAt: string;
-} {
+export function toUserResponse(user: User): UserResponse {
   return {
     id: user.id,
     username: user.username,

@@ -25,6 +25,18 @@ export interface UserInput {
   updated_at: string;
 }
 
+export interface UserResponse {
+  id: string;
+  username: string;
+  email: string;
+  name: string;
+  bio: string | null;
+  avatarUrl: string | null;
+  provider: "github" | "google";
+  createdAt: string;
+  updatedAt: string;
+}
+
 // 書籍
 export type BookStatus = "unread" | "reading" | "completed";
 
@@ -76,6 +88,27 @@ export interface BookFilter {
   sortBy?: "title" | "created" | "updated" | "progress";
 }
 
+export interface BookResponse {
+  id: string;
+  userId: string;
+  rakutenBooksId: string | null;
+  title: string;
+  authors: string[];
+  publisher: string | null;
+  publishedDate: string | null;
+  isbn: string | null;
+  pageCount: number;
+  description: string | null;
+  thumbnailUrl: string | null;
+  rakutenAffiliateUrl: string | null;
+  status: BookStatus;
+  currentPage: number;
+  memo: string | null;
+  finishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // タグ
 export interface Tag {
   id: string;
@@ -85,6 +118,13 @@ export interface Tag {
 }
 
 export interface TagInput {
+  id: string;
+  userId: string;
+  name: string;
+  createdAt: string;
+}
+
+export interface TagResponse {
   id: string;
   userId: string;
   name: string;
