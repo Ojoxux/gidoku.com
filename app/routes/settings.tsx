@@ -214,6 +214,36 @@ export default createRoute(async (c) => {
             </div>
           </div>
         </section>
+
+        <hr class="border-zinc-100" />
+
+        {/* Credits Section */}
+        <section class="grid md:grid-cols-[240px_1fr] gap-8 md:gap-12 items-start">
+          <div>
+            <h2 class="text-lg font-bold text-zinc-900 mb-2">クレジット</h2>
+            <p class="text-sm text-zinc-500 leading-relaxed">
+              このサービスで使用している素材やライブラリの提供元。
+            </p>
+          </div>
+
+          <div class="bg-white rounded-2xl p-8 shadow-sm ring-1 ring-zinc-100">
+            <div class="space-y-4">
+              <div>
+                <p class="text-sm font-bold text-zinc-700 mb-2">アイコン</p>
+                <a
+                  href="https://lordicon.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-xs text-zinc-500 hover:underline transition-colors"
+                  onmouseenter="this.style.color='#0cc18a'"
+                  onmouseleave="this.style.color=''"
+                >
+                  Icons by Lordicon.com
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </Layout>
   );
