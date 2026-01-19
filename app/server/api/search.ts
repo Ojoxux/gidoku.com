@@ -25,7 +25,10 @@ app.get("/books", validator("query", rakutenSearchSchema), async (c) => {
     limit ?? 20
   );
 
-  return successResponse(c, results);
+  const sortedResults =
+    rakutenService.sortByPublishedDateDesc(results);
+
+  return successResponse(c, sortedResults);
 });
 
 /**

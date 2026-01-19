@@ -178,4 +178,35 @@ function parsePageCount(size: string): number {
   return match ? parseInt(match[1], 10) : 0;
 }
 
+/* --- IGNORE --- */
+
+function parsePublishedDate(publishedDate: string): Date | null {
+  if (!publishedDate) return null;
+
+  const match = publishedDate.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+  if (!match) return null;
+
+  const [, year, month, day] = match;
+
+  return new Date(
+    Number(year),
+    Number(month) - 1,
+    Number(day)
+  );
+}
+
+export function sortByPublishedDateDesc(
+  books: BookSearchResult[]
+): BookSearchResult[] {
+  return [...books].sort((a, b) => {
+    const dateA = parsePublishedDate(a.publishedDate);
+    const dateB = parsePublishedDate(b.publishedDate);
+
+    if (!dateA && !dateB) return 0;
+    if (!dateA) return 1;
+    if (!dateB) return -1;
+
+    return dateB.getTime() - dateA.getTime();
+  });
+}
 
