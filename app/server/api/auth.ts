@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { setCookie, deleteCookie } from "hono/cookie";
+import { setCookie, deleteCookie, getCookie } from "hono/cookie";
 import type { HonoContext } from "../../types/env";
 import { userRepo } from "../db/repositories";
 import { authMiddleware } from "../lib/auth";
@@ -7,16 +7,19 @@ import { validator, getValidated } from "../lib/validator";
 import { oauthProviderSchema, oauthCallbackSchema } from "./schemas";
 import type { OAuthProvider, OAuthCallbackInput } from "./schemas/auth";
 import {
-  createSession,
   deleteSession,
+  regenerateSession,
   SESSION_COOKIE_OPTIONS,
 } from "../lib/session";
 import { toUserResponse } from "../lib/mapper";
 import { successResponse, errorResponse } from "../lib/response";
 import * as oauthService from "../services/oauth";
-import { getCookie } from "hono/cookie";
+import { authRateLimiter } from "../lib/rate-limit";
 
 const app = new Hono<HonoContext>();
+
+// 認証エンドポイントにRate Limiting適用
+app.use("*", authRateLimiter);
 
 /**
  * OAuth認証開始
@@ -48,14 +51,12 @@ app.get(
     const provider = c.req.param("provider") as OAuthProvider;
     const { code, state } = getValidated<OAuthCallbackInput>(c, "query");
 
-    // state検証
-    if (state) {
-      const savedProvider = await c.env.KV.get(`oauth_state:${state}`);
-      if (savedProvider !== provider) {
-        return errorResponse(c, "Invalid state", "INVALID_STATE", 400);
-      }
-      await c.env.KV.delete(`oauth_state:${state}`);
+    // state検証（CSRF対策）
+    const savedProvider = await c.env.KV.get(`oauth_state:${state}`);
+    if (savedProvider !== provider) {
+      return errorResponse(c, "Invalid state", "INVALID_STATE", 400);
     }
+    await c.env.KV.delete(`oauth_state:${state}`);
 
     try {
       // アクセストークン取得
@@ -92,8 +93,14 @@ app.get(
         });
       }
 
-      // セッション作成
-      const sessionId = await createSession(c.env.KV, user.id);
+      // セッションを再生成
+      // 既存のセッションがあれば削除して新しいセッションを作成
+      const oldSessionId = getCookie(c, "session_id");
+      const sessionId = await regenerateSession(
+        c.env.KV,
+        oldSessionId,
+        user.id
+      );
 
       // Cookie設定
       setCookie(c, "session_id", sessionId, SESSION_COOKIE_OPTIONS);

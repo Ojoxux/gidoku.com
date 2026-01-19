@@ -105,3 +105,21 @@ export async function deleteAllUserSessions(
   await Promise.all(deletePromises);
 }
 
+/**
+ * セッションを再生成
+ * 既存のセッションを削除し、新しいセッションIDを生成
+ */
+export async function regenerateSession(
+  kv: KVNamespace,
+  oldSessionId: string | undefined,
+  userId: string,
+  ttl: number = SESSION_TTL
+): Promise<string> {
+  // 既存のセッションがあれば削除
+  if (oldSessionId) {
+    await deleteSession(kv, oldSessionId);
+  }
+
+  // 新しいセッションを作成
+  return createSession(kv, userId, ttl);
+}

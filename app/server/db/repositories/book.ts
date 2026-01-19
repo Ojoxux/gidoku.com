@@ -178,6 +178,34 @@ export async function update(
       fields.push("publisher = ?");
       params.push(data.publisher);
     }
+    if (data.publishedDate !== undefined) {
+      fields.push("published_date = ?");
+      params.push(data.publishedDate);
+    }
+    if (data.isbn !== undefined) {
+      fields.push("isbn = ?");
+      params.push(data.isbn);
+    }
+    if (data.pageCount !== undefined) {
+      fields.push("page_count = ?");
+      params.push(data.pageCount);
+    }
+    if (data.description !== undefined) {
+      fields.push("description = ?");
+      params.push(data.description);
+    }
+    if (data.thumbnailUrl !== undefined) {
+      fields.push("thumbnail_url = ?");
+      params.push(data.thumbnailUrl);
+    }
+    if (data.rakutenBooksId !== undefined) {
+      fields.push("rakuten_books_id = ?");
+      params.push(data.rakutenBooksId);
+    }
+    if (data.rakutenAffiliateUrl !== undefined) {
+      fields.push("rakuten_affiliate_url = ?");
+      params.push(data.rakutenAffiliateUrl);
+    }
     if (data.status !== undefined) {
       fields.push("status = ?");
       params.push(data.status);

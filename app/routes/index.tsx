@@ -19,7 +19,14 @@ export default createRoute(async (c) => {
         <header class="absolute top-0 left-0 right-0 z-50 flex items-center justify-center w-full py-8">
           <nav class="flex items-center gap-2 px-2 py-2 bg-white/80 backdrop-blur-md border border-zinc-200/60 rounded-full shadow-sm shadow-zinc-200/20">
             <div class="pl-4 pr-2">
-              <span class="italic text-xl font-bold tracking-tight" style={{ fontFamily: '"Cormorant Garamond", "Garamond", serif' }}>gidoku</span>
+              <span
+                class="italic text-xl font-bold tracking-tight"
+                style={{
+                  fontFamily: '"Cormorant Garamond", "Garamond", serif',
+                }}
+              >
+                gidoku
+              </span>
             </div>
             <div class="w-px h-4 bg-zinc-200 mx-1"></div>
             <a
@@ -33,42 +40,68 @@ export default createRoute(async (c) => {
 
         {/* ヒーローセクション */}
         <main class="flex flex-col items-center justify-center h-full w-full px-6 relative">
-          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-tr from-zinc-100 to-transparent rounded-full blur-3xl opacity-60 -z-10 pointer-events-none"></div>
+          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-linear-to-tr from-zinc-100 to-transparent rounded-full blur-3xl opacity-60 -z-10 pointer-events-none"></div>
 
           <div class="space-y-10 text-center max-w-3xl mx-auto z-10">
-             <div class="space-y-2">
-                <h1 class="text-6xl sm:text-8xl md:text-9xl font-medium tracking-tighter leading-[0.9] text-zinc-900">
-                  <span class="block" style={{ fontFamily: '"Cormorant Garamond", "Garamond", serif' }}>
-                    Read<span class="text-zinc-300">.</span>
-                  </span>
-                  <span class="block" style={{ fontFamily: '"Cormorant Garamond", "Garamond", serif' }}>
-                    Record<span class="text-zinc-300">.</span>
-                  </span>
-                  <span class="block" style={{ fontFamily: '"Cormorant Garamond", "Garamond", serif' }}>
-                    Grow<span class="text-zinc-300">.</span>
-                  </span>
-                </h1>
-             </div>
+            <div class="space-y-2">
+              <h1 class="text-6xl sm:text-8xl md:text-9xl font-medium tracking-tighter leading-[0.9] text-zinc-900">
+                <span
+                  class="block"
+                  style={{
+                    fontFamily: '"Cormorant Garamond", "Garamond", serif',
+                  }}
+                >
+                  Read<span class="text-zinc-300">.</span>
+                </span>
+                <span
+                  class="block"
+                  style={{
+                    fontFamily: '"Cormorant Garamond", "Garamond", serif',
+                  }}
+                >
+                  Record<span class="text-zinc-300">.</span>
+                </span>
+                <span
+                  class="block"
+                  style={{
+                    fontFamily: '"Cormorant Garamond", "Garamond", serif',
+                  }}
+                >
+                  Grow<span class="text-zinc-300">.</span>
+                </span>
+              </h1>
+            </div>
 
             <p class="text-lg sm:text-xl text-zinc-500 max-w-lg mx-auto leading-relaxed font-light">
-              技術書の積読を消化し、学習の軌跡を可視化する。<br class="hidden sm:inline" />
+              技術書の積読を消化し、学習の軌跡を可視化する。
+              <br class="hidden sm:inline" />
               エンジニアのための、ミニマルな読書管理ツール。
             </p>
 
             <div class="pt-4">
-               <a
+              <a
                 href="/login"
                 class="group inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-medium text-zinc-900 bg-white border border-zinc-200 rounded-full hover:bg-zinc-50 hover:border-zinc-300 transition-all shadow-sm hover:shadow-md"
               >
                 <span>無料で始める</span>
-                <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                <svg
+                  class="w-4 h-4 transition-transform group-hover:translate-x-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                  />
                 </svg>
               </a>
             </div>
           </div>
         </main>
-        
+
         {/* フッター */}
         <div class="absolute bottom-6 left-0 right-0 text-center text-xs text-zinc-400 font-medium tracking-wide">
           &copy; 2025 gidoku.com
@@ -116,50 +149,26 @@ export default createRoute(async (c) => {
 
   return c.render(
     <Layout user={user} title="ホーム" sidebarExpanded={sidebarExpanded}>
-      <div class="space-y-16">
+      <div class="space-y-12">
         {/* ヘッダーセクション */}
-        <div class="flex flex-col md:flex-row gap-12 items-end border-b border-zinc-900 pb-12">
-          <div class="flex-1">
-            <div class="text-5xl md:text-7xl leading-[1.1] text-zinc-900 tracking-tight">
-              <span style={{ fontFamily: '"Arial", sans-serif' }}>Hello,</span>{" "}
-              <span
-                class="border-b-[3px] md:border-b-4 border-zinc-900 pb-1"
-                style={{ fontFamily: '"Cormorant Garamond", "Garamond", serif' }}
-              >
-                {user.name}
-              </span>
-              .
-              <br />
-              <span
-                style={{ fontFamily: '"Cormorant Garamond", "Garamond", serif' }}
-              >
-                You have
-              </span>{" "}
-              <span
-                class="border-b-[3px] md:border-b-4 border-zinc-900 pb-1"
-                style={{ fontFamily: '"Arial", sans-serif' }}
-              >
-                {stats?.reading ?? 0} active books
-              </span>
-              .
-            </div>
-          </div>
+        <div class="pb-2">
+          <h1 class="text-3xl font-bold text-zinc-900 tracking-tight mb-2">
+            こんにちは、{user.name}さん
+          </h1>
+          <p class="text-zinc-500 font-medium">
+            現在、<span class="text-zinc-900">{stats?.reading ?? 0}</span>
+            冊の本を読んでいます。
+          </p>
         </div>
 
         {/* 読んでいる本のリスト */}
         {formattedReadingBooks.length > 0 && (
           <section>
-            <div class="flex items-baseline justify-between mb-8 border-b border-zinc-200 pb-4">
-              <h2
-                class="text-3xl font-bold tracking-tight text-zinc-900"
-                style={{ fontFamily: '"Arial", sans-serif' }}
-              >
-                読んでいる本
-              </h2>
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-xl font-bold text-zinc-900">読んでいる本</h2>
               <a
                 href="/books?status=reading"
-                class="text-sm font-medium text-zinc-500 hover:text-zinc-900 transition-colors"
-                style={{ fontFamily: '"Arial", sans-serif' }}
+                class="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
               >
                 すべて見る
               </a>
@@ -170,26 +179,20 @@ export default createRoute(async (c) => {
         )}
 
         <section>
-          <div class="flex items-baseline justify-between mb-8 border-b border-zinc-200 pb-4">
-            <h2
-              class="text-3xl font-bold tracking-tight text-zinc-900"
-              style={{ fontFamily: '"Arial", sans-serif' }}
-            >
-              最近の読書
-            </h2>
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-bold text-zinc-900">最近の読書</h2>
             <a
               href="/books"
-              class="text-sm font-medium text-zinc-500 hover:text-zinc-900 transition-colors"
-              style={{ fontFamily: '"Arial", sans-serif' }}
+              class="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
             >
               すべて見る
             </a>
           </div>
           {recentBooks.length > 0 ? (
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-6 gap-y-10">
               {formatBooks(recentBooks).map((book) => (
                 <a href={`/books/${book.id}`} class="group flex flex-col gap-3">
-                  <div class="aspect-2/3 w-full bg-zinc-100 rounded-sm overflow-hidden shadow-sm group-hover:shadow-md transition-all duration-300">
+                  <div class="aspect-2/3 w-full bg-zinc-100 rounded-xl overflow-hidden shadow-sm group-hover:shadow-md transition-all duration-300 ring-1 ring-black/5">
                     <BookCover
                       src={book.thumbnailUrl}
                       alt={book.title}
@@ -198,16 +201,10 @@ export default createRoute(async (c) => {
                     />
                   </div>
                   <div>
-                    <h3
-                      class="text-sm font-bold text-zinc-900 line-clamp-2 leading-tight group-hover:underline decoration-1 underline-offset-2"
-                      style={{ fontFamily: '"Arial", sans-serif' }}
-                    >
+                    <h3 class="text-sm font-semibold text-zinc-900 line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors">
                       {book.title}
                     </h3>
-                    <p
-                      class="text-xs text-zinc-500 mt-1 line-clamp-1"
-                      style={{ fontFamily: '"Arial", sans-serif' }}
-                    >
+                    <p class="text-xs text-zinc-500 mt-1.5 line-clamp-1">
                       {book.authors.join(", ")}
                     </p>
                   </div>
@@ -232,16 +229,12 @@ export default createRoute(async (c) => {
                     />
                   </svg>
                 </div>
-                <p
-                  class="text-zinc-500 mb-6 font-medium"
-                  style={{ fontFamily: '"Arial", sans-serif' }}
-                >
+                <p class="text-zinc-500 mb-6 font-medium">
                   読書記録をはじめましょう
                 </p>
                 <a
                   href="/books/new"
-                  class="inline-flex items-center justify-center px-6 py-2.5 text-sm font-bold text-white bg-zinc-900 hover:bg-zinc-800 transition-colors shadow-sm rounded-sm"
-                  style={{ fontFamily: '"Arial", sans-serif' }}
+                  class="inline-flex items-center justify-center px-6 py-2.5 text-sm font-bold text-white bg-zinc-900 hover:bg-zinc-800 transition-colors shadow-sm rounded-full"
                 >
                   本を追加する
                 </a>

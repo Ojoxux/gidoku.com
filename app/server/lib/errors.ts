@@ -97,23 +97,48 @@ export class RateLimitError extends AppError {
 }
 
 /**
+ * 本番環境かどうかを判定
+ */
+function isProduction(c: Context): boolean {
+  // CW環境では環境変数で判定
+  const env = c.env as { ENVIRONMENT?: string } | undefined;
+  return env?.ENVIRONMENT === "production";
+}
+
+/**
+ * 安全に公開できるエラー詳細かどうかを判定
+ */
+function isSafeToExposeDetails(err: AppError): boolean {
+  // バリデーションエラーとレート制限エラーの詳細は公開可能
+  return err instanceof ValidationError || err instanceof RateLimitError;
+}
+
+/**
  * エラーハンドリングミドルウェア
  */
 export function errorHandler(err: Error, c: Context) {
+  // 本番環境ではスタックトレースをログしない
+  const isProd = isProduction(c);
+
   console.error("Error occurred:", {
     name: err.name,
     message: err.message,
-    stack: err.stack,
+    ...(isProd ? {} : { stack: err.stack }),
   });
 
   if (err instanceof AppError) {
+    // 本番環境では、安全なエラー以外はdetailsを隠す
+    const shouldExposeDetails = !isProd || isSafeToExposeDetails(err);
+
     return c.json(
       {
         success: false,
         error: {
           message: err.message,
           code: err.code,
-          details: err.details,
+          ...(shouldExposeDetails && err.details
+            ? { details: err.details }
+            : {}),
         },
       },
       err.statusCode as 400 | 401 | 403 | 404 | 429 | 500 | 502
