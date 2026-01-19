@@ -2,6 +2,8 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { env } from 'cloudflare:test'
 import api from './index'
 import { createTestUser, createTestSession, createTestBook } from '../../test/helpers'
+import type { SuccessResponse, PaginatedResponse } from '../lib/response'
+import type { BookResponse } from '../../types/database'
 
 describe('Books API Integration', () => {
   let userId: string
@@ -39,7 +41,7 @@ describe('Books API Integration', () => {
       }, env)
 
       expect(res.status).toBe(200)
-      const body = await res.json()
+      const body = await res.json() as SuccessResponse<PaginatedResponse<BookResponse>>
       expect(body.success).toBe(true)
       expect(body.data.items).toEqual([])
       expect(body.data.total).toBe(0)
@@ -54,7 +56,7 @@ describe('Books API Integration', () => {
       }, env)
 
       expect(res.status).toBe(200)
-      const body = await res.json()
+      const body = await res.json() as SuccessResponse<PaginatedResponse<BookResponse>>
       expect(body.data.items).toHaveLength(2)
       expect(body.data.total).toBe(2)
     })
@@ -76,7 +78,7 @@ describe('Books API Integration', () => {
       }, env)
 
       expect(res.status).toBe(201)
-      const body = await res.json()
+      const body = await res.json() as SuccessResponse<BookResponse>
       expect(body.success).toBe(true)
       expect(body.data.title).toBe('New Test Book')
     })
@@ -91,7 +93,7 @@ describe('Books API Integration', () => {
       }, env)
 
       expect(res.status).toBe(200)
-      const body = await res.json()
+      const body = await res.json() as SuccessResponse<BookResponse>
       expect(body.data.title).toBe('My Book')
     })
 
@@ -125,7 +127,7 @@ describe('Books API Integration', () => {
       }, env)
 
       expect(res.status).toBe(200)
-      const body = await res.json()
+      const body = await res.json() as SuccessResponse<BookResponse>
       expect(body.data.currentPage).toBe(150)
       expect(body.data.status).toBe('reading')
     })
@@ -147,7 +149,7 @@ describe('Books API Integration', () => {
       }, env)
 
       expect(res.status).toBe(200)
-      const body = await res.json()
+      const body = await res.json() as SuccessResponse<BookResponse>
       expect(body.data.status).toBe('completed')
       expect(body.data.finishedAt).toBeTruthy()
     })
@@ -163,7 +165,7 @@ describe('Books API Integration', () => {
       }, env)
 
       expect(res.status).toBe(200)
-      const body = await res.json()
+      const body = await res.json() as SuccessResponse<{ deleted: boolean }>
       expect(body.data.deleted).toBe(true)
     })
   })
@@ -173,7 +175,7 @@ describe('Books API Integration', () => {
       const res = await api.request('/health', {}, env)
 
       expect(res.status).toBe(200)
-      const body = await res.json()
+      const body = await res.json() as { status: string }
       expect(body.status).toBe('ok')
     })
   })

@@ -2,6 +2,8 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { env } from 'cloudflare:test'
 import api from './index'
 import { createTestUser, createTestSession, createTestBook, createTestTag } from '../../test/helpers'
+import type { SuccessResponse } from '../lib/response'
+import type { TagResponse } from '../../types/database'
 
 describe('Tags API Integration', () => {
   let userId: string
@@ -25,7 +27,7 @@ describe('Tags API Integration', () => {
       }, env)
 
       expect(res.status).toBe(200)
-      const body = await res.json()
+      const body = await res.json() as SuccessResponse<TagResponse[]>
       expect(body.success).toBe(true)
       expect(body.data).toEqual([])
     })
@@ -39,7 +41,7 @@ describe('Tags API Integration', () => {
       }, env)
 
       expect(res.status).toBe(200)
-      const body = await res.json()
+      const body = await res.json() as SuccessResponse<TagResponse[]>
       expect(body.data).toHaveLength(2)
     })
   })
@@ -56,7 +58,7 @@ describe('Tags API Integration', () => {
       }, env)
 
       expect(res.status).toBe(201)
-      const body = await res.json()
+      const body = await res.json() as SuccessResponse<TagResponse>
       expect(body.success).toBe(true)
       expect(body.data.name).toBe('React')
     })
@@ -76,7 +78,7 @@ describe('Tags API Integration', () => {
       }, env)
 
       expect(res.status).toBe(200)
-      const body = await res.json()
+      const body = await res.json() as SuccessResponse<TagResponse>
       expect(body.data.name).toBe('NewName')
     })
   })
@@ -91,7 +93,7 @@ describe('Tags API Integration', () => {
       }, env)
 
       expect(res.status).toBe(200)
-      const body = await res.json()
+      const body = await res.json() as SuccessResponse<{ deleted: boolean }>
       expect(body.data.deleted).toBe(true)
     })
   })
@@ -107,7 +109,7 @@ describe('Tags API Integration', () => {
       }, env)
 
       expect(res.status).toBe(200)
-      const body = await res.json()
+      const body = await res.json() as SuccessResponse<TagResponse[]>
       expect(body.data).toHaveLength(1)
     })
 
@@ -122,7 +124,7 @@ describe('Tags API Integration', () => {
       }, env)
 
       expect(res.status).toBe(200)
-      const body = await res.json()
+      const body = await res.json() as SuccessResponse<{ removed: boolean }>
       expect(body.data.removed).toBe(true)
     })
   })

@@ -142,7 +142,7 @@ app.patch(
       : existingBook.finished_at;
 
     const book = await bookRepo.update(c.env.DB, id, userId, {
-      currentPage,
+      currentPage: currentPage,
       status: newStatus,
       finishedAt,
       updatedAt: new Date().toISOString(),
