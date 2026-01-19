@@ -15,10 +15,10 @@ export default createRoute(async (c) => {
 
   return c.render(
     <Layout user={user} title="設定" sidebarExpanded={sidebarExpanded}>
-      <div class="max-w-4xl mx-auto space-y-12">
+      <div class="space-y-12">
         {/* Header */}
         <div class="border-b border-zinc-100 pb-8">
-          <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-zinc-900 mb-2">
+          <h1 class="text-3xl font-bold tracking-tight text-zinc-900 mb-2">
             設定
           </h1>
           <p class="text-zinc-500">プロフィールとアカウント設定の管理</p>
