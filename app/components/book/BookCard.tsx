@@ -38,7 +38,7 @@ export const BookCard: FC<BookCardProps> = ({
               authors={authors}
               publisher={publisher}
             />
-            <StatusBadge status={status} />
+            <StatusBadge status={status} class="shrink-0" />
           </div>
           {pageCount > 0 && (
             <div class="mt-3">

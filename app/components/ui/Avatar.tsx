@@ -41,7 +41,7 @@ export const Avatar: FC<AvatarProps> = ({
 
   return (
     <div
-      class={`rounded-full bg-gray-300 flex items-center justify-center font-medium text-gray-600 ${sizeStyles[size]} ${className}`}
+      class={`rounded-full bg-zinc-200 flex items-center justify-center font-medium text-zinc-600 ${sizeStyles[size]} ${className}`}
     >
       {initials}
     </div>
