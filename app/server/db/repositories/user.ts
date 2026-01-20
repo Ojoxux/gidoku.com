@@ -1,6 +1,8 @@
-import type { D1Database } from "@cloudflare/workers-types";
 import type { User, UserInput } from "../../../types/database";
 import { NotFoundError, DatabaseError } from "../../lib/errors";
+import type { Env } from "../../../types/env";
+
+type D1Database = Env["DB"];
 
 /**
  * IDでユーザーを取得

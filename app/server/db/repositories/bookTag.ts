@@ -1,6 +1,8 @@
-import type { D1Database } from "@cloudflare/workers-types";
 import type { BookTag, Tag } from "../../../types/database";
 import { DatabaseError, NotFoundError, ForbiddenError } from "../../lib/errors";
+import type { Env } from "../../../types/env";
+
+type D1Database = Env["DB"];
 
 /**
  * 書籍にタグを追加（所有権チェック付き）

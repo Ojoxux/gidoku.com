@@ -1,4 +1,3 @@
-import type { D1Database } from "@cloudflare/workers-types";
 import type {
   Book,
   BookInput,
@@ -7,6 +6,10 @@ import type {
   BookStatus,
 } from "../../../types/database";
 import { NotFoundError, DatabaseError } from "../../lib/errors";
+
+import type { Env } from "../../../types/env";
+
+type D1Database = Env["DB"];
 
 /**
  * ユーザーIDで書籍一覧を取得（ページネーション対応）

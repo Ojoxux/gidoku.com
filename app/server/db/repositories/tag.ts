@@ -1,6 +1,8 @@
-import type { D1Database } from "@cloudflare/workers-types";
 import type { Tag, TagInput } from "../../../types/database";
 import { NotFoundError, DatabaseError } from "../../lib/errors";
+import type { Env } from "../../../types/env";
+
+type D1Database = Env["DB"];
 
 /**
  * ユーザーのタグ一覧を取得

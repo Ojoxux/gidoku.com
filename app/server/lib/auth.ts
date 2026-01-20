@@ -1,11 +1,12 @@
 import type { Context, Next } from "hono";
 import { getCookie } from "hono/cookie";
-import type { KVNamespace } from "@cloudflare/workers-types";
-import type { HonoContext } from "../../types/env";
+import type { Env, HonoContext } from "../../types/env";
 import type { User } from "../../types/database";
 import { userRepo } from "../db/repositories";
 import { validateSession } from "./session";
 import { UnauthorizedError } from "./errors";
+
+type KVNamespace = Env["KV"];
 
 // ユーザーキャッシュのTTL（秒）
 const USER_CACHE_TTL = 300; // 5分
