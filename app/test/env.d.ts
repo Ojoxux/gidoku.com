@@ -1,4 +1,7 @@
-import type { D1Database, KVNamespace } from '@cloudflare/workers-types'
+import type { Env } from "../types/env";
+
+type D1Database = Env["DB"];
+type KVNamespace = Env["KV"];
 
 declare module 'cloudflare:test' {
   interface ProvidedEnv {

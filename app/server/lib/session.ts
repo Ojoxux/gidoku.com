@@ -1,5 +1,7 @@
-import type { KVNamespace } from "@cloudflare/workers-types";
 import { UnauthorizedError } from "./errors";
+import type { Env } from "../../types/env";
+
+type KVNamespace = Env["KV"];
 
 export const SESSION_TTL = 60 * 60 * 24 * 7;
 
