@@ -5,6 +5,7 @@ import { authMiddleware, optionalAuthMiddleware } from "../lib/auth";
 import { validator, getValidated } from "../lib/validator";
 import { updateUserSchema, usernameSchema } from "./schemas";
 import type { UpdateUserInput } from "./schemas/user";
+import { isReservedUsername } from "./schemas/user";
 import { toUserResponse, toBookResponse } from "../lib/mapper";
 import { successResponse } from "../lib/response";
 
@@ -31,6 +32,10 @@ app.put(
     const userId = c.get("userId");
     const data = getValidated<UpdateUserInput>(c, "json");
 
+    if (data.username && isReservedUsername(data.username)) {
+      return c.json({ error: "このユーザー名は使用できません" }, 400);
+    }
+
     const updatedUser = await userRepo.update(c.env.DB, userId, {
       username: data.username,
       name: data.name,
@@ -51,6 +56,11 @@ app.get(
   validator("param", usernameSchema),
   async (c) => {
     const { username } = getValidated<{ username: string }>(c, "param");
+
+    if (isReservedUsername(username)) {
+      return successResponse(c, { available: false, reason: "reserved" });
+    }
+
     const isTaken = await userRepo.isUsernameTaken(c.env.DB, username);
 
     return successResponse(c, { available: !isTaken });
