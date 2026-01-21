@@ -172,7 +172,8 @@ const ProfilePage: FC<ProfilePageProps> = ({
 );
 
 export default createRoute(async (c) => {
-  const username = c.req.param("username")!;
+  const username = c.req.param("username") ?? "";
+
   const [currentUser, sidebarExpanded] = await Promise.all([
     getPageUser(c),
     Promise.resolve(getSidebarExpanded(c)),
