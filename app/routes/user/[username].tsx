@@ -58,6 +58,7 @@ const NotFoundPage: FC<NotFoundPageProps> = ({ username, currentUser, sidebarExp
             viewBox="0 0 24 24"
             stroke="currentColor"
           >
+            <title>ユーザーアイコン</title>
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -150,6 +151,7 @@ const ProfilePage: FC<ProfilePageProps> = ({
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
+                <title>本のアイコン</title>
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
