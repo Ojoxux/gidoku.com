@@ -1,8 +1,9 @@
+import { DatabaseError, NotFoundError } from "../../lib/errors";
 import type { User, UserInput } from "../../../types/database";
-import { NotFoundError, DatabaseError } from "../../lib/errors";
 import type { Env } from "../../../types/env";
 
 type D1Database = Env["DB"];
+type D1BindValue = string | number | null;
 
 /**
  * IDでユーザーを取得
@@ -98,7 +99,7 @@ export async function isUsernameTaken(
 ): Promise<boolean> {
   try {
     let query = "SELECT id FROM users WHERE username = ?";
-    const params: any[] = [username];
+    const params: D1BindValue[] = [username];
 
     if (excludeUserId) {
       query += " AND id != ?";
@@ -170,7 +171,7 @@ export async function update(
     await findById(db, userId);
 
     const fields: string[] = [];
-    const params: any[] = [];
+    const params: D1BindValue[] = [];
 
     if (data.username !== undefined) {
       // ユーザー名の重複チェック
