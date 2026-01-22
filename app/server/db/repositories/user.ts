@@ -170,42 +170,38 @@ export async function update(
     // ユーザーの存在確認
     await findById(db, userId);
 
-    const fields: string[] = [];
-    const params: D1BindValue[] = [];
-
     if (data.username !== undefined) {
       // ユーザー名の重複チェック
       const isTaken = await isUsernameTaken(db, data.username, userId);
       if (isTaken) {
         throw new DatabaseError("Username already taken");
       }
-      fields.push("username = ?");
-      params.push(data.username);
     }
 
-    if (data.name !== undefined) {
-      fields.push("name = ?");
-      params.push(data.name);
-    }
+    const updates = [
+      ["username", data.username],
+      ["name", data.name],
+      ["bio", data.bio],
+      ["avatar_url", data.avatar_url],
+    ] satisfies Array<[string, D1BindValue | undefined]>;
 
-    if (data.bio !== undefined) {
-      fields.push("bio = ?");
-      params.push(data.bio);
-    }
+    const definedUpdates = updates.filter(
+      ([, value]) => value !== undefined
+    ) as Array<[string, D1BindValue]>;
 
-    if (data.avatar_url !== undefined) {
-      fields.push("avatar_url = ?");
-      params.push(data.avatar_url);
-    }
-
-    if (fields.length === 0) {
+    if (definedUpdates.length === 0) {
       return findById(db, userId);
     }
 
-    fields.push("updated_at = ?");
-    params.push(new Date().toISOString());
-
-    params.push(userId);
+    const fields = [
+      ...definedUpdates.map(([field]) => `${field} = ?`),
+      "updated_at = ?",
+    ];
+    const params: D1BindValue[] = [
+      ...definedUpdates.map(([, value]) => value),
+      new Date().toISOString(),
+      userId,
+    ];
 
     await db
       .prepare(

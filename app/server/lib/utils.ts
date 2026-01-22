@@ -11,15 +11,12 @@ export function sleep(ms: number): Promise<void> {
 export function generateRandomString(length: number = 32): string {
   const chars =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let result = "";
   const randomValues = new Uint8Array(length);
   crypto.getRandomValues(randomValues);
-
-  for (let i = 0; i < length; i++) {
-    result += chars[randomValues[i] % chars.length];
-  }
-
-  return result;
+  return Array.from(
+    randomValues,
+    (value) => chars[value % chars.length]
+  ).join("");
 }
 
 /**
@@ -28,24 +25,19 @@ export function generateRandomString(length: number = 32): string {
 export function removeUndefined<T extends Record<string, unknown>>(
   obj: T
 ): Partial<T> {
-  const result: Partial<T> = {};
-  for (const key in obj) {
-    if (obj[key] !== undefined) {
-      result[key] = obj[key];
-    }
-  }
-  return result;
+  return Object.fromEntries(
+    Object.entries(obj).filter(([, value]) => value !== undefined)
+  ) as Partial<T>;
 }
 
 /**
  * 配列を指定されたサイズのチャンクに分割
  */
 export function chunk<T>(array: T[], size: number): T[][] {
-  const chunks: T[][] = [];
-  for (let i = 0; i < array.length; i += size) {
-    chunks.push(array.slice(i, i + size));
-  }
-  return chunks;
+  const chunkCount = Math.ceil(array.length / size);
+  return Array.from({ length: chunkCount }, (_, index) =>
+    array.slice(index * size, index * size + size)
+  );
 }
 
 /**
@@ -75,11 +67,9 @@ export function camelToSnake(str: string): string {
 export function keysToCamel<T extends Record<string, unknown>>(
   obj: T
 ): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
-  for (const key in obj) {
-    result[snakeToCamel(key)] = obj[key];
-  }
-  return result;
+  return Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => [snakeToCamel(key), value])
+  );
 }
 
 /**
@@ -88,11 +78,9 @@ export function keysToCamel<T extends Record<string, unknown>>(
 export function keysToSnake<T extends Record<string, unknown>>(
   obj: T
 ): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
-  for (const key in obj) {
-    result[camelToSnake(key)] = obj[key];
-  }
-  return result;
+  return Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => [camelToSnake(key), value])
+  );
 }
 
 /**

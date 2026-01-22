@@ -167,70 +167,40 @@ export async function update(
     // 書籍の存在確認
     await findById(db, bookId, userId);
 
-    const fields: string[] = [];
-    const params: D1BindValue[] = [];
+    const updates = [
+      ["title", data.title],
+      [
+        "authors",
+        data.authors === undefined ? undefined : JSON.stringify(data.authors),
+      ],
+      ["publisher", data.publisher],
+      ["published_date", data.publishedDate],
+      ["isbn", data.isbn],
+      ["page_count", data.pageCount],
+      ["description", data.description],
+      ["thumbnail_url", data.thumbnailUrl],
+      ["rakuten_books_id", data.rakutenBooksId],
+      ["rakuten_affiliate_url", data.rakutenAffiliateUrl],
+      ["status", data.status],
+      ["current_page", data.currentPage],
+      ["memo", data.memo],
+      ["finished_at", data.finishedAt],
+    ] satisfies Array<[string, D1BindValue | undefined]>;
 
-    if (data.title !== undefined) {
-      fields.push("title = ?");
-      params.push(data.title);
-    }
-    if (data.authors !== undefined) {
-      fields.push("authors = ?");
-      params.push(JSON.stringify(data.authors));
-    }
-    if (data.publisher !== undefined) {
-      fields.push("publisher = ?");
-      params.push(data.publisher);
-    }
-    if (data.publishedDate !== undefined) {
-      fields.push("published_date = ?");
-      params.push(data.publishedDate);
-    }
-    if (data.isbn !== undefined) {
-      fields.push("isbn = ?");
-      params.push(data.isbn);
-    }
-    if (data.pageCount !== undefined) {
-      fields.push("page_count = ?");
-      params.push(data.pageCount);
-    }
-    if (data.description !== undefined) {
-      fields.push("description = ?");
-      params.push(data.description);
-    }
-    if (data.thumbnailUrl !== undefined) {
-      fields.push("thumbnail_url = ?");
-      params.push(data.thumbnailUrl);
-    }
-    if (data.rakutenBooksId !== undefined) {
-      fields.push("rakuten_books_id = ?");
-      params.push(data.rakutenBooksId);
-    }
-    if (data.rakutenAffiliateUrl !== undefined) {
-      fields.push("rakuten_affiliate_url = ?");
-      params.push(data.rakutenAffiliateUrl);
-    }
-    if (data.status !== undefined) {
-      fields.push("status = ?");
-      params.push(data.status);
-    }
-    if (data.currentPage !== undefined) {
-      fields.push("current_page = ?");
-      params.push(data.currentPage);
-    }
-    if (data.memo !== undefined) {
-      fields.push("memo = ?");
-      params.push(data.memo);
-    }
-    if (data.finishedAt !== undefined) {
-      fields.push("finished_at = ?");
-      params.push(data.finishedAt);
-    }
+    const definedUpdates = updates.filter(
+      ([, value]) => value !== undefined
+    ) as Array<[string, D1BindValue]>;
 
-    fields.push("updated_at = ?");
-    params.push(data.updatedAt || new Date().toISOString());
-
-    params.push(bookId, userId);
+    const fields = [
+      ...definedUpdates.map(([field]) => `${field} = ?`),
+      "updated_at = ?",
+    ];
+    const params: D1BindValue[] = [
+      ...definedUpdates.map(([, value]) => value),
+      data.updatedAt || new Date().toISOString(),
+      bookId,
+      userId,
+    ];
 
     await db
       .prepare(
