@@ -10,6 +10,7 @@ import { NotFoundError, DatabaseError } from "../../lib/errors";
 import type { Env } from "../../../types/env";
 
 type D1Database = Env["DB"];
+type D1BindValue = string | number | null;
 
 /**
  * ユーザーIDで書籍一覧を取得（ページネーション対応）
@@ -21,7 +22,7 @@ export async function findByUserId(
 ): Promise<{ books: Book[]; total: number }> {
   try {
     let query = "SELECT * FROM books WHERE user_id = ?";
-    const params: any[] = [userId];
+    const params: D1BindValue[] = [userId];
 
     // フィルター条件の追加
     if (filter?.status) {
@@ -52,7 +53,7 @@ export async function findByUserId(
     const countQuery = `SELECT COUNT(*) as total FROM books WHERE user_id = ?${
       filter?.status ? " AND status = ?" : ""
     }${filter?.search ? " AND (title LIKE ? OR authors LIKE ?)" : ""}`;
-    const countParams = [userId];
+    const countParams: D1BindValue[] = [userId];
     if (filter?.status) countParams.push(filter.status);
     if (filter?.search) {
       const searchTerm = `%${filter.search}%`;
@@ -167,7 +168,7 @@ export async function update(
     await findById(db, bookId, userId);
 
     const fields: string[] = [];
-    const params: any[] = [];
+    const params: D1BindValue[] = [];
 
     if (data.title !== undefined) {
       fields.push("title = ?");

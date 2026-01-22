@@ -25,10 +25,10 @@ export function generateRandomString(length: number = 32): string {
 /**
  * オブジェクトからundefinedのプロパティを削除
  */
-export function removeUndefined<T extends Record<string, any>>(
+export function removeUndefined<T extends Record<string, unknown>>(
   obj: T
 ): Partial<T> {
-  const result: any = {};
+  const result: Partial<T> = {};
   for (const key in obj) {
     if (obj[key] !== undefined) {
       result[key] = obj[key];
@@ -72,10 +72,10 @@ export function camelToSnake(str: string): string {
 /**
  * オブジェクトのキーをキャメルケースに変換
  */
-export function keysToCamel<T extends Record<string, any>>(
+export function keysToCamel<T extends Record<string, unknown>>(
   obj: T
-): Record<string, any> {
-  const result: Record<string, any> = {};
+): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
   for (const key in obj) {
     result[snakeToCamel(key)] = obj[key];
   }
@@ -85,10 +85,10 @@ export function keysToCamel<T extends Record<string, any>>(
 /**
  * オブジェクトのキーをスネークケースに変換
  */
-export function keysToSnake<T extends Record<string, any>>(
+export function keysToSnake<T extends Record<string, unknown>>(
   obj: T
-): Record<string, any> {
-  const result: Record<string, any> = {};
+): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
   for (const key in obj) {
     result[camelToSnake(key)] = obj[key];
   }
@@ -99,26 +99,23 @@ export function keysToSnake<T extends Record<string, any>>(
  * 文字列を指定された長さに切り詰め
  */
 export function truncate(str: string, maxLength: number): string {
-  if (str.length <= maxLength) return str;
-  return str.slice(0, maxLength - 3) + "...";
+  return str.length <= maxLength ? str : `${str.slice(0, maxLength - 3)}...`;
 }
 
 /**
  * 関数をデバウンス
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
   let timeout: ReturnType<typeof setTimeout> | null = null;
 
-  return function (this: any, ...args: Parameters<T>) {
-    const context = this;
-
+  return function (this: unknown, ...args: Parameters<T>) {
     if (timeout) clearTimeout(timeout);
 
     timeout = setTimeout(() => {
-      func.apply(context, args);
+      func.apply(this, args);
     }, wait);
   };
 }
