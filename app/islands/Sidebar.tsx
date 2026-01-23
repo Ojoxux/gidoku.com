@@ -5,9 +5,10 @@ const SIDEBAR_COOKIE_NAME = "sidebar_expanded";
 
 interface SidebarProps {
   initialExpanded?: boolean;
+  showLogout?: boolean;
 }
 
-export default function Sidebar({ initialExpanded = false }: SidebarProps) {
+export default function Sidebar({ initialExpanded = false, showLogout = true }: SidebarProps) {
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
 
   const navItems = [
@@ -71,12 +72,14 @@ export default function Sidebar({ initialExpanded = false }: SidebarProps) {
               </span>
             </a>
             <button
+              type="button"
               onClick={toggleSidebar}
               class="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 hover:text-white transition-colors shrink-0"
               title="サイドバーを閉じる"
               aria-label="サイドバーを閉じる"
             >
               <svg
+                aria-hidden="true"
                 width="16"
                 height="16"
                 viewBox="0 0 24 24"
@@ -93,12 +96,14 @@ export default function Sidebar({ initialExpanded = false }: SidebarProps) {
           </>
         ) : (
           <button
+            type="button"
             onClick={toggleSidebar}
             class="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 hover:text-white transition-colors mx-auto"
             title="サイドバーを開く"
             aria-label="サイドバーを開く"
           >
             <svg
+              aria-hidden="true"
               width="16"
               height="16"
               viewBox="0 0 24 24"
@@ -151,41 +156,45 @@ export default function Sidebar({ initialExpanded = false }: SidebarProps) {
       </nav>
 
       {/* ログアウトボタン */}
-      <div class="p-3 shrink-0">
-        <button
-          onClick={handleLogout}
-          class={`flex items-center gap-3 w-full px-3 py-2.5 text-zinc-400 hover:text-red-400 hover:bg-white/5 rounded-lg transition-all ${
-            isExpanded ? "justify-start" : "justify-center"
-          }`}
-          title="ログアウト"
-          aria-label="ログアウト"
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="min-w-[18px] shrink-0"
+      {showLogout && (
+        <div class="p-3 shrink-0">
+          <button
+            type="button"
+            onClick={handleLogout}
+            class={`flex items-center gap-3 w-full px-3 py-2.5 text-zinc-400 hover:text-red-400 hover:bg-white/5 rounded-lg transition-all ${
+              isExpanded ? "justify-start" : "justify-center"
+            }`}
+            title="ログアウト"
+            aria-label="ログアウト"
           >
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
-          {isExpanded && (
-            <span
-              class={`text-sm font-medium whitespace-nowrap transition-opacity duration-300 ${
-                isExpanded ? "opacity-100 delay-150" : "opacity-0"
-              }`}
+            <svg
+              aria-hidden="true"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="min-w-[18px] shrink-0"
             >
-              ログアウト
-            </span>
-          )}
-        </button>
-      </div>
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            {isExpanded && (
+              <span
+                class={`text-sm font-medium whitespace-nowrap transition-opacity duration-300 ${
+                  isExpanded ? "opacity-100 delay-150" : "opacity-0"
+                }`}
+              >
+                ログアウト
+              </span>
+            )}
+          </button>
+        </div>
+      )}
     </aside>
   );
 }
