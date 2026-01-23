@@ -6,6 +6,7 @@
     "build": "vite build --mode client && vite build",
     "preview": "wrangler dev",
     "deploy": "pnpm run build && wrangler deploy",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
