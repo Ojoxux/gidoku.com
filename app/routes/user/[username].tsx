@@ -48,7 +48,14 @@ const toBookListItem = (book: Book): BookListItem => ({
 });
 
 const NotFoundPage: FC<NotFoundPageProps> = ({ username, currentUser, sidebarExpanded }) => (
-  <Layout user={currentUser} title="ユーザーが見つかりません" sidebarExpanded={sidebarExpanded}>
+  <Layout
+    user={currentUser}
+    title="ユーザーが見つかりません"
+    sidebarExpanded={sidebarExpanded}
+    appShell
+    showSidebar
+    showLogout={Boolean(currentUser)}
+  >
     <div class="flex items-center justify-center min-h-[60vh]">
       <div class="text-center max-w-md mx-auto">
         <div class="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-6">
