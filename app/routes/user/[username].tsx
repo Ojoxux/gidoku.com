@@ -92,7 +92,14 @@ const ProfilePage: FC<ProfilePageProps> = ({
   currentUser,
   sidebarExpanded,
 }) => (
-  <Layout user={currentUser} title={`${profileUser.name}の本棚`} sidebarExpanded={sidebarExpanded}>
+  <Layout
+    user={currentUser}
+    title={`${profileUser.name}の本棚`}
+    sidebarExpanded={sidebarExpanded}
+    appShell
+    showSidebar
+    showLogout={Boolean(currentUser)}
+  >
     <div class="space-y-12">
       {/* Profile Header */}
       <div class="pb-6 border-b border-zinc-100">

@@ -8,6 +8,9 @@ interface LayoutProps {
   user?: User | null;
   title?: string;
   sidebarExpanded?: boolean;
+  appShell?: boolean;
+  showSidebar?: boolean;
+  showLogout?: boolean;
 }
 
 export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
@@ -15,18 +18,27 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
   user,
   title,
   sidebarExpanded = false,
+  appShell,
+  showSidebar,
+  showLogout,
 }) => {
+  const useAppShell = appShell ?? Boolean(user);
+  const shouldShowSidebar = showSidebar ?? Boolean(user);
+  const shouldShowLogout = showLogout ?? Boolean(user);
+
   return (
     <>
       {title && <title>{title} | gidoku</title>}
       <div class="min-h-screen flex bg-zinc-950 text-zinc-900 selection:bg-blue-500/20">
-        {user && <Sidebar initialExpanded={sidebarExpanded} />}
+        {shouldShowSidebar && (
+          <Sidebar initialExpanded={sidebarExpanded} showLogout={shouldShowLogout} />
+        )}
 
         <div
           id="main-layout"
           class="flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300 ease-in-out"
         >
-          {user ? (
+          {useAppShell ? (
             <div class="flex-1 p-2 sm:p-3 overflow-hidden">
               <div class="bg-white rounded-[20px] shadow-2xl border border-white/10 h-full flex flex-col overflow-hidden relative isolate">
                 <Header user={user} />
