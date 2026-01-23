@@ -6,12 +6,11 @@ import type {
   TagInput,
   TagResponse,
   User,
-  UserInput,
   UserResponse,
-  BookStatus,
 } from "../../types/database";
 import type { CreateBookInput, UpdateBookInput } from "../api/schemas/book";
 import type { CreateTagInput } from "../api/schemas/tag";
+import { removeUndefined } from "./utils";
 
 /**
  * API入力からBookInputへ変換
@@ -48,26 +47,23 @@ export function toBookInput(
 export function toBookUpdateInput(
   data: UpdateBookInput
 ): Partial<BookInput> {
-  const result: Partial<BookInput> = {
+  return removeUndefined({
     updatedAt: new Date().toISOString(),
-  };
-
-  if (data.title !== undefined) result.title = data.title;
-  if (data.authors !== undefined) result.authors = data.authors;
-  if (data.publisher !== undefined) result.publisher = data.publisher;
-  if (data.publishedDate !== undefined) result.publishedDate = data.publishedDate;
-  if (data.isbn !== undefined) result.isbn = data.isbn;
-  if (data.pageCount !== undefined) result.pageCount = data.pageCount;
-  if (data.description !== undefined) result.description = data.description;
-  if (data.thumbnailUrl !== undefined) result.thumbnailUrl = data.thumbnailUrl;
-  if (data.rakutenBooksId !== undefined) result.rakutenBooksId = data.rakutenBooksId;
-  if (data.rakutenAffiliateUrl !== undefined) result.rakutenAffiliateUrl = data.rakutenAffiliateUrl;
-  if (data.status !== undefined) result.status = data.status;
-  if (data.currentPage !== undefined) result.currentPage = data.currentPage;
-  if (data.memo !== undefined) result.memo = data.memo;
-  if (data.finishedAt !== undefined) result.finishedAt = data.finishedAt;
-
-  return result;
+    title: data.title,
+    authors: data.authors,
+    publisher: data.publisher,
+    publishedDate: data.publishedDate,
+    isbn: data.isbn,
+    pageCount: data.pageCount,
+    description: data.description,
+    thumbnailUrl: data.thumbnailUrl,
+    rakutenBooksId: data.rakutenBooksId,
+    rakutenAffiliateUrl: data.rakutenAffiliateUrl,
+    status: data.status,
+    currentPage: data.currentPage,
+    memo: data.memo,
+    finishedAt: data.finishedAt,
+  });
 }
 
 /**
