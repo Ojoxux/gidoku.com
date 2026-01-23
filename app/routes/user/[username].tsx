@@ -1,11 +1,10 @@
 import type { FC } from "hono/jsx";
 import { createRoute } from "honox/factory";
-import { getPageUser, getSidebarExpanded } from "../../lib/page-auth";
-import { Layout } from "../../components/layout/Layout";
+import { getPageUser } from "../../lib/page-auth";
+import { PublicProfileLayout } from "../../components/layout/PublicProfileLayout";
 import { UserProfile } from "../../components/user/UserProfile";
 import { UserStats } from "../../components/user/UserStats";
-import { BookList } from "../../components/book/BookList";
-import { Card, CardBody } from "../../components/ui/Card";
+import ProfileBookTabs from "../../islands/ProfileBookTabs";
 import { userRepo, bookRepo } from "../../server/db/repositories";
 import type { User, Book, BookStats, BookStatus } from "../../types/database";
 
@@ -22,7 +21,6 @@ interface BookListItem {
 
 interface PageProps {
   currentUser: User | null;
-  sidebarExpanded: boolean;
 }
 
 interface NotFoundPageProps extends PageProps {
@@ -33,6 +31,7 @@ interface ProfilePageProps extends PageProps {
   profileUser: User;
   stats: BookStats;
   readingBooks: BookListItem[];
+  unreadBooks: BookListItem[];
   completedBooks: BookListItem[];
 }
 
@@ -47,15 +46,8 @@ const toBookListItem = (book: Book): BookListItem => ({
   pageCount: book.page_count,
 });
 
-const NotFoundPage: FC<NotFoundPageProps> = ({ username, currentUser, sidebarExpanded }) => (
-  <Layout
-    user={currentUser}
-    title="ユーザーが見つかりません"
-    sidebarExpanded={sidebarExpanded}
-    appShell
-    showSidebar
-    showLogout={Boolean(currentUser)}
-  >
+const NotFoundPage: FC<NotFoundPageProps> = ({ username, currentUser }) => (
+  <PublicProfileLayout user={currentUser} title="ユーザーが見つかりません">
     <div class="flex items-center justify-center min-h-[60vh]">
       <div class="text-center max-w-md mx-auto">
         <div class="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -88,25 +80,18 @@ const NotFoundPage: FC<NotFoundPageProps> = ({ username, currentUser, sidebarExp
         </a>
       </div>
     </div>
-  </Layout>
+  </PublicProfileLayout>
 );
 
 const ProfilePage: FC<ProfilePageProps> = ({
   profileUser,
   stats,
   readingBooks,
+  unreadBooks,
   completedBooks,
   currentUser,
-  sidebarExpanded,
 }) => (
-  <Layout
-    user={currentUser}
-    title={`${profileUser.name}の本棚`}
-    sidebarExpanded={sidebarExpanded}
-    appShell
-    showSidebar
-    showLogout={Boolean(currentUser)}
-  >
+  <PublicProfileLayout user={currentUser} title={`${profileUser.name}の本棚`}>
     <div class="space-y-12">
       {/* Profile Header */}
       <div class="pb-6 border-b border-zinc-100">
@@ -122,79 +107,28 @@ const ProfilePage: FC<ProfilePageProps> = ({
       <section>
         <h2 class="text-xl font-bold text-zinc-900 mb-6">本棚</h2>
         <UserStats
-          totalBooks={stats.reading + stats.completed}
+          totalBooks={stats.total}
           readingBooks={stats.reading}
           completedBooks={stats.completed}
         />
       </section>
 
-      {/* Reading Books Section */}
-      {readingBooks.length > 0 && (
-        <section>
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-zinc-900">読書中</h2>
-            <span class="text-sm font-medium text-zinc-500">
-              {readingBooks.length}冊
-            </span>
-          </div>
-          <BookList books={readingBooks} />
-        </section>
-      )}
-
-      {/* Completed Books Section */}
-      {completedBooks.length > 0 && (
-        <section>
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-zinc-900">読了</h2>
-            <span class="text-sm font-medium text-zinc-500">
-              {completedBooks.length}冊
-            </span>
-          </div>
-          <BookList books={completedBooks} />
-        </section>
-      )}
-
-      {/* Empty State */}
-      {readingBooks.length === 0 && completedBooks.length === 0 && (
-        <Card>
-          <CardBody class="text-center py-16">
-            <div class="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                class="w-8 h-8 text-zinc-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <title>本のアイコン</title>
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                />
-              </svg>
-            </div>
-            <h3 class="text-lg font-bold tracking-tight text-zinc-900 mb-2">
-              まだ公開されている本がありません
-            </h3>
-            <p class="text-zinc-500 text-sm">
-              {profileUser.name}さんの読書記録はまだありません
-            </p>
-          </CardBody>
-        </Card>
-      )}
+      <section>
+        <ProfileBookTabs
+          readingBooks={readingBooks}
+          unreadBooks={unreadBooks}
+          completedBooks={completedBooks}
+          userName={profileUser.name}
+        />
+      </section>
     </div>
-  </Layout>
+  </PublicProfileLayout>
 );
 
 export default createRoute(async (c) => {
   const username = c.req.param("username") ?? "";
 
-  const [currentUser, sidebarExpanded] = await Promise.all([
-    getPageUser(c),
-    Promise.resolve(getSidebarExpanded(c)),
-  ]);
-  const resolvedSidebarExpanded = currentUser ? sidebarExpanded : true;
+  const currentUser = await getPageUser(c);
 
   const profileUser = await userRepo
     .findByUsername(c.env.DB, username)
@@ -202,17 +136,15 @@ export default createRoute(async (c) => {
 
   if (!profileUser) {
     return c.render(
-      <NotFoundPage
-        username={username}
-        currentUser={currentUser}
-        sidebarExpanded={resolvedSidebarExpanded}
-      />
+      <NotFoundPage username={username} currentUser={currentUser} />
     );
   }
 
-  const [stats, { books: rawReadingBooks }, { books: rawCompletedBooks }] = await Promise.all([
+  const [stats, { books: rawReadingBooks }, { books: rawUnreadBooks }, { books: rawCompletedBooks }] =
+    await Promise.all([
     bookRepo.getStats(c.env.DB, profileUser.id),
     bookRepo.findByUserId(c.env.DB, profileUser.id, { status: "reading", limit: 12, offset: 0 }),
+    bookRepo.findByUserId(c.env.DB, profileUser.id, { status: "unread", sortBy: "updated", limit: 24, offset: 0 }),
     bookRepo.findByUserId(c.env.DB, profileUser.id, { status: "completed", sortBy: "updated", limit: 24, offset: 0 }),
   ]);
 
@@ -221,9 +153,9 @@ export default createRoute(async (c) => {
       profileUser={profileUser}
       stats={stats}
       readingBooks={rawReadingBooks.map(toBookListItem)}
+      unreadBooks={rawUnreadBooks.map(toBookListItem)}
       completedBooks={rawCompletedBooks.map(toBookListItem)}
       currentUser={currentUser}
-      sidebarExpanded={resolvedSidebarExpanded}
     />
   );
 });
