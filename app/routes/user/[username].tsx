@@ -194,6 +194,7 @@ export default createRoute(async (c) => {
     getPageUser(c),
     Promise.resolve(getSidebarExpanded(c)),
   ]);
+  const resolvedSidebarExpanded = currentUser ? sidebarExpanded : true;
 
   const profileUser = await userRepo
     .findByUsername(c.env.DB, username)
@@ -204,7 +205,7 @@ export default createRoute(async (c) => {
       <NotFoundPage
         username={username}
         currentUser={currentUser}
-        sidebarExpanded={sidebarExpanded}
+        sidebarExpanded={resolvedSidebarExpanded}
       />
     );
   }
@@ -222,7 +223,7 @@ export default createRoute(async (c) => {
       readingBooks={rawReadingBooks.map(toBookListItem)}
       completedBooks={rawCompletedBooks.map(toBookListItem)}
       currentUser={currentUser}
-      sidebarExpanded={sidebarExpanded}
+      sidebarExpanded={resolvedSidebarExpanded}
     />
   );
 });
