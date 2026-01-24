@@ -62,6 +62,67 @@ describe('Books API Integration', () => {
     })
   })
 
+  describe('GET /books filters', () => {
+    it('should filter by status', async () => {
+      await createTestBook(env.DB, userId, { status: 'reading' })
+      await createTestBook(env.DB, userId, { status: 'completed' })
+
+      const res = await api.request('/books?status=reading', {
+        headers: { Cookie: `session_id=${sessionId}` },
+      }, env)
+
+      expect(res.status).toBe(200)
+      const body = await res.json() as SuccessResponse<PaginatedResponse<BookResponse>>
+      expect(body.data.items).toHaveLength(1)
+      expect(body.data.items[0].status).toBe('reading')
+    })
+
+    it('should filter by search term', async () => {
+      await createTestBook(env.DB, userId, { title: 'JavaScript Guide' })
+      await createTestBook(env.DB, userId, { title: 'Python Guide' })
+
+      const res = await api.request('/books?search=JavaScript', {
+        headers: { Cookie: `session_id=${sessionId}` },
+      }, env)
+
+      expect(res.status).toBe(200)
+      const body = await res.json() as SuccessResponse<PaginatedResponse<BookResponse>>
+      expect(body.data.items).toHaveLength(1)
+      expect(body.data.items[0].title).toBe('JavaScript Guide')
+    })
+
+    it('should sort by title ascending', async () => {
+      await createTestBook(env.DB, userId, { title: 'Zeta Book' })
+      await createTestBook(env.DB, userId, { title: 'Alpha Book' })
+
+      const res = await api.request('/books?sortBy=title', {
+        headers: { Cookie: `session_id=${sessionId}` },
+      }, env)
+
+      expect(res.status).toBe(200)
+      const body = await res.json() as SuccessResponse<PaginatedResponse<BookResponse>>
+      expect(body.data.items[0].title).toBe('Alpha Book')
+    })
+
+    it('should support pagination', async () => {
+      await createTestBook(env.DB, userId, { title: 'Book 1' })
+      await createTestBook(env.DB, userId, { title: 'Book 2' })
+      await createTestBook(env.DB, userId, { title: 'Book 3' })
+
+      const res = await api.request('/books?limit=1&offset=1', {
+        headers: { Cookie: `session_id=${sessionId}` },
+      }, env)
+
+      expect(res.status).toBe(200)
+      const body = await res.json() as SuccessResponse<PaginatedResponse<BookResponse>>
+      expect(body.data.items).toHaveLength(1)
+      expect(body.data.total).toBe(3)
+      expect(body.data.limit).toBe(1)
+      expect(body.data.offset).toBe(1)
+      expect(body.data.hasMore).toBe(true)
+    })
+  })
+
   describe('POST /books', () => {
     it('should create a new book', async () => {
       const res = await api.request('/books', {
@@ -81,6 +142,31 @@ describe('Books API Integration', () => {
       const body = await res.json() as SuccessResponse<BookResponse>
       expect(body.success).toBe(true)
       expect(body.data.title).toBe('New Test Book')
+    })
+  })
+
+  describe('PUT /books/:id', () => {
+    it('should update book fields', async () => {
+      const book = await createTestBook(env.DB, userId, { title: 'Old Title' })
+
+      const res = await api.request(`/books/${book.id}`, {
+        method: 'PUT',
+        headers: {
+          Cookie: `session_id=${sessionId}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: 'New Title',
+          status: 'reading',
+          currentPage: 10,
+        }),
+      }, env)
+
+      expect(res.status).toBe(200)
+      const body = await res.json() as SuccessResponse<BookResponse>
+      expect(body.data.title).toBe('New Title')
+      expect(body.data.status).toBe('reading')
+      expect(body.data.currentPage).toBe(10)
     })
   })
 
@@ -167,6 +253,31 @@ describe('Books API Integration', () => {
       expect(res.status).toBe(200)
       const body = await res.json() as SuccessResponse<{ deleted: boolean }>
       expect(body.data.deleted).toBe(true)
+    })
+  })
+
+  describe('GET /books/stats', () => {
+    it('should return aggregated stats', async () => {
+      await createTestBook(env.DB, userId, { status: 'reading' })
+      await createTestBook(env.DB, userId, { status: 'reading' })
+      await createTestBook(env.DB, userId, { status: 'completed' })
+      await createTestBook(env.DB, userId, { status: 'unread' })
+
+      const res = await api.request('/books/stats', {
+        headers: { Cookie: `session_id=${sessionId}` },
+      }, env)
+
+      expect(res.status).toBe(200)
+      const body = await res.json() as SuccessResponse<{
+        total: number
+        reading: number
+        completed: number
+        unread: number
+      }>
+      expect(body.data.total).toBe(4)
+      expect(body.data.reading).toBe(2)
+      expect(body.data.completed).toBe(1)
+      expect(body.data.unread).toBe(1)
     })
   })
 

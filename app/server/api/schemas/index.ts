@@ -5,6 +5,7 @@ export {
   progressSchema,
   bookFilterSchema,
   bookIdSchema,
+  bookIdParamSchema,
 } from "./book";
 
 // タグ関連

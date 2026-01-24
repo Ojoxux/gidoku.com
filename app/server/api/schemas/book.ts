@@ -64,6 +64,14 @@ export const bookIdSchema = type({
   id: /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
 });
 
+/**
+ * 書籍IDパラメータ検証スキーマ
+ */
+export const bookIdParamSchema = type({
+  bookId:
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+});
+
 // 型エクスポート
 export type CreateBookInput = typeof createBookSchema.infer;
 export type UpdateBookInput = typeof updateBookSchema.infer;

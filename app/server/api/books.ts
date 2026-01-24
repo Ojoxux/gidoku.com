@@ -56,6 +56,21 @@ app.get("/", validator("query", bookFilterSchema), async (c) => {
  * 書籍詳細取得
  * GET /api/books/:id
  */
+/**
+ * 書籍統計取得
+ * GET /api/books/stats
+ */
+app.get("/stats", async (c) => {
+  const userId = c.get("userId");
+  const stats = await bookRepo.getStats(c.env.DB, userId);
+
+  return successResponse(c, stats);
+});
+
+/**
+ * 書籍詳細取得
+ * GET /api/books/:id
+ */
 app.get("/:id", validator("param", bookIdSchema), async (c) => {
   const userId = c.get("userId");
   const { id } = getValidated<{ id: string }>(c, "param");
@@ -163,17 +178,6 @@ app.delete("/:id", validator("param", bookIdSchema), async (c) => {
   await bookRepo.deleteById(c.env.DB, id, userId);
 
   return successResponse(c, { deleted: true });
-});
-
-/**
- * 書籍統計取得
- * GET /api/books/stats
- */
-app.get("/stats", async (c) => {
-  const userId = c.get("userId");
-  const stats = await bookRepo.getStats(c.env.DB, userId);
-
-  return successResponse(c, stats);
 });
 
 export default app;
