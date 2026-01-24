@@ -3,8 +3,9 @@ import type { HonoContext } from "../../types/env";
 import { authMiddleware } from "../lib/auth";
 import { validator, getValidated } from "../lib/validator";
 import { rakutenSearchSchema, isbnSearchSchema } from "./schemas";
-import type { RakutenSearchInput, IsbnSearchInput } from "./schemas/auth";
+import type { RakutenSearchInput } from "./schemas/auth";
 import { successResponse } from "../lib/response";
+import { isValidISBN } from "../lib/validation";
 import * as rakutenService from "../services/rakuten";
 import { searchRateLimiter } from "../lib/rate-limit";
 
@@ -52,7 +53,20 @@ app.get("/books", validator("query", rakutenSearchSchema), async (c) => {
  * GET /api/search/isbn/:isbn
  */
 app.get("/isbn/:isbn", validator("param", isbnSearchSchema), async (c) => {
-  const { isbn } = getValidated<IsbnSearchInput>(c, "param");
+  const isbn = c.req.param("isbn");
+  if (!isValidISBN(isbn)) {
+    return c.json(
+      {
+        success: false,
+        error: {
+          message: "Validation failed",
+          code: "VALIDATION_ERROR",
+          details: "Invalid ISBN",
+        },
+      },
+      400
+    );
+  }
 
   const result = await rakutenService.searchByISBN(isbn, c.env.RAKUTEN_APP_ID);
 

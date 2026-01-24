@@ -21,6 +21,7 @@ export { updateUserSchema, usernameSchema } from "./user";
 // 認証関連
 export {
   oauthProviderSchema,
+  oauthProviderParamSchema,
   oauthCallbackSchema,
   rakutenSearchSchema,
   isbnSearchSchema,
