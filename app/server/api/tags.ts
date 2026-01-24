@@ -8,7 +8,7 @@ import {
   updateTagSchema,
   tagIdSchema,
   addTagToBookSchema,
-  bookIdSchema,
+  bookIdParamSchema,
 } from "./schemas";
 import type { CreateTagInput, UpdateTagInput, AddTagToBookInput } from "./schemas/tag";
 import { toTagInput, toTagResponse } from "../lib/mapper";
@@ -82,11 +82,11 @@ app.delete("/:id", validator("param", tagIdSchema), async (c) => {
  */
 app.post(
   "/books/:bookId",
-  validator("param", bookIdSchema),
+  validator("param", bookIdParamSchema),
   validator("json", addTagToBookSchema),
   async (c) => {
     const userId = c.get("userId");
-    const { id: bookId } = getValidated<{ id: string }>(c, "param");
+    const { bookId } = getValidated<{ bookId: string }>(c, "param");
     const { tagId } = getValidated<AddTagToBookInput>(c, "json");
 
     await bookTagRepo.addTagToBook(c.env.DB, bookId, tagId, userId);

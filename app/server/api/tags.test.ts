@@ -113,6 +113,24 @@ describe('Tags API Integration', () => {
       expect(body.data).toHaveLength(1)
     })
 
+    it('should add a tag to a book', async () => {
+      const book = await createTestBook(env.DB, userId)
+      const tag = await createTestTag(env.DB, userId, 'NewTag')
+
+      const res = await api.request(`/tags/books/${book.id}`, {
+        method: 'POST',
+        headers: {
+          Cookie: `session_id=${sessionId}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tagId: tag.id }),
+      }, env)
+
+      expect(res.status).toBe(201)
+      const body = await res.json() as SuccessResponse<{ added: boolean }>
+      expect(body.data.added).toBe(true)
+    })
+
     it('should remove tag from book', async () => {
       const book = await createTestBook(env.DB, userId)
       const tag = await createTestTag(env.DB, userId, 'ToRemove')
