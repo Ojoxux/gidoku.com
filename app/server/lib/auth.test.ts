@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { Hono } from 'hono'
 import { env } from 'cloudflare:test'
 import { authMiddleware, optionalAuthMiddleware, invalidateUserCache } from './auth'
@@ -6,7 +6,10 @@ import { createTestSession, createTestUser, cleanupDatabase } from '../../test/h
 import type { HonoContext } from '../../types/env'
 
 describe('Auth middleware', () => {
+  const warnSpy = vi.spyOn(console, 'warn')
+
   beforeEach(async () => {
+    warnSpy.mockImplementation(() => {})
     await cleanupDatabase(env.DB)
   })
 
@@ -66,6 +69,7 @@ describe('Auth middleware', () => {
       env
     )
     expect(res.status).toBe(200)
+    expect(warnSpy).toHaveBeenCalled()
   })
 
   it('should invalidate cached user', async () => {

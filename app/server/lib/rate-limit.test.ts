@@ -1,10 +1,20 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { Hono } from 'hono'
 import { env } from 'cloudflare:test'
 import { rateLimiter } from './rate-limit'
 import { errorHandler } from './errors'
 
 describe('rateLimiter middleware', () => {
+  const errorSpy = vi.spyOn(console, 'error')
+
+  beforeEach(() => {
+    errorSpy.mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    errorSpy.mockReset()
+  })
+
   it('should enforce limits per window', async () => {
     const app = new Hono()
     app.onError(errorHandler)
@@ -34,5 +44,6 @@ describe('rateLimiter middleware', () => {
     )
     expect(second.status).toBe(429)
     expect(second.headers.get('Retry-After')).toBeTruthy()
+    expect(errorSpy).toHaveBeenCalled()
   })
 })
