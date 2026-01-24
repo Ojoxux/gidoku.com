@@ -1,9 +1,16 @@
-import { type } from "arktype";
+import { regex, type } from "arktype";
 
 /**
  * OAuth認証プロバイダー
  */
 export const oauthProviderSchema = type("'github' | 'google'");
+
+/**
+ * OAuth認証プロバイダーパラメータ
+ */
+export const oauthProviderParamSchema = type({
+  provider: "'github' | 'google'",
+});
 
 /**
  * OAuth コールバックスキーマ
@@ -25,12 +32,15 @@ export const rakutenSearchSchema = type({
 /**
  * ISBN検索スキーマ
  */
+const isbnPattern = regex("^(?:\\d{10}|\\d{13})$");
+
 export const isbnSearchSchema = type({
-  isbn: /^(?:\d{10}|\d{13})$/,
+  isbn: isbnPattern,
 });
 
 // 型エクスポート
 export type OAuthProvider = typeof oauthProviderSchema.infer;
+export type OAuthProviderParam = typeof oauthProviderParamSchema.infer;
 export type OAuthCallbackInput = typeof oauthCallbackSchema.infer;
 export type RakutenSearchInput = typeof rakutenSearchSchema.infer;
 export type IsbnSearchInput = typeof isbnSearchSchema.infer;

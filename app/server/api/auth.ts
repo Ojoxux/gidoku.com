@@ -4,7 +4,7 @@ import type { HonoContext } from "../../types/env";
 import { userRepo } from "../db/repositories";
 import { authMiddleware } from "../lib/auth";
 import { validator, getValidated } from "../lib/validator";
-import { oauthProviderSchema, oauthCallbackSchema } from "./schemas";
+import { oauthProviderParamSchema, oauthCallbackSchema } from "./schemas";
 import type { OAuthProvider, OAuthCallbackInput } from "./schemas/auth";
 import {
   deleteSession,
@@ -22,11 +22,42 @@ const app = new Hono<HonoContext>();
 app.use("*", authRateLimiter);
 
 /**
+ * ログアウト
+ * POST /api/auth/logout
+ */
+app.post("/logout", authMiddleware, async (c) => {
+  const sessionId = getCookie(c, "session_id");
+
+  if (sessionId) {
+    await deleteSession(c.env.KV, sessionId);
+  }
+
+  deleteCookie(c, "session_id", { path: "/" });
+
+  return successResponse(c, { loggedOut: true });
+});
+
+/**
+ * セッション確認
+ * GET /api/auth/session
+ */
+app.get("/session", authMiddleware, async (c) => {
+  const user = c.get("user");
+  return successResponse(c, {
+    authenticated: true,
+    user: toUserResponse(user),
+  });
+});
+
+/**
  * OAuth認証開始
  * GET /api/auth/:provider
  */
-app.get("/:provider", validator("param", oauthProviderSchema), async (c) => {
-  const provider = c.req.param("provider") as OAuthProvider;
+app.get("/:provider", validator("param", oauthProviderParamSchema), async (c) => {
+  const provider = c.req.param("provider") as OAuthProvider | undefined;
+  if (provider !== "github" && provider !== "google") {
+    return errorResponse(c, "Invalid provider", "INVALID_PROVIDER", 400);
+  }
   const state = crypto.randomUUID();
 
   // stateをセッションに保存（CSRF対策）
@@ -45,10 +76,13 @@ app.get("/:provider", validator("param", oauthProviderSchema), async (c) => {
  */
 app.get(
   "/:provider/callback",
-  validator("param", oauthProviderSchema),
+  validator("param", oauthProviderParamSchema),
   validator("query", oauthCallbackSchema),
   async (c) => {
-    const provider = c.req.param("provider") as OAuthProvider;
+    const provider = c.req.param("provider") as OAuthProvider | undefined;
+    if (provider !== "github" && provider !== "google") {
+      return errorResponse(c, "Invalid provider", "INVALID_PROVIDER", 400);
+    }
     const { code, state } = getValidated<OAuthCallbackInput>(c, "query");
 
     // state検証（CSRF対策）
@@ -113,34 +147,6 @@ app.get(
     }
   }
 );
-
-/**
- * ログアウト
- * POST /api/auth/logout
- */
-app.post("/logout", authMiddleware, async (c) => {
-  const sessionId = getCookie(c, "session_id");
-
-  if (sessionId) {
-    await deleteSession(c.env.KV, sessionId);
-  }
-
-  deleteCookie(c, "session_id", { path: "/" });
-
-  return successResponse(c, { loggedOut: true });
-});
-
-/**
- * セッション確認
- * GET /api/auth/session
- */
-app.get("/session", authMiddleware, async (c) => {
-  const user = c.get("user");
-  return successResponse(c, {
-    authenticated: true,
-    user: toUserResponse(user),
-  });
-});
 
 /**
  * ユニークなユーザー名を生成
