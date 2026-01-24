@@ -3,6 +3,7 @@ import { Hono } from 'hono'
 import { env } from 'cloudflare:test'
 import { authMiddleware, optionalAuthMiddleware, invalidateUserCache } from './auth'
 import { createTestSession, createTestUser, cleanupDatabase } from '../../test/helpers'
+import type { HonoContext } from '../../types/env'
 
 describe('Auth middleware', () => {
   beforeEach(async () => {
@@ -10,7 +11,7 @@ describe('Auth middleware', () => {
   })
 
   it('should return 401 without session cookie', async () => {
-    const app = new Hono()
+    const app = new Hono<HonoContext>()
     app.use('*', authMiddleware)
     app.get('/protected', (c) => c.json({ ok: true }))
 
@@ -22,7 +23,7 @@ describe('Auth middleware', () => {
     const user = await createTestUser(env.DB)
     const sessionId = await createTestSession(env.KV, user.id)
 
-    const app = new Hono()
+    const app = new Hono<HonoContext>()
     app.use('*', authMiddleware)
     app.get('/protected', (c) =>
       c.json({ userId: c.get('userId'), user: c.get('user') })
@@ -44,7 +45,7 @@ describe('Auth middleware', () => {
   })
 
   it('should allow optional auth without session', async () => {
-    const app = new Hono()
+    const app = new Hono<HonoContext>()
     app.use('*', optionalAuthMiddleware)
     app.get('/optional', (c) => c.json({ userId: c.get('userId') ?? null }))
 
@@ -55,7 +56,7 @@ describe('Auth middleware', () => {
   })
 
   it('should ignore invalid session in optional auth', async () => {
-    const app = new Hono()
+    const app = new Hono<HonoContext>()
     app.use('*', optionalAuthMiddleware)
     app.get('/optional', (c) => c.json({ userId: c.get('userId') ?? null }))
 
