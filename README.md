@@ -2,6 +2,8 @@
 
 技術書に特化した読書管理 Web アプリケーション
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Ojoxux/gidoku.com)
+
 ## セットアップ
 
 ### 1. 依存関係のインストール
