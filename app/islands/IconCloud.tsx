@@ -116,7 +116,9 @@ export default function IconCloud({
             iconSize - padding * 2,
           );
 
-          imagesLoadedRef.current![index] = true;
+          if (imagesLoadedRef.current) {
+            imagesLoadedRef.current[index] = true;
+          }
         };
       }
       return offscreen;
@@ -171,11 +173,12 @@ export default function IconCloud({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const rot = rotationRef.current ?? { x: 0, y: 0 };
     iconPositions.forEach((icon) => {
-      const cosX = Math.cos(rotationRef.current!.x);
-      const sinX = Math.sin(rotationRef.current!.x);
-      const cosY = Math.cos(rotationRef.current!.y);
-      const sinY = Math.sin(rotationRef.current!.y);
+      const cosX = Math.cos(rot.x);
+      const sinX = Math.sin(rot.x);
+      const cosY = Math.cos(rot.y);
+      const sinY = Math.sin(rot.y);
 
       const rotatedX = icon.x * cosY - icon.z * sinY;
       const rotatedZ = icon.x * sinY + icon.z * cosY;
@@ -196,8 +199,8 @@ export default function IconCloud({
         );
         const targetY = Math.atan2(icon.x, icon.z);
 
-        const currentX = rotationRef.current!.x;
-        const currentY = rotationRef.current!.y;
+        const currentX = rot.x;
+        const currentY = rot.y;
         const distance = Math.sqrt(
           Math.pow(targetX - currentX, 2) + Math.pow(targetY - currentY, 2),
         );
@@ -236,9 +239,10 @@ export default function IconCloud({
       const deltaX = e.clientX - lastMousePos.x;
       const deltaY = e.clientY - lastMousePos.y;
 
+      const prevRot = rotationRef.current ?? { x: 0, y: 0 };
       rotationRef.current = {
-        x: rotationRef.current!.x + deltaY * 0.002,
-        y: rotationRef.current!.y + deltaX * 0.002,
+        x: prevRot.x + deltaY * 0.002,
+        y: prevRot.y + deltaX * 0.002,
       };
 
       setLastMousePos({ x: e.clientX, y: e.clientY });
