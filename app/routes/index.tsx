@@ -2,7 +2,7 @@ import { createRoute } from "honox/factory";
 import { getPageUser, getSidebarExpanded } from "../lib/page-auth";
 import { Layout } from "../components/layout/Layout";
 import ReadingBooksCarousel from "../islands/ReadingBooksCarousel";
-import IconCloud from "../islands/IconCloud";
+import { HeroVisual } from "../components/landing/HeroVisual";
 import { Card, CardBody } from "../components/ui/Card";
 import { bookRepo } from "../server/db/repositories";
 import { BookCover } from "../components/book/BookCover";
@@ -51,11 +51,15 @@ export default createRoute(async (c) => {
         <div class="absolute inset-0 -z-10 h-full w-full bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[16px_16px] mask-[radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
 
         {/* ヘッダー */}
-        <header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-center w-full py-6 px-6">
-          <nav class="flex items-center justify-between w-full max-w-6xl mx-auto bg-white/80 backdrop-blur-xl border border-zinc-200/60 rounded-full px-6 py-3.5 shadow-lg shadow-zinc-900/5">
+        <header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-center w-full py-4 px-4 sm:py-6 sm:px-6">
+          <nav class="flex items-center justify-between w-full max-w-6xl mx-auto bg-white/80 backdrop-blur-xl border border-zinc-200/60 rounded-full px-4 sm:px-6 py-3 sm:py-3.5 shadow-lg shadow-zinc-900/5">
             {/* Logo */}
             <div class="flex items-center gap-2.5">
-              <img src="/favicon128.ico" alt="gidoku" class="w-8 h-8 rounded-lg" />
+              <img
+                src="/favicon128.ico"
+                alt="gidoku"
+                class="w-8 h-8 rounded-lg"
+              />
               <span class="text-xl font-bold tracking-tight text-zinc-900">
                 gidoku
               </span>
@@ -65,7 +69,7 @@ export default createRoute(async (c) => {
             <div class="flex items-center gap-2">
               <a
                 href="/login"
-                class="px-6 py-2.5 text-sm font-medium text-white bg-zinc-900 rounded-full hover:bg-zinc-800 transition-all shadow-sm hover:shadow-md"
+                class="px-4 py-2 sm:px-6 sm:py-2.5 text-sm font-medium text-white bg-zinc-900 rounded-full hover:bg-zinc-800 transition-all shadow-sm hover:shadow-md"
               >
                 ログイン
               </a>
@@ -74,51 +78,37 @@ export default createRoute(async (c) => {
         </header>
 
         {/* ヒーローセクション */}
-        <main class="flex flex-col items-center justify-center min-h-screen w-full px-6 pt-20">
-          <div class="max-w-6xl mx-auto w-full grid lg:grid-cols-2 gap-12 lg:gap-20 items-center h-full">
-            <div class="space-y-8 text-center lg:text-left order-2 lg:order-1 z-10 pointer-events-none">
+        <main class="flex flex-col items-center justify-start sm:justify-center min-h-svh sm:min-h-screen w-full px-4 sm:px-6 pt-24 sm:pt-20">
+          <div class="max-w-6xl mx-auto w-full grid lg:grid-cols-2 gap-0 sm:gap-12 lg:gap-20 items-center h-full">
+            <div class="space-y-4 sm:space-y-8 text-center lg:text-left order-2 lg:order-1 z-10 pointer-events-none -mt-4 sm:mt-0 px-1">
               <div class="space-y-4 pointer-events-auto">
                 <style>{`
-                  @keyframes fadeInBlack {
-                    from { color: #a1a1aa; }
-                    to { color: #18181b; }
+                  @keyframes fadeUp {
+                    from { opacity: 0; transform: translateY(16px); }
+                    to { opacity: 1; transform: translateY(0); }
                   }
-                  @keyframes fadeInGreen {
-                    from { color: #a1a1aa; }
-                    to { color: #059669; }
-                  }
-                  .animate-read {
-                    color: #a1a1aa;
-                    animation: fadeInBlack 0.6s ease-out 0.5s forwards;
-                  }
-                  .animate-record {
-                    color: #a1a1aa;
-                    animation: fadeInBlack 0.6s ease-out 1.3s forwards;
-                  }
-                  .animate-grow {
-                    color: #a1a1aa;
-                    animation: fadeInGreen 0.6s ease-out 2.1s forwards;
+                  .animate-hero {
+                    opacity: 0;
+                    animation: fadeUp 0.8s ease-out 0.3s forwards;
                   }
                 `}</style>
-                <h1 class="text-6xl sm:text-7xl lg:text-8xl font-mono font-semibold tracking-tight leading-[1.2]">
-                  <span class="animate-read">Read;</span>
+                <h1 class="animate-hero text-[clamp(1.75rem,0.9rem+4.1vw,3.75rem)] font-bold tracking-tight leading-[1.3] text-zinc-900">
+                  技術書と
                   <br />
-                  <span class="animate-record">Record;</span>
-                  <br />
-                  <span class="animate-grow">Grow;</span>
+                  ともに成長しよう。
                 </h1>
               </div>
 
-              <p class="text-lg text-zinc-500 max-w-lg mx-auto lg:mx-0 leading-relaxed font-light pointer-events-auto">
-                技術書の積読を消化し、学習の軌跡を可視化する。
+              <p class="text-[clamp(0.813rem,0.5rem+1.56vw,1.125rem)] text-zinc-500 max-w-lg mx-auto lg:mx-0 leading-relaxed font-light pointer-events-auto">
+                読んだ技術書を記録して、自分だけの本棚をつくろう。
                 <br />
-                エンジニアのための、シンプルで美しい読書管理ツール。
+                読書の記録は公開プロフィールとしてシェアもできます。
               </p>
 
               <div class="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start pointer-events-auto">
                 <a
                   href="/login"
-                  class="group inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-medium text-white bg-zinc-900 rounded-full hover:bg-zinc-800 hover:scale-105 transition-all shadow-xl shadow-zinc-900/10"
+                  class="group inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-8 sm:py-4 text-sm sm:text-base font-medium text-white bg-zinc-900 rounded-full hover:bg-zinc-800 hover:scale-105 transition-all shadow-xl shadow-zinc-900/10"
                 >
                   <span>無料で始める</span>
                   <svg
@@ -126,6 +116,7 @@ export default createRoute(async (c) => {
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
+                    aria-hidden="true"
                   >
                     <path
                       stroke-linecap="round"
@@ -138,135 +129,25 @@ export default createRoute(async (c) => {
               </div>
             </div>
 
-            {/* Icon Cloud with Book */}
-            <div class="flex items-center justify-center order-1 lg:order-2 h-[500px] lg:h-[700px] w-full max-w-[700px] mx-auto relative -mt-20 lg:-mt-32">
-              {/* Icon Cloud */}
-              <div class="relative z-10">
-                <IconCloud images={techIcons} width={700} height={700} />
-              </div>
-
-              {/* Open Book Base - Realistic */}
-              <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[500px] z-0 opacity-90">
-                <svg
-                  viewBox="0 0 440 140"
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="w-full"
-                  style={{ filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.15))" }}
-                >
-                  <defs>
-                    <linearGradient
-                      id="coverGrad"
-                      x1="0%"
-                      y1="0%"
-                      x2="100%"
-                      y2="0%"
-                    >
-                      <stop offset="0%" stop-color="#18181b" />
-                      <stop offset="50%" stop-color="#27272a" />
-                      <stop offset="100%" stop-color="#18181b" />
-                    </linearGradient>
-
-                    <linearGradient
-                      id="pageGradLeft"
-                      x1="0%"
-                      y1="0%"
-                      x2="100%"
-                      y2="0%"
-                    >
-                      <stop offset="0%" stop-color="#e4e4e7" />
-                      <stop offset="90%" stop-color="#a1a1aa" />
-                      <stop offset="100%" stop-color="#71717a" />
-                    </linearGradient>
-
-                    <linearGradient
-                      id="pageGradRight"
-                      x1="0%"
-                      y1="0%"
-                      x2="100%"
-                      y2="0%"
-                    >
-                      <stop offset="0%" stop-color="#71717a" />
-                      <stop offset="10%" stop-color="#a1a1aa" />
-                      <stop offset="100%" stop-color="#e4e4e7" />
-                    </linearGradient>
-                  </defs>
-
-                  {/* Hard Cover (Bottom Layer) */}
-                  <path
-                    d="M35 55 Q35 45, 75 40 Q165 30, 220 50 L220 125 Q165 105, 75 115 Q35 120, 35 110 Z"
-                    fill="url(#coverGrad)"
-                  />
-                  <path
-                    d="M220 50 Q275 30, 365 40 Q405 45, 405 55 L405 115 Q405 125, 365 120 Q275 105, 220 125 Z"
-                    fill="url(#coverGrad)"
-                  />
-
-                  {/* Page Block (Thickness) */}
-                  <path
-                    d="M40 50 Q40 40, 80 37 Q170 27, 220 47 L220 118 Q170 100, 80 110 Q40 113, 40 103 Z"
-                    fill="#52525b"
-                  />
-                  <path
-                    d="M220 47 Q270 27, 360 37 Q400 40, 400 50 L400 103 Q400 113, 360 110 Q270 100, 220 118 Z"
-                    fill="#52525b"
-                  />
-
-                  {/* Top Pages */}
-                  <path
-                    d="M40 48 Q40 38, 80 35 Q170 25, 220 45 L220 115 Q170 98, 80 108 Q40 111, 40 101 Z"
-                    fill="url(#pageGradLeft)"
-                  />
-                  <path
-                    d="M220 45 Q270 25, 360 35 Q400 38, 400 48 L400 101 Q400 111, 360 108 Q270 98, 220 115 Z"
-                    fill="url(#pageGradRight)"
-                  />
-
-                  {/* Texture Lines */}
-                  <g opacity="0.1">
-                    <path
-                      d="M55 50 Q130 40, 200 55"
-                      stroke="#000"
-                      stroke-width="1"
-                      fill="none"
-                    />
-                    <path
-                      d="M55 65 Q130 55, 200 70"
-                      stroke="#000"
-                      stroke-width="1"
-                      fill="none"
-                    />
-                    <path
-                      d="M55 80 Q130 70, 200 85"
-                      stroke="#000"
-                      stroke-width="1"
-                      fill="none"
-                    />
-
-                    <path
-                      d="M240 55 Q310 40, 385 50"
-                      stroke="#000"
-                      stroke-width="1"
-                      fill="none"
-                    />
-                    <path
-                      d="M240 70 Q310 55, 385 65"
-                      stroke="#000"
-                      stroke-width="1"
-                      fill="none"
-                    />
-                    <path
-                      d="M240 85 Q310 70, 385 80"
-                      stroke="#000"
-                      stroke-width="1"
-                      fill="none"
-                    />
-                  </g>
-                </svg>
-              </div>
+            <div class="order-1 lg:order-2 min-w-0">
+              <HeroVisual
+                techIcons={techIcons}
+                cloudSize={620}
+                gradientIdPrefix="mobile-hero"
+                className="flex lg:hidden aspect-square w-full max-w-[620px] mx-auto -mt-[min(6rem,16vw)]"
+                bookWidthClass="w-[85%]"
+              />
+              <HeroVisual
+                techIcons={techIcons}
+                cloudSize={700}
+                gradientIdPrefix="desktop-hero"
+                className="hidden lg:flex aspect-square w-full max-w-[700px] mx-auto -mt-32"
+                bookWidthClass="w-[80%]"
+              />
             </div>
           </div>
         </main>
-      </div>
+      </div>,
     );
   }
 
@@ -280,7 +161,7 @@ export default createRoute(async (c) => {
       status: "reading",
       limit: 6,
       offset: 0,
-    }
+    },
   );
 
   const { books: recentBooks } = await bookRepo.findByUserId(
@@ -290,7 +171,7 @@ export default createRoute(async (c) => {
       sortBy: "updated",
       limit: 6,
       offset: 0,
-    }
+    },
   );
 
   const formatBooks = (books: Book[]) =>
@@ -309,13 +190,13 @@ export default createRoute(async (c) => {
 
   return c.render(
     <Layout user={user} title="ホーム" sidebarExpanded={sidebarExpanded}>
-      <div class="space-y-12">
+      <div class="space-y-8 sm:space-y-12">
         {/* ヘッダーセクション */}
         <div class="pb-2">
-          <h1 class="text-3xl font-bold text-zinc-900 tracking-tight mb-2">
+          <h1 class="text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight mb-2">
             こんにちは、{user.name}さん
           </h1>
-          <p class="text-zinc-500 font-medium">
+          <p class="text-zinc-500 font-medium text-sm sm:text-base">
             現在、<span class="text-zinc-900">{stats?.reading ?? 0}</span>
             冊の本を読んでいます。
           </p>
@@ -324,8 +205,10 @@ export default createRoute(async (c) => {
         {/* 読んでいる本のリスト */}
         {formattedReadingBooks.length > 0 && (
           <section>
-            <div class="flex items-center justify-between mb-6">
-              <h2 class="text-xl font-bold text-zinc-900">読んでいる本</h2>
+            <div class="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 class="text-lg sm:text-xl font-bold text-zinc-900">
+                読んでいる本
+              </h2>
               <a
                 href="/books?status=reading"
                 class="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
@@ -339,8 +222,10 @@ export default createRoute(async (c) => {
         )}
 
         <section>
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-zinc-900">最近の読書</h2>
+          <div class="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 class="text-lg sm:text-xl font-bold text-zinc-900">
+              最近の読書
+            </h2>
             <a
               href="/books"
               class="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
@@ -349,7 +234,7 @@ export default createRoute(async (c) => {
             </a>
           </div>
           {recentBooks.length > 0 ? (
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-6 gap-y-10">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-6 sm:gap-x-6 sm:gap-y-10">
               {formatBooks(recentBooks).map((book) => (
                 <a href={`/books/${book.id}`} class="group flex flex-col gap-3">
                   <div class="aspect-2/3 w-full bg-zinc-100 rounded-xl overflow-hidden shadow-sm group-hover:shadow-md transition-all duration-300 ring-1 ring-black/5">
@@ -373,13 +258,14 @@ export default createRoute(async (c) => {
             </div>
           ) : (
             <Card>
-              <CardBody class="text-center py-16">
+              <CardBody class="text-center py-10 sm:py-16">
                 <div class="w-12 h-12 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-4 text-zinc-400">
                   <svg
                     class="w-6 h-6"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
+                    aria-hidden="true"
                   >
                     <path
                       stroke-linecap="round"
@@ -403,6 +289,6 @@ export default createRoute(async (c) => {
           )}
         </section>
       </div>
-    </Layout>
+    </Layout>,
   );
 });

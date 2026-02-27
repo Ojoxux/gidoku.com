@@ -19,16 +19,47 @@ function easeOutCubic(t: number): number {
   return 1 - Math.pow(1 - t, 3);
 }
 
+function useResponsiveSize(baseWidth: number, baseHeight: number) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState({ width: baseWidth, height: baseHeight });
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const update = () => {
+      const w = container.clientWidth;
+      if (w > 0) {
+        const clamped = Math.min(w, baseWidth);
+        setSize({ width: clamped, height: clamped });
+      }
+    };
+
+    update();
+
+    const ro = new ResizeObserver(update);
+    ro.observe(container);
+    return () => ro.disconnect();
+  }, [baseWidth, baseHeight]);
+
+  return { containerRef, ...size };
+}
+
 export default function IconCloud({
   images,
   width = 400,
   height = 400,
 }: IconCloudProps) {
+  const {
+    containerRef,
+    width: resolvedWidth,
+    height: resolvedHeight,
+  } = useResponsiveSize(width, height);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [iconPositions, setIconPositions] = useState<Icon[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [mousePos, setMousePos] = useState({ x: width / 2, y: height / 2 });
   const [targetRotation, setTargetRotation] = useState<{
     x: number;
     y: number;
@@ -44,8 +75,13 @@ export default function IconCloud({
   const iconCanvasesRef = useRef<HTMLCanvasElement[]>([]);
   const imagesLoadedRef = useRef<boolean[]>([]);
 
-  // Icon size constant
-  const iconSize = 70;
+  // Keep idle rotation centered on initial render and when size changes.
+  useEffect(() => {
+    setMousePos({ x: width / 2, y: height / 2 });
+  }, [width, height]);
+
+  const scaleFactor = resolvedWidth / (width || 400);
+  const iconSize = Math.round(70 * Math.max(0.65, scaleFactor));
   const iconRadius = iconSize / 2;
 
   // Create icon canvases once when images change
@@ -74,7 +110,7 @@ export default function IconCloud({
             padding,
             padding,
             iconSize - padding * 2,
-            iconSize - padding * 2
+            iconSize - padding * 2,
           );
 
           imagesLoadedRef.current![index] = true;
@@ -92,7 +128,6 @@ export default function IconCloud({
 
     const newIcons: Icon[] = [];
     const numIcons = images.length;
-    // Sphere radius scales with canvas size - use actual width/height props
     const sphereRadius = Math.min(width, height) * 0.27;
 
     const offset = 2 / numIcons;
@@ -124,8 +159,10 @@ export default function IconCloud({
     const rect = canvas?.getBoundingClientRect();
     if (!rect || !canvas) return;
 
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -151,14 +188,14 @@ export default function IconCloud({
       if (dx * dx + dy * dy < clickRadius * clickRadius) {
         const targetX = -Math.atan2(
           icon.y,
-          Math.sqrt(icon.x * icon.x + icon.z * icon.z)
+          Math.sqrt(icon.x * icon.x + icon.z * icon.z),
         );
         const targetY = Math.atan2(icon.x, icon.z);
 
         const currentX = rotationRef.current!.x;
         const currentY = rotationRef.current!.y;
         const distance = Math.sqrt(
-          Math.pow(targetX - currentX, 2) + Math.pow(targetY - currentY, 2)
+          Math.pow(targetX - currentX, 2) + Math.pow(targetY - currentY, 2),
         );
 
         const duration = Math.min(2000, Math.max(800, distance * 1000));
@@ -181,10 +218,13 @@ export default function IconCloud({
   };
 
   const handleMouseMove = (e: MouseEvent) => {
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (rect) {
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+    const canvas = canvasRef.current;
+    const rect = canvas?.getBoundingClientRect();
+    if (rect && canvas) {
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const x = (e.clientX - rect.left) * scaleX;
+      const y = (e.clientY - rect.top) * scaleY;
       setMousePos({ x, y });
     }
 
@@ -271,7 +311,7 @@ export default function IconCloud({
         ctx.save();
         ctx.translate(
           canvas.width / 2 + icon.rotatedX,
-          canvas.height / 2 + icon.rotatedY
+          canvas.height / 2 + icon.rotatedY,
         );
         ctx.scale(scale, scale);
         ctx.globalAlpha = opacity;
@@ -284,7 +324,7 @@ export default function IconCloud({
             -iconRadius,
             -iconRadius,
             iconSize,
-            iconSize
+            iconSize,
           );
         } else {
           // Fallback: show a placeholder circle while loading
@@ -318,7 +358,8 @@ export default function IconCloud({
       onMouseMove={handleMouseMove as unknown as () => void}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
-      class="cursor-grab active:cursor-grabbing"
+      class="cursor-grab active:cursor-grabbing block w-full aspect-square mx-auto"
+      style={{ maxWidth: `${width}px` }}
       aria-label="Interactive 3D Icon Cloud"
       role="img"
     />
