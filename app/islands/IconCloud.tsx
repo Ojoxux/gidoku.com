@@ -81,8 +81,11 @@ export default function IconCloud({
   }, [width, height]);
 
   const scaleFactor = resolvedWidth / (width || 400);
-  const iconSize = Math.round(70 * Math.max(0.65, scaleFactor));
+  // Larger icons on PC (scaleFactor >= 1), bigger minimum size on mobile
+  const iconSize = Math.round(90 * Math.max(0.75, scaleFactor * 1.3));
   const iconRadius = iconSize / 2;
+  // Slower rotation on mobile (smaller screens)
+  const isMobile = resolvedWidth < 600;
 
   // Create icon canvases once when images change
   useEffect(() => {
@@ -113,7 +116,9 @@ export default function IconCloud({
             iconSize - padding * 2,
           );
 
-          imagesLoadedRef.current![index] = true;
+          if (imagesLoadedRef.current) {
+            imagesLoadedRef.current[index] = true;
+          }
         };
       }
       return offscreen;
@@ -128,7 +133,8 @@ export default function IconCloud({
 
     const newIcons: Icon[] = [];
     const numIcons = images.length;
-    const sphereRadius = Math.min(width, height) * 0.27;
+    // Use resolved (actual container) size for responsive sphere radius
+    const sphereRadius = Math.min(resolvedWidth, resolvedHeight) * 0.35;
 
     const offset = 2 / numIcons;
     const increment = Math.PI * (3 - Math.sqrt(5));
@@ -151,7 +157,7 @@ export default function IconCloud({
       });
     }
     setIconPositions(newIcons);
-  }, [images, width, height]);
+  }, [images, resolvedWidth, resolvedHeight]);
 
   // Handle mouse events
   const handleMouseDown = (e: MouseEvent) => {
@@ -167,11 +173,12 @@ export default function IconCloud({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const rot = rotationRef.current ?? { x: 0, y: 0 };
     iconPositions.forEach((icon) => {
-      const cosX = Math.cos(rotationRef.current!.x);
-      const sinX = Math.sin(rotationRef.current!.x);
-      const cosY = Math.cos(rotationRef.current!.y);
-      const sinY = Math.sin(rotationRef.current!.y);
+      const cosX = Math.cos(rot.x);
+      const sinX = Math.sin(rot.x);
+      const cosY = Math.cos(rot.y);
+      const sinY = Math.sin(rot.y);
 
       const rotatedX = icon.x * cosY - icon.z * sinY;
       const rotatedZ = icon.x * sinY + icon.z * cosY;
@@ -192,8 +199,8 @@ export default function IconCloud({
         );
         const targetY = Math.atan2(icon.x, icon.z);
 
-        const currentX = rotationRef.current!.x;
-        const currentY = rotationRef.current!.y;
+        const currentX = rot.x;
+        const currentY = rot.y;
         const distance = Math.sqrt(
           Math.pow(targetX - currentX, 2) + Math.pow(targetY - currentY, 2),
         );
@@ -232,9 +239,10 @@ export default function IconCloud({
       const deltaX = e.clientX - lastMousePos.x;
       const deltaY = e.clientY - lastMousePos.y;
 
+      const prevRot = rotationRef.current ?? { x: 0, y: 0 };
       rotationRef.current = {
-        x: rotationRef.current!.x + deltaY * 0.002,
-        y: rotationRef.current!.y + deltaX * 0.002,
+        x: prevRot.x + deltaY * 0.002,
+        y: prevRot.y + deltaX * 0.002,
       };
 
       setLastMousePos({ x: e.clientX, y: e.clientY });
@@ -260,7 +268,10 @@ export default function IconCloud({
       const dx = mousePos.x - centerX;
       const dy = mousePos.y - centerY;
       const distance = Math.sqrt(dx * dx + dy * dy);
-      const speed = 0.003 + (distance / maxDistance) * 0.01;
+      // Slower rotation on mobile
+      const baseSpeed = isMobile ? 0.0015 : 0.003;
+      const speedMultiplier = isMobile ? 0.005 : 0.01;
+      const speed = baseSpeed + (distance / maxDistance) * speedMultiplier;
 
       if (targetRotation) {
         const elapsed = performance.now() - targetRotation.startTime;
@@ -347,21 +358,26 @@ export default function IconCloud({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [images, iconPositions, isDragging, mousePos, targetRotation]);
+  }, [images, iconPositions, isDragging, mousePos, targetRotation, isMobile]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={width}
-      height={height}
-      onMouseDown={handleMouseDown as unknown as () => void}
-      onMouseMove={handleMouseMove as unknown as () => void}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-      class="cursor-grab active:cursor-grabbing block w-full aspect-square mx-auto"
+    <div
+      ref={containerRef}
+      class="w-full aspect-square mx-auto"
       style={{ maxWidth: `${width}px` }}
-      aria-label="Interactive 3D Icon Cloud"
-      role="img"
-    />
+    >
+      <canvas
+        ref={canvasRef}
+        width={resolvedWidth}
+        height={resolvedHeight}
+        onMouseDown={handleMouseDown as unknown as () => void}
+        onMouseMove={handleMouseMove as unknown as () => void}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        class="cursor-grab active:cursor-grabbing block w-full h-full"
+        aria-label="Interactive 3D Icon Cloud"
+        role="img"
+      />
+    </div>
   );
 }

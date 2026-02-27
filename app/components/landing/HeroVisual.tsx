@@ -6,6 +6,8 @@ interface HeroVisualProps {
   gradientIdPrefix: string;
   className?: string;
   bookWidthClass?: string;
+  cloudOffsetClass?: string;
+  bookBottomClass?: string;
 }
 
 export function HeroVisual({
@@ -14,6 +16,8 @@ export function HeroVisual({
   gradientIdPrefix,
   className = "",
   bookWidthClass = "w-[72%]",
+  cloudOffsetClass = "",
+  bookBottomClass = "bottom-8",
 }: HeroVisualProps) {
   const coverGradId = `${gradientIdPrefix}-cover-grad`;
   const pageGradLeftId = `${gradientIdPrefix}-page-grad-left`;
@@ -21,12 +25,12 @@ export function HeroVisual({
 
   return (
     <div class={`min-w-0 items-center justify-center relative ${className}`}>
-      <div class="min-w-0 relative z-10 w-full flex items-center justify-center overflow-hidden">
+      <div class={`min-w-0 relative z-10 w-full flex items-center justify-center overflow-hidden ${cloudOffsetClass}`}>
         <IconCloud images={techIcons} width={cloudSize} height={cloudSize} />
       </div>
 
       <div
-        class={`absolute bottom-8 left-1/2 -translate-x-1/2 z-0 opacity-90 ${bookWidthClass}`}
+        class={`absolute ${bookBottomClass} left-1/2 -translate-x-1/2 z-0 opacity-90 ${bookWidthClass}`}
       >
         <svg
           viewBox="0 0 440 140"
