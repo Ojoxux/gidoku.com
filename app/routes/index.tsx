@@ -78,9 +78,9 @@ export default createRoute(async (c) => {
         </header>
 
         {/* ヒーローセクション */}
-        <main class="flex flex-col items-center justify-start sm:justify-center min-h-svh sm:min-h-screen w-full px-4 sm:px-6 pt-24 sm:pt-20">
-          <div class="max-w-6xl mx-auto w-full grid lg:grid-cols-2 gap-0 sm:gap-12 lg:gap-20 items-center h-full">
-            <div class="space-y-4 sm:space-y-8 text-center lg:text-left order-2 lg:order-1 z-10 pointer-events-none -mt-4 sm:mt-0 px-1">
+        <main class="flex flex-col items-center justify-center min-h-svh sm:min-h-screen w-full px-4 sm:px-6 pt-16 sm:pt-20">
+          <div class="max-w-6xl mx-auto w-full grid lg:grid-cols-2 gap-0 sm:gap-12 lg:gap-20 items-start lg:items-center h-full">
+            <div class="space-y-4 sm:space-y-8 text-center lg:text-left order-2 lg:order-1 z-10 pointer-events-none mt-4 sm:mt-0 px-1">
               <div class="space-y-4 pointer-events-auto">
                 <style>{`
                   @keyframes fadeUp {
@@ -132,17 +132,20 @@ export default createRoute(async (c) => {
             <div class="order-1 lg:order-2 min-w-0">
               <HeroVisual
                 techIcons={techIcons}
-                cloudSize={620}
+                cloudSize={700}
                 gradientIdPrefix="mobile-hero"
-                className="flex lg:hidden aspect-square w-full max-w-[620px] mx-auto -mt-[min(6rem,16vw)]"
+                className="flex lg:hidden aspect-square w-full max-w-[700px] mx-auto"
                 bookWidthClass="w-[85%]"
+                cloudOffsetClass="-mt-12"
+                bookBottomClass="bottom-0"
               />
               <HeroVisual
                 techIcons={techIcons}
-                cloudSize={700}
+                cloudSize={800}
                 gradientIdPrefix="desktop-hero"
-                className="hidden lg:flex aspect-square w-full max-w-[700px] mx-auto -mt-32"
-                bookWidthClass="w-[80%]"
+                className="hidden lg:flex aspect-square w-full max-w-[800px] mx-auto -mt-16"
+                bookWidthClass="w-[75%]"
+                bookBottomClass="bottom-0"
               />
             </div>
           </div>

@@ -81,8 +81,11 @@ export default function IconCloud({
   }, [width, height]);
 
   const scaleFactor = resolvedWidth / (width || 400);
-  const iconSize = Math.round(70 * Math.max(0.65, scaleFactor));
+  // Larger icons on PC (scaleFactor >= 1), bigger minimum size on mobile
+  const iconSize = Math.round(90 * Math.max(0.75, scaleFactor * 1.3));
   const iconRadius = iconSize / 2;
+  // Slower rotation on mobile (smaller screens)
+  const isMobile = resolvedWidth < 600;
 
   // Create icon canvases once when images change
   useEffect(() => {
@@ -128,7 +131,8 @@ export default function IconCloud({
 
     const newIcons: Icon[] = [];
     const numIcons = images.length;
-    const sphereRadius = Math.min(width, height) * 0.27;
+    // Use resolved (actual container) size for responsive sphere radius
+    const sphereRadius = Math.min(resolvedWidth, resolvedHeight) * 0.35;
 
     const offset = 2 / numIcons;
     const increment = Math.PI * (3 - Math.sqrt(5));
@@ -151,7 +155,7 @@ export default function IconCloud({
       });
     }
     setIconPositions(newIcons);
-  }, [images, width, height]);
+  }, [images, resolvedWidth, resolvedHeight]);
 
   // Handle mouse events
   const handleMouseDown = (e: MouseEvent) => {
@@ -260,7 +264,10 @@ export default function IconCloud({
       const dx = mousePos.x - centerX;
       const dy = mousePos.y - centerY;
       const distance = Math.sqrt(dx * dx + dy * dy);
-      const speed = 0.003 + (distance / maxDistance) * 0.01;
+      // Slower rotation on mobile
+      const baseSpeed = isMobile ? 0.0015 : 0.003;
+      const speedMultiplier = isMobile ? 0.005 : 0.01;
+      const speed = baseSpeed + (distance / maxDistance) * speedMultiplier;
 
       if (targetRotation) {
         const elapsed = performance.now() - targetRotation.startTime;
@@ -347,21 +354,26 @@ export default function IconCloud({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [images, iconPositions, isDragging, mousePos, targetRotation]);
+  }, [images, iconPositions, isDragging, mousePos, targetRotation, isMobile]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={width}
-      height={height}
-      onMouseDown={handleMouseDown as unknown as () => void}
-      onMouseMove={handleMouseMove as unknown as () => void}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-      class="cursor-grab active:cursor-grabbing block w-full aspect-square mx-auto"
+    <div
+      ref={containerRef}
+      class="w-full aspect-square mx-auto"
       style={{ maxWidth: `${width}px` }}
-      aria-label="Interactive 3D Icon Cloud"
-      role="img"
-    />
+    >
+      <canvas
+        ref={canvasRef}
+        width={resolvedWidth}
+        height={resolvedHeight}
+        onMouseDown={handleMouseDown as unknown as () => void}
+        onMouseMove={handleMouseMove as unknown as () => void}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        class="cursor-grab active:cursor-grabbing block w-full h-full"
+        aria-label="Interactive 3D Icon Cloud"
+        role="img"
+      />
+    </div>
   );
 }
