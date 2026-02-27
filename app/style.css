@@ -1,1 +1,23 @@
 @import 'tailwindcss';
+
+@keyframes slide-in {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.2s ease-out;
+}
+
+@media (max-width: 767px) {
+  #main-layout header {
+    transition: height 0.3s, opacity 0.3s, overflow 0s 0.3s;
+  }
+  #main-layout[data-scrolled="down"] header {
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition: height 0.3s, opacity 0.3s, overflow 0s;
+  }
+}
