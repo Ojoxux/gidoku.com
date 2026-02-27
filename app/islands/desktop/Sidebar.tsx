@@ -8,7 +8,10 @@ interface SidebarProps {
   showLogout?: boolean;
 }
 
-export default function Sidebar({ initialExpanded = false, showLogout = true }: SidebarProps) {
+export default function Sidebar({
+  initialExpanded = false,
+  showLogout = true,
+}: SidebarProps) {
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
 
   const navItems = [
@@ -36,7 +39,12 @@ export default function Sidebar({ initialExpanded = false, showLogout = true }: 
     const newState = !isExpanded;
     setIsExpanded(newState);
     localStorage.setItem(SIDEBAR_STORAGE_KEY, JSON.stringify(newState));
-    document.cookie = `${SIDEBAR_COOKIE_NAME}=${newState}; path=/; max-age=31536000`;
+    cookieStore.set({
+      name: SIDEBAR_COOKIE_NAME,
+      value: String(newState),
+      path: "/",
+      expires: Date.now() + 31536000 * 1000,
+    });
   };
 
   const handleLogout = () => {

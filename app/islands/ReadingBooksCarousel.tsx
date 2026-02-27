@@ -22,7 +22,9 @@ export default function ReadingBooksCarousel({
   const scroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
-      const scrollAmount = 304; // card width (280) + gap (24)
+      const card = container.querySelector("a");
+      const cardWidth = card ? card.offsetWidth : 260;
+      const scrollAmount = cardWidth + 16;
       container.scrollBy({
         left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth",
@@ -32,10 +34,11 @@ export default function ReadingBooksCarousel({
 
   return (
     <div class="relative group">
-      {/* Left Button */}
+      {/* Left Button (hidden on touch devices) */}
       <button
+        type="button"
         onClick={() => scroll("left")}
-        class="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-md border border-zinc-100 flex items-center justify-center text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-zinc-50 focus:opacity-100 disabled:opacity-0"
+        class="hidden sm:flex absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-md border border-zinc-100 items-center justify-center text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-zinc-50 focus:opacity-100 disabled:opacity-0"
         aria-label="Previous"
       >
         <svg
@@ -47,6 +50,7 @@ export default function ReadingBooksCarousel({
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
+          aria-hidden="true"
         >
           <path d="M15 18l-6-6 6-6" />
         </svg>
@@ -55,7 +59,7 @@ export default function ReadingBooksCarousel({
       {/* Carousel Container */}
       <div
         ref={scrollContainerRef}
-        class="flex gap-6 overflow-x-auto snap-x snap-mandatory py-4 px-1 -mx-1"
+        class="flex gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory py-4 px-1 -mx-1"
         style={{
           scrollbarWidth: "none",
           msOverflowStyle: "none",
@@ -65,7 +69,7 @@ export default function ReadingBooksCarousel({
           <a
             key={book.id}
             href={`/books/${book.id}`}
-            class="snap-start shrink-0 w-[280px] group/card bg-white border border-zinc-200 rounded-sm p-6 flex flex-col hover:border-zinc-900 transition-colors duration-300"
+            class="snap-start shrink-0 w-[240px] sm:w-[280px] group/card bg-white border border-zinc-200 rounded-sm p-4 sm:p-6 flex flex-col hover:border-zinc-900 transition-colors duration-300"
           >
             <div class="flex gap-4 mb-4">
               <div class="shrink-0">
@@ -109,7 +113,7 @@ export default function ReadingBooksCarousel({
                     style={{
                       width: `${Math.min(
                         100,
-                        (book.currentPage / book.pageCount) * 100
+                        (book.currentPage / book.pageCount) * 100,
                       )}%`,
                     }}
                   />
@@ -126,10 +130,11 @@ export default function ReadingBooksCarousel({
         ))}
       </div>
 
-      {/* Right Button */}
+      {/* Right Button (hidden on touch devices) */}
       <button
+        type="button"
         onClick={() => scroll("right")}
-        class="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-md border border-zinc-100 flex items-center justify-center text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-zinc-50 focus:opacity-100 disabled:opacity-0"
+        class="hidden sm:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-md border border-zinc-100 items-center justify-center text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-zinc-50 focus:opacity-100 disabled:opacity-0"
         aria-label="Next"
       >
         <svg
@@ -141,6 +146,7 @@ export default function ReadingBooksCarousel({
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
+          aria-hidden="true"
         >
           <path d="M9 18l6-6-6-6" />
         </svg>

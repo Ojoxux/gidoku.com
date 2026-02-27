@@ -2,7 +2,8 @@ import type { FC, PropsWithChildren } from "hono/jsx";
 import type { User } from "../../types/database";
 import { Header } from "./Header";
 import { Container } from "./Container";
-import Sidebar from "../../islands/Sidebar";
+import Sidebar from "../../islands/desktop/Sidebar";
+import MobileSidebar from "../../islands/mobile/Sidebar";
 
 interface LayoutProps {
   user?: User | null;
@@ -29,9 +30,16 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
   return (
     <>
       {title && <title>{title} | gidoku</title>}
+      {shouldShowSidebar && (
+        <div class="md:hidden">
+          <MobileSidebar showLogout={shouldShowLogout} />
+        </div>
+      )}
       <div class="min-h-screen flex bg-zinc-950 text-zinc-900 selection:bg-blue-500/20">
         {shouldShowSidebar && (
-          <Sidebar initialExpanded={sidebarExpanded} showLogout={shouldShowLogout} />
+          <div class="hidden md:block">
+            <Sidebar initialExpanded={sidebarExpanded} showLogout={shouldShowLogout} />
+          </div>
         )}
 
         <div
@@ -39,7 +47,7 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
           class="flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300 ease-in-out"
         >
           {useAppShell ? (
-            <div class="flex-1 p-2 sm:p-3 overflow-hidden">
+            <div class="flex-1 pt-2 px-2 pb-2 sm:p-3 overflow-hidden">
               <div class="bg-white rounded-[20px] shadow-2xl border border-white/10 h-full flex flex-col overflow-hidden relative isolate">
                 <Header user={user} />
                 <main class="flex-1 overflow-y-auto">
