@@ -8,6 +8,7 @@ import type { UpdateUserInput } from "./schemas/user";
 import { isReservedUsername } from "./schemas/user";
 import { toUserResponse, toBookResponse } from "../lib/mapper";
 import { successResponse } from "../lib/response";
+import { invalidateUserCache } from "../lib/auth";
 
 const app = new Hono<HonoContext>();
 
@@ -42,6 +43,8 @@ app.put(
       bio: data.bio,
       avatar_url: data.avatarUrl,
     });
+
+    await invalidateUserCache(c.env.KV, userId);
 
     return successResponse(c, toUserResponse(updatedUser));
   }
