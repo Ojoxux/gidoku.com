@@ -1,9 +1,9 @@
 import { createRoute } from "honox/factory";
 import { requirePageAuth, getSidebarExpanded } from "../lib/page-auth";
 import { Layout } from "../components/layout/Layout";
-import { Input, Textarea, Label } from "../components/ui/Input";
+import { Input, Label } from "../components/ui/Input";
 import { Button } from "../components/ui/Button";
-import { Avatar } from "../components/ui/Avatar";
+import ProfileForm from "../islands/ProfileForm";
 
 export default createRoute(async (c) => {
   const authResult = await requirePageAuth(c);
@@ -35,99 +35,13 @@ export default createRoute(async (c) => {
             </p>
           </div>
 
-          <form id="profile-form" class="bg-white rounded-2xl p-8 shadow-sm ring-1 ring-zinc-100 space-y-8">
-            <div class="flex items-center gap-6 pb-6 border-b border-zinc-50">
-              <Avatar
-                src={user.avatar_url}
-                alt={user.name}
-                size="xl"
-                class="w-20 h-20 ring-4 ring-zinc-50"
-              />
-              <div class="flex-1">
-                <p class="text-sm font-bold text-zinc-900 mb-1">
-                  プロフィール画像
-                </p>
-                <p class="text-xs text-zinc-500">
-                  {user.provider === "github" ? "GitHub" : "Google"}
-                  のアカウント写真を使用中
-                </p>
-              </div>
-            </div>
-
-            <div class="space-y-6">
-              <div>
-                <Label for="username" class="mb-2 block text-sm font-bold text-zinc-700">ユーザーID</Label>
-                <div class="flex rounded-xl shadow-sm ring-1 ring-zinc-200 overflow-hidden">
-                  <span class="inline-flex items-center px-4 border-r border-zinc-200 bg-zinc-50 text-zinc-500 text-sm font-medium">
-                    gidoku.com/@
-                  </span>
-                  <Input
-                    name="username"
-                    value={user.username}
-                    class="rounded-none border-0 focus:ring-0 bg-white"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label for="name" class="mb-2 block text-sm font-bold text-zinc-700">表示名</Label>
-                <Input name="name" value={user.name} class="rounded-xl border-zinc-200 bg-zinc-50 focus:bg-white transition-colors" />
-              </div>
-
-              <div>
-                <Label for="bio" class="mb-2 block text-sm font-bold text-zinc-700">自己紹介</Label>
-                <Textarea name="bio" value={user.bio || ""} rows={4} class="rounded-xl border-zinc-200 bg-zinc-50 focus:bg-white transition-colors" />
-                <p class="mt-2 text-xs text-zinc-500 font-medium">
-                  簡単な自己紹介を書いてください。
-                </p>
-              </div>
-            </div>
-
-            <div class="flex justify-end pt-4 border-t border-zinc-50">
-              <Button
-                type="button"
-                class="rounded-full px-6 py-2.5 font-bold shadow-sm"
-                onClick={`
-                  const form = document.getElementById('profile-form');
-                  const btn = this;
-                  const originalText = btn.innerText;
-                  btn.innerText = '保存中...';
-                  btn.disabled = true;
-
-                  const formData = new FormData(form);
-                  const bio = formData.get('bio');
-                  const data = {
-                    username: formData.get('username'),
-                    name: formData.get('name'),
-                  };
-                  if (bio) data.bio = bio;
-                  fetch('/api/users/me', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                  }).then(async r => {
-                    if (r.ok) {
-                      btn.innerText = '保存しました';
-                      setTimeout(() => {
-                        window.location.href = window.location.pathname + '?t=' + Date.now();
-                      }, 1000);
-                    } else {
-                      const d = await r.json();
-                      alert(d.error?.message || '保存に失敗しました');
-                      btn.innerText = originalText;
-                      btn.disabled = false;
-                    }
-                  }).catch(e => {
-                    alert('通信エラーが発生しました: ' + e.message);
-                    btn.innerText = originalText;
-                    btn.disabled = false;
-                  });
-                `}
-              >
-                変更を保存
-              </Button>
-            </div>
-          </form>
+          <ProfileForm
+            avatarUrl={user.avatar_url}
+            provider={user.provider}
+            initialUsername={user.username}
+            initialName={user.name}
+            initialBio={user.bio || ""}
+          />
         </section>
 
         <hr class="border-zinc-100" />
