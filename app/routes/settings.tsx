@@ -109,9 +109,7 @@ export default createRoute(async (c) => {
                     if (r.ok) {
                       btn.innerText = '保存しました';
                       setTimeout(() => {
-                        btn.innerText = originalText;
-                        btn.disabled = false;
-                        location.reload();
+                        window.location.href = window.location.pathname + '?t=' + Date.now();
                       }, 1000);
                     } else {
                       const d = await r.json();
@@ -119,6 +117,10 @@ export default createRoute(async (c) => {
                       btn.innerText = originalText;
                       btn.disabled = false;
                     }
+                  }).catch(e => {
+                    alert('通信エラーが発生しました: ' + e.message);
+                    btn.innerText = originalText;
+                    btn.disabled = false;
                   });
                 `}
               >
