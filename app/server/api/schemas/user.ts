@@ -47,7 +47,7 @@ const usernamePattern = regex("^[a-zA-Z0-9\\-_]{3,30}$");
 export const updateUserSchema = type({
   "username?": usernamePattern,
   "name?": "1 <= string <= 100",
-  "bio?": "string <= 500",
+  "bio?": "string <= 500 | null",
   "avatarUrl?": "string",
 });
 

@@ -95,11 +95,12 @@ export default createRoute(async (c) => {
                   btn.disabled = true;
 
                   const formData = new FormData(form);
+                  const bio = formData.get('bio');
                   const data = {
                     username: formData.get('username'),
                     name: formData.get('name'),
-                    bio: formData.get('bio') || null
                   };
+                  if (bio) data.bio = bio;
                   fetch('/api/users/me', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
