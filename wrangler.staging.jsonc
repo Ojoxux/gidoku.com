@@ -1,0 +1,28 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "gidoku-com-staging",
+  "main": "./dist/index.js",
+  "compatibility_date": "2025-12-09",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "gidoku-db-staging",
+      "database_id": "REPLACE_WITH_STAGING_D1_DATABASE_ID"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "REPLACE_WITH_STAGING_KV_NAMESPACE_ID"
+    }
+  ],
+  "vars": {
+    "GITHUB_CLIENT_ID": "Ov23li1W8sYXe7C1fWlR",
+    "GOOGLE_CLIENT_ID": "494336925174-ovnmt0b3ssdfqfvgtm1n28va40oau4n1.apps.googleusercontent.com",
+    "APP_URL": "https://gidoku-com-staging.workers.dev"
+  }
+}

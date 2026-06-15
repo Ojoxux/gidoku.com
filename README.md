@@ -51,7 +51,27 @@ pnpm run dev
 
 ## 本番環境へのデプロイ
 
-### シークレットの設定
+[mimifuwa.cc](https://github.com/mimifuwacc/mimifuwa.cc) と同様に、`staging` で開発してリリース PR 経由で `main` に入れたときだけ本番デプロイします。
+
+### リリースの流れ
+
+1. 機能ブランチを `staging` にマージする
+   - **Staging Preview** … staging 環境へデプロイ
+   - **Create Release Pull Request** … `staging` → `main` のリリース PR を自動作成・更新
+2. リリース PR で変更内容を確認し、`staging` での動作チェックを済ませる
+3. リリース PR を `main` にマージする
+   - **Deploy and Release** … 本番デプロイ + タイムスタンプ付き GitHub Release 作成
+
+### 初回セットアップ（リポジトリ管理者向け）
+
+1. Cloudflare Dashboard の Workers Builds で **Git リポジトリの接続を Disconnect** する
+2. GitHub リポジトリの Secrets に以下を登録する
+   - `CLOUDFLARE_API_TOKEN`
+   - `CLOUDFLARE_ACCOUNT_ID`
+3. `staging` ブランチを作成し、以降の開発は `staging` 向けに行う
+4. `wrangler.staging.jsonc` の D1 / KV ID を staging 用リソースの値に差し替える
+
+### Wrangler シークレットの設定
 
 ```bash
 # GitHub OAuth
@@ -67,11 +87,13 @@ wrangler secret put SESSION_SECRET
 wrangler secret put RAKUTEN_APP_ID
 ```
 
-### デプロイ
+### 手動デプロイ（緊急時のみ）
 
 ```bash
 pnpm run deploy
 ```
+
+または GitHub Actions の **Deploy and Release** workflow を `workflow_dispatch` で手動実行します。
 
 ## ちょくちょく使う開発コマンド
 
