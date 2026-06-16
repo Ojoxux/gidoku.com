@@ -23,8 +23,14 @@
 		}
 	],
 	"vars": {
-		"GITHUB_CLIENT_ID": "Ov23li1W8sYXe7C1fWlR",
-		"GOOGLE_CLIENT_ID": "494336925174-ovnmt0b3ssdfqfvgtm1n28va40oau4n1.apps.googleusercontent.com",
-		"APP_URL": "https://gidoku-com-staging.workers.dev"
-	}
+		"GITHUB_CLIENT_ID": "Ov23liq4okvsI8w6kVsC",
+		"GOOGLE_CLIENT_ID": "494336925174-q3f41lih9r2o58unehpr312oncl3mdft.apps.googleusercontent.com",
+		"APP_URL": "https://staging.gidoku.com"
+	},
+	"routes": [
+		{
+			"pattern": "staging.gidoku.com",
+			"custom_domain": true
+		}
+	]
 }
