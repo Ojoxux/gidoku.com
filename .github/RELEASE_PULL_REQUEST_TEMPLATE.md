@@ -1,7 +1,7 @@
 <%= ENV['PR_TITLE'] %>
 
 ## 確認事項
-- [ ] staging での動作チェック
+- [ ] [staging での動作チェック](https://staging.gidoku.com)
 
 ## 更新内容
 <% pull_requests.each do |pr| -%>
