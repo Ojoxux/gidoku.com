@@ -3,6 +3,7 @@ import { requirePageAuth, getSidebarExpanded } from "../../../lib/page-auth";
 import { Layout } from "../../../components/layout/Layout";
 import { StatusBadge, Badge } from "../../../components/ui/Badge";
 import { BookCover } from "../../../components/book/BookCover";
+import { Button } from "../../../components/ui/Button";
 import { bookRepo, bookTagRepo } from "../../../server/db/repositories";
 import ProgressSlider from "../../../islands/ProgressSlider";
 import StatusToggle from "../../../islands/StatusToggle";
@@ -59,13 +60,14 @@ export default createRoute(async (c) => {
             >
               編集
             </a>
-            <button
-              type="button"
-              class="text-sm font-bold text-red-600 hover:text-red-700 transition-colors px-4 py-2 bg-white rounded-full border border-red-100 hover:bg-red-50 shadow-sm"
-              onclick={`if(confirm('この本を削除しますか？')) { fetch('/api/books/${book.id}', { method: 'DELETE' }).then(() => location.href = '/books') }`}
+            <Button
+              variant="danger"
+              shape="pill"
+              weight="bold"
+              onClick={`if(confirm('この本を削除しますか？')) { fetch('/api/books/${book.id}', { method: 'DELETE' }).then(() => location.href = '/books') }`}
             >
               削除
-            </button>
+            </Button>
           </div>
         </div>
 

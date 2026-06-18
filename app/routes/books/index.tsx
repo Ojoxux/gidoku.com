@@ -103,7 +103,7 @@ export default createRoute(async (c) => {
             />
           </div>
 
-          <Button type="submit" class="sm:w-auto w-full font-bold py-2.5 rounded-xl">
+          <Button type="submit" shape="xl" weight="bold" class="sm:w-auto w-full py-2.5">
             検索
           </Button>
         </form>
