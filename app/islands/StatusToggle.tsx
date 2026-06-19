@@ -51,7 +51,8 @@ export default function StatusToggle({
   };
 
   return (
-    <div class="items-center inline-flex gap-1 p-1 bg-zinc-100 rounded-lg">
+    <div class="flex w-full justify-center">
+      <div class="inline-flex items-center gap-1 p-1 bg-zinc-100 rounded-lg">
       {statusOptions.map((option) => (
         <button
           key={option.value}
@@ -66,6 +67,7 @@ export default function StatusToggle({
           {option.label}
         </button>
       ))}
+      </div>
     </div>
   );
 }
