@@ -53,7 +53,7 @@ export default function ProfileBookTabs({
 
   return (
     <div class="space-y-6">
-      <div class="flex items-center justify-between gap-4">
+      <div class="flex flex-col items-center gap-4">
         <h2 class="text-xl font-bold text-zinc-900">本の一覧</h2>
         <div
           class="inline-flex items-center gap-1 rounded-full bg-zinc-100 p-1"

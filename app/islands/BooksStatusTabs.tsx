@@ -61,7 +61,7 @@ export default function BooksStatusTabs({
 
   return (
     <div class="space-y-6">
-      <div class="flex flex-col items-center sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div class="flex flex-col items-center gap-4">
         <p class="text-zinc-500 font-medium">全 {total} 冊</p>
         <div
           class="inline-flex items-center gap-1 rounded-full bg-zinc-100 p-1"
