@@ -62,8 +62,8 @@ export default createRoute(async (c) => {
             </a>
             <Button
               variant="danger"
-              size="sm"
-              class="bg-white text-red-600 hover:bg-red-50 border border-red-100 font-bold rounded-full shadow-sm"
+              shape="pill"
+              weight="bold"
               onClick={`if(confirm('この本を削除しますか？')) { fetch('/api/books/${book.id}', { method: 'DELETE' }).then(() => location.href = '/books') }`}
             >
               削除

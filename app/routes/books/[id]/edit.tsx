@@ -131,7 +131,9 @@ export default createRoute(async (c) => {
             </a>
             <Button
               type="button"
-              class="rounded-full px-8 py-2.5 font-bold shadow-sm"
+              shape="pill"
+              weight="bold"
+              class="px-8 py-2.5"
               onClick={`
                 const form = document.getElementById('edit-form');
                 const btn = this;

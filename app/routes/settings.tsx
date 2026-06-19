@@ -110,8 +110,10 @@ export default createRoute(async (c) => {
             <div class="pt-6 border-t border-zinc-50">
               <Button
                 type="button"
-                variant="danger"
-                class="bg-red-50 text-red-600 hover:bg-red-100 shadow-none border border-red-100 rounded-full px-6 font-bold"
+                variant="danger-soft"
+                shape="pill"
+                weight="bold"
+                class="px-6"
                 onClick={`
                   if (confirm('ログアウトしますか？')) {
                     fetch('/api/auth/logout', {
