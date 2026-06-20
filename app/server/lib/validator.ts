@@ -1,5 +1,5 @@
 import type { Context, MiddlewareHandler } from "hono";
-import type { Type } from "arktype";
+import { type, type Type } from "arktype";
 
 type ValidatedDataKey =
   | "validated_json"
@@ -43,14 +43,14 @@ export function validator<T>(
 
     const result = schema(data);
 
-    if (result instanceof Error) {
+    if (result instanceof type.errors) {
       return c.json(
         {
           success: false,
           error: {
             message: "Validation failed",
             code: "VALIDATION_ERROR",
-            details: result.message,
+            details: result.summary,
           },
         },
         400

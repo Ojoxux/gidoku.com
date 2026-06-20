@@ -98,7 +98,55 @@ describe('rakuten service', () => {
     const sorted = sortByPublishedDateDesc([
       { title: 'Old', publishedDate: '2020年1月1日' } as never,
       { title: 'New', publishedDate: '2024年1月1日' } as never,
+      { title: 'Unknown', publishedDate: 'invalid' } as never,
     ])
     expect(sorted[0].title).toBe('New')
+    expect(sorted[sorted.length - 1].title).toBe('Unknown')
+  })
+
+  it('should parse authors separated by Japanese comma', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        new Response(
+          JSON.stringify({
+            Items: [
+              {
+                Item: {
+                  isbn: '9780000000003',
+                  title: 'Comma Book',
+                  author: 'Author A、Author B',
+                  publisherName: 'Publisher',
+                  salesDate: '2024年1月1日',
+                  size: '',
+                  itemCaption: '',
+                  largeImageUrl: '',
+                  affiliateUrl: '',
+                },
+              },
+            ],
+            pageCount: 1,
+            hits: 1,
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        )
+      )
+    )
+
+    const result = await searchBooks('query', 'app-id')
+    expect(result.results[0].authors).toEqual(['Author A', 'Author B'])
+    expect(result.results[0].pageCount).toBe(0)
+  })
+
+  it('should throw ExternalApiError when API returns non-OK status', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('error', { status: 500 }))
+    )
+
+    await expect(searchBooks('query', 'app-id')).rejects.toMatchObject({
+      name: 'ExternalApiError',
+      statusCode: 502,
+    })
   })
 })
