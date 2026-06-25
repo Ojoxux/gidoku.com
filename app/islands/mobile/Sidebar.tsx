@@ -98,9 +98,7 @@ export default function Sidebar({ showLogout = true }: SidebarProps) {
           <aside class="relative w-72 max-w-[80vw] bg-zinc-950 flex flex-col h-full shadow-2xl animate-slide-in">
             <div class="h-16 flex items-center justify-between px-5 shrink-0 mt-3">
               <a href="/" class="flex items-center">
-                <span class="text-2xl font-bold tracking-tight text-white">
-                  gidoku
-                </span>
+                <span class="text-2xl font-bold tracking-tight text-white">gidoku</span>
               </a>
               <button
                 type="button"
@@ -141,9 +139,7 @@ export default function Sidebar({ showLogout = true }: SidebarProps) {
                         style="width:20px;height:20px"
                       />
                     </span>
-                    <span class="text-sm font-medium text-zinc-300">
-                      {item.label}
-                    </span>
+                    <span class="text-sm font-medium text-zinc-300">{item.label}</span>
                   </a>
                 ))}
               </div>

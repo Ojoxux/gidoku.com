@@ -40,8 +40,9 @@ export async function searchBooks(
   query: string,
   applicationId: string,
   limit: number = 20,
-  page: number = 1
-): Promise<{ results: BookSearchResult[]; hits: number; pageCount: number}> { // 戻り値を変更
+  page: number = 1,
+): Promise<{ results: BookSearchResult[]; hits: number; pageCount: number }> {
+  // 戻り値を変更
   const url = new URL(RAKUTEN_API_BASE);
   url.searchParams.set("applicationId", applicationId);
   url.searchParams.set("title", query);
@@ -53,10 +54,7 @@ export async function searchBooks(
     const response = await fetch(url.toString());
 
     if (!response.ok) {
-      throw new ExternalApiError(
-        `Rakuten API returned ${response.status}`,
-        "Rakuten"
-      );
+      throw new ExternalApiError(`Rakuten API returned ${response.status}`, "Rakuten");
     }
 
     const data: RakutenBookResponse = await response.json();
@@ -65,7 +63,7 @@ export async function searchBooks(
       results: data.Items.map((item) => mapRakutenItem(item.Item)),
       hits: data.hits,
       pageCount: data.pageCount,
-    } 
+    };
   } catch (error) {
     if (error instanceof ExternalApiError) throw error;
     throw new ExternalApiError("Failed to fetch from Rakuten API", "Rakuten", error);
@@ -77,7 +75,7 @@ export async function searchBooks(
  */
 export async function searchByISBN(
   isbn: string,
-  applicationId: string
+  applicationId: string,
 ): Promise<BookSearchResult | null> {
   const url = new URL(RAKUTEN_API_BASE);
   url.searchParams.set("applicationId", applicationId);
@@ -88,10 +86,7 @@ export async function searchByISBN(
     const response = await fetch(url.toString());
 
     if (!response.ok) {
-      throw new ExternalApiError(
-        `Rakuten API returned ${response.status}`,
-        "Rakuten"
-      );
+      throw new ExternalApiError(`Rakuten API returned ${response.status}`, "Rakuten");
     }
 
     const data: RakutenBookResponse = await response.json();
@@ -113,7 +108,7 @@ export async function searchByISBN(
 export async function searchByAuthor(
   author: string,
   applicationId: string,
-  limit: number = 20
+  limit: number = 20,
 ): Promise<BookSearchResult[]> {
   const url = new URL(RAKUTEN_API_BASE);
   url.searchParams.set("applicationId", applicationId);
@@ -125,10 +120,7 @@ export async function searchByAuthor(
     const response = await fetch(url.toString());
 
     if (!response.ok) {
-      throw new ExternalApiError(
-        `Rakuten API returned ${response.status}`,
-        "Rakuten"
-      );
+      throw new ExternalApiError(`Rakuten API returned ${response.status}`, "Rakuten");
     }
 
     const data: RakutenBookResponse = await response.json();
@@ -166,7 +158,7 @@ function parseAuthors(authorString: string): string[] {
   if (!authorString) return [];
 
   // 複数の区切り文字に対応
-  const separators = /[\/、,，]/;
+  const separators = /[/、,，]/;
   return authorString
     .split(separators)
     .map((author) => author.trim())
@@ -196,19 +188,13 @@ function parsePublishedDate(publishedDate: string): Date | null {
 
   const [, year, month, day] = match;
 
-  return new Date(
-    Number(year),
-    Number(month) - 1,
-    Number(day)
-  );
+  return new Date(Number(year), Number(month) - 1, Number(day));
 }
 
 /**
  * 本の配列を、出版日が新しい順に並び替え
  */
-export function sortByPublishedDateDesc(
-  books: BookSearchResult[]
-): BookSearchResult[] {
+export function sortByPublishedDateDesc(books: BookSearchResult[]): BookSearchResult[] {
   return [...books].sort((before, after) => {
     const beforeDate = parsePublishedDate(before.publishedDate);
     const afterDate = parsePublishedDate(after.publishedDate);
@@ -220,5 +206,3 @@ export function sortByPublishedDateDesc(
     return afterDate.getTime() - beforeDate.getTime();
   });
 }
-
-

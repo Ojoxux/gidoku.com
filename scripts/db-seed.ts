@@ -63,9 +63,6 @@ console.log("cat > migrations/seed.sql << 'EOF'");
 console.log(seedSQL);
 console.log("EOF\n");
 console.log("# ローカルで実行");
-console.log(
-  "wrangler d1 execute gidoku-db --local --file=migrations/seed.sql\n"
-);
+console.log("wrangler d1 execute gidoku-db --local --file=migrations/seed.sql\n");
 console.log("# 本番で実行（注意！）");
 console.log("wrangler d1 execute gidoku-db --file=migrations/seed.sql\n");
-

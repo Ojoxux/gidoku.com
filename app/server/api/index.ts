@@ -27,5 +27,3 @@ app.get("/health", (c) => {
 // RPC型エクスポート
 export type AppType = typeof app;
 export default app;
-
-

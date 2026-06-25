@@ -30,10 +30,7 @@ export const Badge: FC<PropsWithChildren<BadgeProps>> = ({
   );
 };
 
-const statusConfig: Record<
-  BookStatus,
-  { label: string; variant: BadgeVariant }
-> = {
+const statusConfig: Record<BookStatus, { label: string; variant: BadgeVariant }> = {
   unread: { label: "積読", variant: "default" },
   reading: { label: "読書中", variant: "info" },
   completed: { label: "読了", variant: "success" },
@@ -44,10 +41,7 @@ interface StatusBadgeProps {
   class?: string;
 }
 
-export const StatusBadge: FC<StatusBadgeProps> = ({
-  status,
-  class: className = "",
-}) => {
+export const StatusBadge: FC<StatusBadgeProps> = ({ status, class: className = "" }) => {
   const config = statusConfig[status];
   return (
     <Badge variant={config.variant} class={className}>

@@ -124,4 +124,3 @@ export interface PublicBook {
   finishedAt: string | null;
   tags: string[];
 }
-

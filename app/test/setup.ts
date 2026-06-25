@@ -1,5 +1,5 @@
-import { env } from 'cloudflare:test'
-import { beforeAll } from 'vitest'
+import { env } from "cloudflare:test";
+import { beforeAll } from "vitest";
 
 // テスト前にデータベーススキーマをセットアップ
 beforeAll(async () => {
@@ -17,7 +17,7 @@ beforeAll(async () => {
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     )
-  `).run()
+  `).run();
 
   // books テーブル
   await env.DB.prepare(`
@@ -42,7 +42,7 @@ beforeAll(async () => {
       updated_at TEXT NOT NULL,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )
-  `).run()
+  `).run();
 
   // tags テーブル
   await env.DB.prepare(`
@@ -54,7 +54,7 @@ beforeAll(async () => {
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
       UNIQUE(user_id, name)
     )
-  `).run()
+  `).run();
 
   // book_tags テーブル
   await env.DB.prepare(`
@@ -65,7 +65,7 @@ beforeAll(async () => {
       FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
       FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
     )
-  `).run()
+  `).run();
 
   // sessions テーブル（存在しない場合のみ）
   await env.DB.prepare(`
@@ -75,5 +75,5 @@ beforeAll(async () => {
       created_at TEXT NOT NULL,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )
-  `).run()
-})
+  `).run();
+});

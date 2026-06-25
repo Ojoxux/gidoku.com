@@ -16,12 +16,7 @@ const sizeStyles: Record<AvatarSize, string> = {
   xl: "w-16 h-16 text-lg",
 };
 
-export const Avatar: FC<AvatarProps> = ({
-  src,
-  alt,
-  size = "md",
-  class: className = "",
-}) => {
+export const Avatar: FC<AvatarProps> = ({ src, alt, size = "md", class: className = "" }) => {
   const initials = alt
     .split(" ")
     .map((n) => n[0])

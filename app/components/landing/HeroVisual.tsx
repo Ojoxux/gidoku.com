@@ -25,7 +25,9 @@ export function HeroVisual({
 
   return (
     <div class={`min-w-0 items-center justify-center relative ${className}`}>
-      <div class={`min-w-0 relative z-10 w-full flex items-center justify-center overflow-hidden ${cloudOffsetClass}`}>
+      <div
+        class={`min-w-0 relative z-10 w-full flex items-center justify-center overflow-hidden ${cloudOffsetClass}`}
+      >
         <IconCloud images={techIcons} width={cloudSize} height={cloudSize} />
       </div>
 
@@ -46,25 +48,13 @@ export function HeroVisual({
               <stop offset="100%" stop-color="#18181b" />
             </linearGradient>
 
-            <linearGradient
-              id={pageGradLeftId}
-              x1="0%"
-              y1="0%"
-              x2="100%"
-              y2="0%"
-            >
+            <linearGradient id={pageGradLeftId} x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stop-color="#e4e4e7" />
               <stop offset="90%" stop-color="#a1a1aa" />
               <stop offset="100%" stop-color="#71717a" />
             </linearGradient>
 
-            <linearGradient
-              id={pageGradRightId}
-              x1="0%"
-              y1="0%"
-              x2="100%"
-              y2="0%"
-            >
+            <linearGradient id={pageGradRightId} x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stop-color="#71717a" />
               <stop offset="10%" stop-color="#a1a1aa" />
               <stop offset="100%" stop-color="#e4e4e7" />
@@ -99,43 +89,13 @@ export function HeroVisual({
           />
 
           <g opacity="0.1">
-            <path
-              d="M55 50 Q130 40, 200 55"
-              stroke="#000"
-              stroke-width="1"
-              fill="none"
-            />
-            <path
-              d="M55 65 Q130 55, 200 70"
-              stroke="#000"
-              stroke-width="1"
-              fill="none"
-            />
-            <path
-              d="M55 80 Q130 70, 200 85"
-              stroke="#000"
-              stroke-width="1"
-              fill="none"
-            />
+            <path d="M55 50 Q130 40, 200 55" stroke="#000" stroke-width="1" fill="none" />
+            <path d="M55 65 Q130 55, 200 70" stroke="#000" stroke-width="1" fill="none" />
+            <path d="M55 80 Q130 70, 200 85" stroke="#000" stroke-width="1" fill="none" />
 
-            <path
-              d="M240 55 Q310 40, 385 50"
-              stroke="#000"
-              stroke-width="1"
-              fill="none"
-            />
-            <path
-              d="M240 70 Q310 55, 385 65"
-              stroke="#000"
-              stroke-width="1"
-              fill="none"
-            />
-            <path
-              d="M240 85 Q310 70, 385 80"
-              stroke="#000"
-              stroke-width="1"
-              fill="none"
-            />
+            <path d="M240 55 Q310 40, 385 50" stroke="#000" stroke-width="1" fill="none" />
+            <path d="M240 70 Q310 55, 385 65" stroke="#000" stroke-width="1" fill="none" />
+            <path d="M240 85 Q310 70, 385 80" stroke="#000" stroke-width="1" fill="none" />
           </g>
         </svg>
       </div>

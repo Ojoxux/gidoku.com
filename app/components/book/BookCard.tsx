@@ -33,20 +33,12 @@ export const BookCard: FC<BookCardProps> = ({
         <BookCover src={thumbnailUrl} alt={title} size="sm" />
         <div class="flex-1 min-w-0">
           <div class="flex items-start justify-between gap-2">
-            <BookMeta
-              title={title}
-              authors={authors}
-              publisher={publisher}
-            />
+            <BookMeta title={title} authors={authors} publisher={publisher} />
             <StatusBadge status={status} class="shrink-0" />
           </div>
           {pageCount > 0 && (
             <div class="mt-3">
-              <ProgressBar
-                current={currentPage}
-                total={pageCount}
-                showLabel={true}
-              />
+              <ProgressBar current={currentPage} total={pageCount} showLabel={true} />
             </div>
           )}
         </div>

@@ -10,7 +10,7 @@ export class AppError extends Error {
     message: string,
     statusCode: number = 500,
     public code?: string,
-    public details?: unknown
+    public details?: unknown,
   ) {
     super(message);
     this.name = "AppError";
@@ -79,7 +79,7 @@ export class ExternalApiError extends AppError {
   constructor(
     message: string = "External API error",
     public apiName?: string,
-    cause?: unknown
+    cause?: unknown,
   ) {
     super(message, 502, "EXTERNAL_API_ERROR", cause);
     this.name = "ExternalApiError";
@@ -136,12 +136,10 @@ export function errorHandler(err: Error, c: Context) {
         error: {
           message: err.message,
           code: err.code,
-          ...(shouldExposeDetails && err.details
-            ? { details: err.details }
-            : {}),
+          ...(shouldExposeDetails && err.details ? { details: err.details } : {}),
         },
       },
-      err.statusCode as 400 | 401 | 403 | 404 | 429 | 500 | 502
+      err.statusCode as 400 | 401 | 403 | 404 | 429 | 500 | 502,
     );
   }
 
@@ -154,6 +152,6 @@ export function errorHandler(err: Error, c: Context) {
         code: "INTERNAL_ERROR",
       },
     },
-    500
+    500,
   );
 }

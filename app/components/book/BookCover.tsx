@@ -15,12 +15,7 @@ const sizeStyles: Record<CoverSize, string> = {
   lg: "w-32 h-48",
 };
 
-export const BookCover: FC<BookCoverProps> = ({
-  src,
-  alt,
-  size = "md",
-  class: className = "",
-}) => {
+export const BookCover: FC<BookCoverProps> = ({ src, alt, size = "md", class: className = "" }) => {
   if (src) {
     return (
       <img
@@ -35,9 +30,7 @@ export const BookCover: FC<BookCoverProps> = ({
     <div
       class={`bg-zinc-100 rounded-md shadow-sm border border-zinc-200 flex items-center justify-center ${sizeStyles[size]} ${className}`}
     >
-      <span class="text-zinc-400 text-[10px] uppercase font-medium text-center px-1">
-        No Image
-      </span>
+      <span class="text-zinc-400 text-[10px] uppercase font-medium text-center px-1">No Image</span>
     </div>
   );
 };

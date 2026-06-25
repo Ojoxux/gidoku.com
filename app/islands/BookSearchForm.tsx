@@ -35,7 +35,6 @@ export default function BookSearchForm() {
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
 
-
   const handleSearch = async () => {
     if (!query.trim()) return;
 
@@ -44,13 +43,11 @@ export default function BookSearchForm() {
     setCurrentPage(1);
 
     try {
-      const res = await fetch(
-        `/api/search/books?query=${encodeURIComponent(query)}&page=1`
-      );
+      const res = await fetch(`/api/search/books?query=${encodeURIComponent(query)}&page=1`);
       const data = (await res.json()) as ApiResponse<SearchResponse>;
 
-      if (data.success && data.data) {        
-        setResults(data.data.results);        
+      if (data.success && data.data) {
+        setResults(data.data.results);
         setHasMore(data.data.currentPage < data.data.pageCount);
         setCurrentPage(data.data.currentPage);
       } else {
@@ -71,7 +68,7 @@ export default function BookSearchForm() {
 
     try {
       const res = await fetch(
-        `/api/search/books?query=${encodeURIComponent(query)}&page=${nextPage}`
+        `/api/search/books?query=${encodeURIComponent(query)}&page=${nextPage}`,
       );
       const data = (await res.json()) as ApiResponse<SearchResponse>;
 
@@ -157,15 +154,10 @@ export default function BookSearchForm() {
           {loading ? "検索中..." : "検索"}
         </button>
       </div>
-      
+
       {error && (
         <div class="p-4 bg-red-50 border border-red-100 rounded-lg text-red-600 text-sm flex items-center gap-2">
-          <svg
-            class="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -200,12 +192,8 @@ export default function BookSearchForm() {
 
               <div class="flex-1 min-w-0 flex flex-col">
                 <div class="flex-1">
-                  <h4 class="font-bold text-zinc-900 line-clamp-2 mb-1">
-                    {book.title}
-                  </h4>
-                  <p class="text-sm text-zinc-600 mb-1">
-                    {book.authors.join(", ")}
-                  </p>
+                  <h4 class="font-bold text-zinc-900 line-clamp-2 mb-1">{book.title}</h4>
+                  <p class="text-sm text-zinc-600 mb-1">{book.authors.join(", ")}</p>
                   <div class="flex flex-wrap gap-x-3 gap-y-1 text-xs text-zinc-500">
                     {book.publisher && <span>{book.publisher}</span>}
                     {book.publishedDate && <span>{book.publishedDate}</span>}

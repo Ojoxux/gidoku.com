@@ -1,10 +1,4 @@
-import type {
-  Book,
-  BookInput,
-  BookFilter,
-  BookStats,
-  BookStatus,
-} from "../../../types/database";
+import type { Book, BookInput, BookFilter, BookStats, BookStatus } from "../../../types/database";
 import { NotFoundError, DatabaseError } from "../../lib/errors";
 
 import type { Env } from "../../../types/env";
@@ -18,7 +12,7 @@ type D1BindValue = string | number | null;
 export async function findByUserId(
   db: D1Database,
   userId: string,
-  filter?: BookFilter & { limit?: number; offset?: number }
+  filter?: BookFilter & { limit?: number; offset?: number },
 ): Promise<{ books: Book[]; total: number }> {
   try {
     let query = "SELECT * FROM books WHERE user_id = ?";
@@ -88,11 +82,7 @@ export async function findByUserId(
 /**
  * IDで書籍を取得
  */
-export async function findById(
-  db: D1Database,
-  bookId: string,
-  userId: string
-): Promise<Book> {
+export async function findById(db: D1Database, bookId: string, userId: string): Promise<Book> {
   try {
     const result = await db
       .prepare("SELECT * FROM books WHERE id = ? AND user_id = ?")
@@ -124,7 +114,7 @@ export async function create(db: D1Database, book: BookInput): Promise<Book> {
           rakuten_affiliate_url, status, current_page, memo, finished_at,
           created_at, updated_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `
+      `,
       )
       .bind(
         book.id,
@@ -144,7 +134,7 @@ export async function create(db: D1Database, book: BookInput): Promise<Book> {
         book.memo || null,
         book.finishedAt || null,
         book.createdAt,
-        book.updatedAt
+        book.updatedAt,
       )
       .run();
 
@@ -161,7 +151,7 @@ export async function update(
   db: D1Database,
   bookId: string,
   userId: string,
-  data: Partial<BookInput>
+  data: Partial<BookInput>,
 ): Promise<Book> {
   try {
     // 書籍の存在確認
@@ -169,10 +159,7 @@ export async function update(
 
     const updates = [
       ["title", data.title],
-      [
-        "authors",
-        data.authors === undefined ? undefined : JSON.stringify(data.authors),
-      ],
+      ["authors", data.authors === undefined ? undefined : JSON.stringify(data.authors)],
       ["publisher", data.publisher],
       ["published_date", data.publishedDate],
       ["isbn", data.isbn],
@@ -187,14 +174,11 @@ export async function update(
       ["finished_at", data.finishedAt],
     ] satisfies Array<[string, D1BindValue | undefined]>;
 
-    const definedUpdates = updates.filter(
-      ([, value]) => value !== undefined
-    ) as Array<[string, D1BindValue]>;
+    const definedUpdates = updates.filter(([, value]) => value !== undefined) as Array<
+      [string, D1BindValue]
+    >;
 
-    const fields = [
-      ...definedUpdates.map(([field]) => `${field} = ?`),
-      "updated_at = ?",
-    ];
+    const fields = [...definedUpdates.map(([field]) => `${field} = ?`), "updated_at = ?"];
     const params: D1BindValue[] = [
       ...definedUpdates.map(([, value]) => value),
       data.updatedAt || new Date().toISOString(),
@@ -208,7 +192,7 @@ export async function update(
         UPDATE books 
         SET ${fields.join(", ")}
         WHERE id = ? AND user_id = ?
-      `
+      `,
       )
       .bind(...params)
       .run();
@@ -229,7 +213,7 @@ export async function updateProgress(
   bookId: string,
   userId: string,
   currentPage: number,
-  status: BookStatus
+  status: BookStatus,
 ): Promise<Book> {
   try {
     // 書籍の存在確認
@@ -241,7 +225,7 @@ export async function updateProgress(
         UPDATE books 
         SET current_page = ?, status = ?, updated_at = ?
         WHERE id = ? AND user_id = ?
-      `
+      `,
       )
       .bind(currentPage, status, new Date().toISOString(), bookId, userId)
       .run();
@@ -256,11 +240,7 @@ export async function updateProgress(
 /**
  * 書籍を削除（関連するタグも削除）
  */
-export async function deleteById(
-  db: D1Database,
-  bookId: string,
-  userId: string
-): Promise<void> {
+export async function deleteById(db: D1Database, bookId: string, userId: string): Promise<void> {
   try {
     // 書籍の存在確認
     await findById(db, bookId, userId);
@@ -268,9 +248,7 @@ export async function deleteById(
     // トランザクション的に削除（D1のbatch機能を使用）
     await db.batch([
       db.prepare("DELETE FROM book_tags WHERE book_id = ?").bind(bookId),
-      db
-        .prepare("DELETE FROM books WHERE id = ? AND user_id = ?")
-        .bind(bookId, userId),
+      db.prepare("DELETE FROM books WHERE id = ? AND user_id = ?").bind(bookId, userId),
     ]);
   } catch (error) {
     if (error instanceof NotFoundError) throw error;
@@ -281,10 +259,7 @@ export async function deleteById(
 /**
  * ユーザーの統計情報を取得
  */
-export async function getStats(
-  db: D1Database,
-  userId: string
-): Promise<BookStats> {
+export async function getStats(db: D1Database, userId: string): Promise<BookStats> {
   try {
     const result = await db
       .prepare(
@@ -296,7 +271,7 @@ export async function getStats(
           SUM(CASE WHEN status = 'unread' THEN 1 ELSE 0 END) as unread
         FROM books 
         WHERE user_id = ?
-      `
+      `,
       )
       .bind(userId)
       .first<BookStats>();
@@ -320,7 +295,7 @@ export async function getStats(
 export async function belongsToUser(
   db: D1Database,
   bookId: string,
-  userId: string
+  userId: string,
 ): Promise<boolean> {
   try {
     const result = await db

@@ -18,10 +18,7 @@ const statusOptions: { value: BookStatus; label: string }[] = [
   { value: "completed", label: "読了" },
 ];
 
-export default function StatusToggle({
-  bookId,
-  currentStatus,
-}: StatusToggleProps) {
+export default function StatusToggle({ bookId, currentStatus }: StatusToggleProps) {
   const [status, setStatus] = useState<BookStatus>(currentStatus);
   const [saving, setSaving] = useState(false);
 
@@ -53,20 +50,20 @@ export default function StatusToggle({
   return (
     <div class="flex w-full justify-center">
       <div class="inline-flex items-center gap-1 p-1 bg-zinc-100 rounded-lg">
-      {statusOptions.map((option) => (
-        <button
-          key={option.value}
-          onClick={() => handleChange(option.value)}
-          disabled={saving}
-          class={`px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-200 ${
-            status === option.value
-              ? "bg-white text-zinc-900 shadow-sm"
-              : "text-zinc-500 hover:text-zinc-700 hover:bg-zinc-200/50"
-          } disabled:opacity-50`}
-        >
-          {option.label}
-        </button>
-      ))}
+        {statusOptions.map((option) => (
+          <button
+            key={option.value}
+            onClick={() => handleChange(option.value)}
+            disabled={saving}
+            class={`px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-200 ${
+              status === option.value
+                ? "bg-white text-zinc-900 shadow-sm"
+                : "text-zinc-500 hover:text-zinc-700 hover:bg-zinc-200/50"
+            } disabled:opacity-50`}
+          >
+            {option.label}
+          </button>
+        ))}
       </div>
     </div>
   );

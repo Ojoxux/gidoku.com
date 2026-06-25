@@ -15,10 +15,7 @@ import { removeUndefined } from "./utils";
 /**
  * API入力からBookInputへ変換
  */
-export function toBookInput(
-  data: CreateBookInput,
-  userId: string
-): BookInput {
+export function toBookInput(data: CreateBookInput, userId: string): BookInput {
   const now = new Date().toISOString();
   return {
     id: crypto.randomUUID(),
@@ -44,9 +41,7 @@ export function toBookInput(
 /**
  * 更新用のBookInputへ変換
  */
-export function toBookUpdateInput(
-  data: UpdateBookInput
-): Partial<BookInput> {
+export function toBookUpdateInput(data: UpdateBookInput): Partial<BookInput> {
   return removeUndefined({
     updatedAt: new Date().toISOString(),
     title: data.title,
@@ -95,10 +90,7 @@ export function toBookResponse(book: Book): BookResponse {
 /**
  * API入力からTagInputへ変換
  */
-export function toTagInput(
-  data: CreateTagInput,
-  userId: string
-): TagInput {
+export function toTagInput(data: CreateTagInput, userId: string): TagInput {
   return {
     id: crypto.randomUUID(),
     userId,
@@ -135,5 +127,3 @@ export function toUserResponse(user: User): UserResponse {
     updatedAt: user.updated_at,
   };
 }
-
-

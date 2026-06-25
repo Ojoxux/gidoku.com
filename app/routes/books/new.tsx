@@ -28,6 +28,6 @@ export default createRoute(async (c) => {
           </div>
         </section>
       </div>
-    </Layout>
+    </Layout>,
   );
 });
