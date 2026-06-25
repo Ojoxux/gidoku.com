@@ -120,9 +120,7 @@ export default function ProfileBookTabs({
                       <h3 class="font-semibold text-zinc-900 text-sm leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors">
                         {book.title}
                       </h3>
-                      <p class="text-xs text-zinc-500 line-clamp-1">
-                        {book.authors.join(", ")}
-                      </p>
+                      <p class="text-xs text-zinc-500 line-clamp-1">{book.authors.join(", ")}</p>
                     </div>
                   </a>
                 ))}
@@ -149,9 +147,7 @@ export default function ProfileBookTabs({
                   <h3 class="text-lg font-bold tracking-tight text-zinc-900 mb-2">
                     まだ公開されている本がありません
                   </h3>
-                  <p class="text-zinc-500 text-sm">
-                    {userName}さんの読書記録はまだありません
-                  </p>
+                  <p class="text-zinc-500 text-sm">{userName}さんの読書記録はまだありません</p>
                 </CardBody>
               </Card>
             )}

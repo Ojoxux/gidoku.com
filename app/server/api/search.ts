@@ -22,7 +22,6 @@ app.use("*", searchRateLimiter);
  * GET /api/search/books
  */
 app.get("/books", validator("query", rakutenSearchSchema), async (c) => {
-
   // バリデーション済みのデータを取得
   const { query, limit, page } = getValidated<RakutenSearchInput>(c, "query");
 
@@ -35,7 +34,7 @@ app.get("/books", validator("query", rakutenSearchSchema), async (c) => {
     query,
     c.env.RAKUTEN_APP_ID,
     limit ?? 20,
-    page ?? 1
+    page ?? 1,
   );
 
   const sortedResults = rakutenService.sortByPublishedDateDesc(results);
@@ -64,7 +63,7 @@ app.get("/isbn/:isbn", validator("param", isbnSearchSchema), async (c) => {
           details: "Invalid ISBN",
         },
       },
-      400
+      400,
     );
   }
 

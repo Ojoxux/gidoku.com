@@ -25,73 +25,59 @@ app.get("/me", authMiddleware, async (c) => {
  * プロフィール更新
  * PUT /api/users/me
  */
-app.put(
-  "/me",
-  authMiddleware,
-  validator("json", updateUserSchema),
-  async (c) => {
-    const userId = c.get("userId");
-    const data = getValidated<UpdateUserInput>(c, "json");
+app.put("/me", authMiddleware, validator("json", updateUserSchema), async (c) => {
+  const userId = c.get("userId");
+  const data = getValidated<UpdateUserInput>(c, "json");
 
-    if (data.username && isReservedUsername(data.username)) {
-      return c.json({ error: "このユーザー名は使用できません" }, 400);
-    }
-
-    const updatedUser = await userRepo.update(c.env.DB, userId, {
-      username: data.username,
-      name: data.name,
-      bio: data.bio,
-      avatar_url: data.avatarUrl,
-    });
-
-    await invalidateUserCache(c.env.KV, userId);
-
-    return successResponse(c, toUserResponse(updatedUser));
+  if (data.username && isReservedUsername(data.username)) {
+    return c.json({ error: "このユーザー名は使用できません" }, 400);
   }
-);
+
+  const updatedUser = await userRepo.update(c.env.DB, userId, {
+    username: data.username,
+    name: data.name,
+    bio: data.bio,
+    avatar_url: data.avatarUrl,
+  });
+
+  await invalidateUserCache(c.env.KV, userId);
+
+  return successResponse(c, toUserResponse(updatedUser));
+});
 
 /**
  * ユーザー名の重複チェック
  * GET /api/users/check/:username
  */
-app.get(
-  "/check/:username",
-  validator("param", usernameSchema),
-  async (c) => {
-    const { username } = getValidated<{ username: string }>(c, "param");
+app.get("/check/:username", validator("param", usernameSchema), async (c) => {
+  const { username } = getValidated<{ username: string }>(c, "param");
 
-    if (isReservedUsername(username)) {
-      return successResponse(c, { available: false, reason: "reserved" });
-    }
-
-    const isTaken = await userRepo.isUsernameTaken(c.env.DB, username);
-
-    return successResponse(c, { available: !isTaken });
+  if (isReservedUsername(username)) {
+    return successResponse(c, { available: false, reason: "reserved" });
   }
-);
+
+  const isTaken = await userRepo.isUsernameTaken(c.env.DB, username);
+
+  return successResponse(c, { available: !isTaken });
+});
 
 /**
  * 公開プロフィール取得
  * GET /api/users/:username
  */
-app.get(
-  "/:username",
-  optionalAuthMiddleware,
-  validator("param", usernameSchema),
-  async (c) => {
-    const { username } = getValidated<{ username: string }>(c, "param");
-    const user = await userRepo.findByUsername(c.env.DB, username);
+app.get("/:username", optionalAuthMiddleware, validator("param", usernameSchema), async (c) => {
+  const { username } = getValidated<{ username: string }>(c, "param");
+  const user = await userRepo.findByUsername(c.env.DB, username);
 
-    // 公開情報のみ返す
-    return successResponse(c, {
-      id: user.id,
-      username: user.username,
-      name: user.name,
-      bio: user.bio,
-      avatarUrl: user.avatar_url,
-    });
-  }
-);
+  // 公開情報のみ返す
+  return successResponse(c, {
+    id: user.id,
+    username: user.username,
+    name: user.name,
+    bio: user.bio,
+    avatarUrl: user.avatar_url,
+  });
+});
 
 /**
  * ユーザーの公開書籍一覧
@@ -114,7 +100,7 @@ app.get("/:username/books", optionalAuthMiddleware, async (c) => {
       ...toBookResponse(book),
       // 公開用に一部フィールドを隠す
       memo: null,
-    }))
+    })),
   );
 });
 
@@ -130,4 +116,3 @@ app.delete("/me", authMiddleware, async (c) => {
 });
 
 export default app;
-

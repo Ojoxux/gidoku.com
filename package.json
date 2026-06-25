@@ -1,5 +1,6 @@
 {
   "name": "basic",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -7,6 +8,10 @@
     "preview": "wrangler dev",
     "deploy": "pnpm run build && wrangler deploy",
     "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
@@ -18,7 +23,6 @@
     "db:console:local": "wrangler d1 execute gidoku-db --local --command",
     "db:console:prod": "wrangler d1 execute gidoku-db --remote --command"
   },
-  "private": true,
   "dependencies": {
     "@lordicon/element": "^2.0.1",
     "arktype": "^2.0.0-rc.19",
@@ -33,6 +37,8 @@
     "@hono/vite-dev-server": "^0.18.2",
     "@tailwindcss/vite": "^4.0.9",
     "@types/node": "^24.10.2",
+    "oxfmt": "^0.55.0",
+    "oxlint": "^1.70.0",
     "tailwindcss": "^4.0.9",
     "tsx": "^4.19.2",
     "typescript": "^5.9.3",

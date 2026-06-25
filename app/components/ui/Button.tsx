@@ -1,11 +1,6 @@
 import type { FC, PropsWithChildren, CSSProperties } from "hono/jsx";
 
-type ButtonVariant =
-  | "primary"
-  | "secondary"
-  | "danger"
-  | "danger-soft"
-  | "ghost";
+type ButtonVariant = "primary" | "secondary" | "danger" | "danger-soft" | "ghost";
 type ButtonSize = "sm" | "md" | "lg";
 type ButtonShape = "md" | "pill" | "xl";
 type ButtonWeight = "medium" | "bold";
@@ -33,8 +28,7 @@ const variantStyles: Record<ButtonVariant, string> = {
     "bg-white text-red-600 border border-red-100 hover:bg-red-50 hover:text-red-700 shadow-sm focus:ring-red-500",
   "danger-soft":
     "bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 shadow-sm focus:ring-red-500",
-  ghost:
-    "bg-transparent text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus:ring-zinc-900",
+  ghost: "bg-transparent text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 focus:ring-zinc-900",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {

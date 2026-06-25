@@ -24,7 +24,7 @@ export const SESSION_COOKIE_OPTIONS = {
 export async function createSession(
   kv: KVNamespace,
   userId: string,
-  ttl: number = SESSION_TTL
+  ttl: number = SESSION_TTL,
 ): Promise<string> {
   const sessionId = crypto.randomUUID();
   const key = `${SESSION_PREFIX}${sessionId}`;
@@ -39,10 +39,7 @@ export async function createSession(
 /**
  * セッションを取得
  */
-export async function getSession(
-  kv: KVNamespace,
-  sessionId: string
-): Promise<string | null> {
+export async function getSession(kv: KVNamespace, sessionId: string): Promise<string | null> {
   const key = `${SESSION_PREFIX}${sessionId}`;
   return await kv.get(key);
 }
@@ -50,10 +47,7 @@ export async function getSession(
 /**
  * セッションを検証してユーザーIDを取得（存在しない場合はエラー）
  */
-export async function validateSession(
-  kv: KVNamespace,
-  sessionId: string
-): Promise<string> {
+export async function validateSession(kv: KVNamespace, sessionId: string): Promise<string> {
   const userId = await getSession(kv, sessionId);
 
   if (!userId) {
@@ -66,10 +60,7 @@ export async function validateSession(
 /**
  * セッションを削除
  */
-export async function deleteSession(
-  kv: KVNamespace,
-  sessionId: string
-): Promise<void> {
+export async function deleteSession(kv: KVNamespace, sessionId: string): Promise<void> {
   const key = `${SESSION_PREFIX}${sessionId}`;
   await kv.delete(key);
 }
@@ -80,7 +71,7 @@ export async function deleteSession(
 export async function refreshSession(
   kv: KVNamespace,
   sessionId: string,
-  ttl: number = SESSION_TTL
+  ttl: number = SESSION_TTL,
 ): Promise<void> {
   const userId = await getSession(kv, sessionId);
 
@@ -97,13 +88,8 @@ export async function refreshSession(
 /**
  * ユーザーの全セッションを削除（ログアウト時など）
  */
-export async function deleteAllUserSessions(
-  kv: KVNamespace,
-  sessionIds: string[]
-): Promise<void> {
-  const deletePromises = sessionIds.map((sessionId) =>
-    deleteSession(kv, sessionId)
-  );
+export async function deleteAllUserSessions(kv: KVNamespace, sessionIds: string[]): Promise<void> {
+  const deletePromises = sessionIds.map((sessionId) => deleteSession(kv, sessionId));
   await Promise.all(deletePromises);
 }
 
@@ -115,7 +101,7 @@ export async function regenerateSession(
   kv: KVNamespace,
   oldSessionId: string | undefined,
   userId: string,
-  ttl: number = SESSION_TTL
+  ttl: number = SESSION_TTL,
 ): Promise<string> {
   // 既存のセッションがあれば削除
   if (oldSessionId) {

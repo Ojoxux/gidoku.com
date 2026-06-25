@@ -7,10 +7,7 @@ type D1Database = Env["DB"];
 /**
  * ユーザーのタグ一覧を取得
  */
-export async function findByUserId(
-  db: D1Database,
-  userId: string
-): Promise<Tag[]> {
+export async function findByUserId(db: D1Database, userId: string): Promise<Tag[]> {
   try {
     const result = await db
       .prepare("SELECT * FROM tags WHERE user_id = ? ORDER BY name ASC")
@@ -26,11 +23,7 @@ export async function findByUserId(
 /**
  * IDでタグを取得
  */
-export async function findById(
-  db: D1Database,
-  tagId: string,
-  userId: string
-): Promise<Tag> {
+export async function findById(db: D1Database, tagId: string, userId: string): Promise<Tag> {
   try {
     const result = await db
       .prepare("SELECT * FROM tags WHERE id = ? AND user_id = ?")
@@ -54,7 +47,7 @@ export async function findById(
 export async function findByName(
   db: D1Database,
   name: string,
-  userId: string
+  userId: string,
 ): Promise<Tag | null> {
   try {
     const result = await db
@@ -71,10 +64,7 @@ export async function findByName(
 /**
  * 書籍に紐づくタグ一覧を取得
  */
-export async function findByBookId(
-  db: D1Database,
-  bookId: string
-): Promise<Tag[]> {
+export async function findByBookId(db: D1Database, bookId: string): Promise<Tag[]> {
   try {
     const result = await db
       .prepare(
@@ -83,7 +73,7 @@ export async function findByBookId(
         INNER JOIN book_tags bt ON t.id = bt.tag_id
         WHERE bt.book_id = ?
         ORDER BY t.name ASC
-      `
+      `,
       )
       .bind(bookId)
       .all<Tag>();
@@ -110,7 +100,7 @@ export async function create(db: D1Database, tag: TagInput): Promise<Tag> {
         `
         INSERT INTO tags (id, user_id, name, created_at)
         VALUES (?, ?, ?, ?)
-      `
+      `,
       )
       .bind(tag.id, tag.userId, tag.name, tag.createdAt)
       .run();
@@ -129,7 +119,7 @@ export async function update(
   db: D1Database,
   tagId: string,
   userId: string,
-  name: string
+  name: string,
 ): Promise<Tag> {
   try {
     // タグの存在確認
@@ -148,8 +138,7 @@ export async function update(
 
     return findById(db, tagId, userId);
   } catch (error) {
-    if (error instanceof NotFoundError || error instanceof DatabaseError)
-      throw error;
+    if (error instanceof NotFoundError || error instanceof DatabaseError) throw error;
     throw new DatabaseError("Failed to update tag", error);
   }
 }
@@ -157,20 +146,13 @@ export async function update(
 /**
  * タグを削除
  */
-export async function deleteById(
-  db: D1Database,
-  tagId: string,
-  userId: string
-): Promise<void> {
+export async function deleteById(db: D1Database, tagId: string, userId: string): Promise<void> {
   try {
     // タグの存在確認
     await findById(db, tagId, userId);
 
     // CASCADE削除により関連するbook_tagsも削除される
-    await db
-      .prepare("DELETE FROM tags WHERE id = ? AND user_id = ?")
-      .bind(tagId, userId)
-      .run();
+    await db.prepare("DELETE FROM tags WHERE id = ? AND user_id = ?").bind(tagId, userId).run();
   } catch (error) {
     if (error instanceof NotFoundError) throw error;
     throw new DatabaseError("Failed to delete tag", error);
@@ -183,7 +165,7 @@ export async function deleteById(
 export async function belongsToUser(
   db: D1Database,
   tagId: string,
-  userId: string
+  userId: string,
 ): Promise<boolean> {
   try {
     const result = await db
@@ -196,4 +178,3 @@ export async function belongsToUser(
     throw new DatabaseError("Failed to check tag ownership", error);
   }
 }
-

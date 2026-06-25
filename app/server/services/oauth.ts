@@ -14,11 +14,7 @@ export interface OAuthUser {
 /**
  * OAuth認証URLを生成
  */
-export function getAuthUrl(
-  provider: "github" | "google",
-  state: string,
-  env: Env
-): string {
+export function getAuthUrl(provider: "github" | "google", state: string, env: Env): string {
   const redirectUri = `${env.APP_URL}/api/auth/${provider}/callback`;
 
   if (provider === "github") {
@@ -52,39 +48,33 @@ export function getAuthUrl(
 export async function getAccessToken(
   provider: "github" | "google",
   code: string,
-  env: Env
+  env: Env,
 ): Promise<string> {
   const redirectUri = `${env.APP_URL}/api/auth/${provider}/callback`;
 
   if (provider === "github") {
-    const response = await fetch(
-      "https://github.com/login/oauth/access_token",
-      {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          client_id: env.GITHUB_CLIENT_ID,
-          client_secret: env.GITHUB_CLIENT_SECRET,
-          code,
-          redirect_uri: redirectUri,
-        }),
-      }
-    );
+    const response = await fetch("https://github.com/login/oauth/access_token", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        client_id: env.GITHUB_CLIENT_ID,
+        client_secret: env.GITHUB_CLIENT_SECRET,
+        code,
+        redirect_uri: redirectUri,
+      }),
+    });
 
     if (!response.ok) {
       throw new ExternalApiError("Failed to get GitHub access token", "GitHub");
     }
 
-    const data = await response.json() as { access_token?: string; error?: string };
+    const data = (await response.json()) as { access_token?: string; error?: string };
 
     if (data.error || !data.access_token) {
-      throw new ExternalApiError(
-        data.error || "No access token received",
-        "GitHub"
-      );
+      throw new ExternalApiError(data.error || "No access token received", "GitHub");
     }
 
     return data.access_token;
@@ -109,13 +99,10 @@ export async function getAccessToken(
       throw new ExternalApiError("Failed to get Google access token", "Google");
     }
 
-    const data = await response.json() as { access_token?: string; error?: string };
+    const data = (await response.json()) as { access_token?: string; error?: string };
 
     if (data.error || !data.access_token) {
-      throw new ExternalApiError(
-        data.error || "No access token received",
-        "Google"
-      );
+      throw new ExternalApiError(data.error || "No access token received", "Google");
     }
 
     return data.access_token;
@@ -129,7 +116,7 @@ export async function getAccessToken(
  */
 export async function getUser(
   provider: "github" | "google",
-  accessToken: string
+  accessToken: string,
 ): Promise<OAuthUser> {
   if (provider === "github") {
     return getGitHubUser(accessToken);
@@ -158,7 +145,7 @@ async function getGitHubUser(accessToken: string): Promise<OAuthUser> {
     throw new ExternalApiError("Failed to fetch GitHub user", "GitHub");
   }
 
-  const data = await response.json() as {
+  const data = (await response.json()) as {
     id: number;
     login: string;
     name: string | null;
@@ -179,7 +166,7 @@ async function getGitHubUser(accessToken: string): Promise<OAuthUser> {
     });
 
     if (emailResponse.ok) {
-      const emails = await emailResponse.json() as Array<{
+      const emails = (await emailResponse.json()) as Array<{
         email: string;
         primary: boolean;
         verified: boolean;
@@ -208,20 +195,17 @@ async function getGitHubUser(accessToken: string): Promise<OAuthUser> {
  * Google ユーザー情報取得
  */
 async function getGoogleUser(accessToken: string): Promise<OAuthUser> {
-  const response = await fetch(
-    "https://www.googleapis.com/oauth2/v2/userinfo",
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  );
+  const response = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
 
   if (!response.ok) {
     throw new ExternalApiError("Failed to fetch Google user", "Google");
   }
 
-  const data = await response.json() as {
+  const data = (await response.json()) as {
     id: string;
     email: string;
     name: string;
@@ -238,5 +222,3 @@ async function getGoogleUser(accessToken: string): Promise<OAuthUser> {
     bio: null,
   };
 }
-
-

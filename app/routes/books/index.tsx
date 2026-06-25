@@ -16,12 +16,7 @@ export default createRoute(async (c) => {
 
   const search = c.req.query("search");
   const initialTab = c.req.query("status") as BookStatus | undefined;
-  const sortBy = c.req.query("sort") as
-    | "title"
-    | "created"
-    | "updated"
-    | "progress"
-    | undefined;
+  const sortBy = c.req.query("sort") as "title" | "created" | "updated" | "progress" | undefined;
 
   const { books, total } = await bookRepo.findByUserId(c.env.DB, user.id, {
     search,
@@ -47,9 +42,7 @@ export default createRoute(async (c) => {
       <div class="space-y-8">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
           <div>
-            <h1 class="text-3xl font-bold text-zinc-900 mb-2 tracking-tight">
-              自分の本棚
-            </h1>
+            <h1 class="text-3xl font-bold text-zinc-900 mb-2 tracking-tight">自分の本棚</h1>
             <p class="text-zinc-500 font-medium">全 {total} 冊</p>
           </div>
           <a
@@ -108,12 +101,8 @@ export default createRoute(async (c) => {
           </Button>
         </form>
 
-        <BooksStatusTabs
-          books={formatBooks(books)}
-          total={total}
-          initialTab={initialTab}
-        />
+        <BooksStatusTabs books={formatBooks(books)} total={total} initialTab={initialTab} />
       </div>
-    </Layout>
+    </Layout>,
   );
 });

@@ -11,10 +11,7 @@ const sizeStyles: Record<string, string> = {
   lg: "w-12 h-12",
 };
 
-export const LoadingSpinner: FC<LoadingSpinnerProps> = ({
-  size = "md",
-  class: className = "",
-}) => {
+export const LoadingSpinner: FC<LoadingSpinnerProps> = ({ size = "md", class: className = "" }) => {
   return (
     <div
       class={`animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-900 ${sizeStyles[size]} ${className}`}

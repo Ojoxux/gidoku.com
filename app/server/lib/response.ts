@@ -43,14 +43,14 @@ export interface PaginatedResponse<T> {
 export function successResponse<T, S extends ContentfulStatusCode = 200>(
   c: Context,
   data: T,
-  status?: S
+  status?: S,
 ) {
   return c.json<SuccessResponse<T>, S>(
     {
       success: true,
       data,
     },
-    (status ?? 200) as S
+    (status ?? 200) as S,
   );
 }
 
@@ -62,7 +62,7 @@ export function errorResponse<S extends ContentfulStatusCode = 400>(
   message: string,
   code: string,
   status?: S,
-  details?: unknown
+  details?: unknown,
 ) {
   return c.json<ErrorResponse, S>(
     {
@@ -73,7 +73,7 @@ export function errorResponse<S extends ContentfulStatusCode = 400>(
         details,
       },
     },
-    (status ?? 400) as S
+    (status ?? 400) as S,
   );
 }
 
@@ -86,7 +86,7 @@ export function paginatedResponse<T, S extends ContentfulStatusCode = 200>(
   total: number,
   limit: number,
   offset: number,
-  status?: S
+  status?: S,
 ) {
   return c.json<SuccessResponse<PaginatedResponse<T>>, S>(
     {
@@ -99,6 +99,6 @@ export function paginatedResponse<T, S extends ContentfulStatusCode = 200>(
         hasMore: offset + items.length < total,
       },
     },
-    (status ?? 200) as S
+    (status ?? 200) as S,
   );
 }

@@ -43,13 +43,7 @@ app.get("/", validator("query", bookFilterSchema), async (c) => {
   });
 
   const items = books.map(toBookResponse);
-  return paginatedResponse(
-    c,
-    items,
-    total,
-    filter.limit ?? 20,
-    filter.offset ?? 0
-  );
+  return paginatedResponse(c, items, total, filter.limit ?? 20, filter.offset ?? 0);
 });
 
 /**
@@ -115,7 +109,7 @@ app.put(
     const book = await bookRepo.update(c.env.DB, id, userId, updateData);
 
     return successResponse(c, toBookResponse(book));
-  }
+  },
 );
 
 /**
@@ -133,26 +127,17 @@ app.patch(
 
     // 書籍を取得してページ数を検証
     const existingBook = await bookRepo.findById(c.env.DB, id, userId);
-    const validation = bookDomain.validatePageProgress(
-      currentPage,
-      existingBook.page_count
-    );
+    const validation = bookDomain.validatePageProgress(currentPage, existingBook.page_count);
 
     if (!validation.valid) {
       throw new ValidationError(validation.error);
     }
 
     // ステータスを自動計算
-    const newStatus = bookDomain.calculateStatus(
-      currentPage,
-      existingBook.page_count
-    );
+    const newStatus = bookDomain.calculateStatus(currentPage, existingBook.page_count);
 
     // 読了日の設定
-    const finishedAt = bookDomain.shouldSetFinishedAt(
-      newStatus,
-      existingBook.status
-    )
+    const finishedAt = bookDomain.shouldSetFinishedAt(newStatus, existingBook.status)
       ? new Date().toISOString()
       : existingBook.finished_at;
 
@@ -164,7 +149,7 @@ app.patch(
     });
 
     return successResponse(c, toBookResponse(book));
-  }
+  },
 );
 
 /**

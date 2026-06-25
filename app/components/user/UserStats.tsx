@@ -6,11 +6,7 @@ interface UserStatsProps {
   completedBooks: number;
 }
 
-export const UserStats: FC<UserStatsProps> = ({
-  totalBooks,
-  readingBooks,
-  completedBooks,
-}) => {
+export const UserStats: FC<UserStatsProps> = ({ totalBooks, readingBooks, completedBooks }) => {
   return (
     <div class="flex items-center gap-8 text-zinc-600">
       <div class="flex items-baseline gap-2">

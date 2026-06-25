@@ -11,7 +11,7 @@ export async function addTagToBook(
   db: D1Database,
   bookId: string,
   tagId: string,
-  userId: string
+  userId: string,
 ): Promise<void> {
   try {
     // 書籍の所有権チェック
@@ -51,7 +51,7 @@ export async function addTagToBook(
         `
         INSERT INTO book_tags (book_id, tag_id)
         VALUES (?, ?)
-      `
+      `,
       )
       .bind(bookId, tagId)
       .run();
@@ -70,7 +70,7 @@ export async function removeTagFromBook(
   db: D1Database,
   bookId: string,
   tagId: string,
-  userId: string
+  userId: string,
 ): Promise<void> {
   try {
     // 書籍の所有権チェック
@@ -101,10 +101,7 @@ export async function removeTagFromBook(
 /**
  * 書籍に紐づくタグ一覧を取得
  */
-export async function findTagsByBookId(
-  db: D1Database,
-  bookId: string
-): Promise<Tag[]> {
+export async function findTagsByBookId(db: D1Database, bookId: string): Promise<Tag[]> {
   try {
     const result = await db
       .prepare(
@@ -113,7 +110,7 @@ export async function findTagsByBookId(
         INNER JOIN book_tags bt ON t.id = bt.tag_id
         WHERE bt.book_id = ?
         ORDER BY t.name ASC
-      `
+      `,
       )
       .bind(bookId)
       .all<Tag>();
@@ -127,15 +124,9 @@ export async function findTagsByBookId(
 /**
  * 書籍の全タグを削除
  */
-export async function removeAllTagsFromBook(
-  db: D1Database,
-  bookId: string
-): Promise<void> {
+export async function removeAllTagsFromBook(db: D1Database, bookId: string): Promise<void> {
   try {
-    await db
-      .prepare("DELETE FROM book_tags WHERE book_id = ?")
-      .bind(bookId)
-      .run();
+    await db.prepare("DELETE FROM book_tags WHERE book_id = ?").bind(bookId).run();
   } catch (error) {
     throw new DatabaseError("Failed to remove all tags from book", error);
   }
@@ -147,7 +138,7 @@ export async function removeAllTagsFromBook(
 export async function isTagAttached(
   db: D1Database,
   bookId: string,
-  tagId: string
+  tagId: string,
 ): Promise<boolean> {
   try {
     const result = await db
@@ -164,10 +155,7 @@ export async function isTagAttached(
 /**
  * 書籍に紐づくタグの数を取得
  */
-export async function countTagsByBook(
-  db: D1Database,
-  bookId: string
-): Promise<number> {
+export async function countTagsByBook(db: D1Database, bookId: string): Promise<number> {
   try {
     const result = await db
       .prepare("SELECT COUNT(*) as count FROM book_tags WHERE book_id = ?")
@@ -183,10 +171,7 @@ export async function countTagsByBook(
 /**
  * タグに紐づく書籍の数を取得
  */
-export async function countBooksByTag(
-  db: D1Database,
-  tagId: string
-): Promise<number> {
+export async function countBooksByTag(db: D1Database, tagId: string): Promise<number> {
   try {
     const result = await db
       .prepare("SELECT COUNT(*) as count FROM book_tags WHERE tag_id = ?")
@@ -205,7 +190,7 @@ export async function countBooksByTag(
 export async function updateBookTags(
   db: D1Database,
   bookId: string,
-  tagIds: string[]
+  tagIds: string[],
 ): Promise<void> {
   try {
     // 既存のタグを削除
@@ -214,9 +199,7 @@ export async function updateBookTags(
     // 新しいタグを追加
     if (tagIds.length > 0) {
       const statements = tagIds.map((tagId) =>
-        db
-          .prepare("INSERT INTO book_tags (book_id, tag_id) VALUES (?, ?)")
-          .bind(bookId, tagId)
+        db.prepare("INSERT INTO book_tags (book_id, tag_id) VALUES (?, ?)").bind(bookId, tagId),
       );
 
       await db.batch(statements);

@@ -10,10 +10,7 @@ type D1BindValue = string | number | null;
  */
 export async function findById(db: D1Database, userId: string): Promise<User> {
   try {
-    const result = await db
-      .prepare("SELECT * FROM users WHERE id = ?")
-      .bind(userId)
-      .first<User>();
+    const result = await db.prepare("SELECT * FROM users WHERE id = ?").bind(userId).first<User>();
 
     if (!result) {
       throw new NotFoundError("User not found");
@@ -29,10 +26,7 @@ export async function findById(db: D1Database, userId: string): Promise<User> {
 /**
  * ユーザー名でユーザーを取得
  */
-export async function findByUsername(
-  db: D1Database,
-  username: string
-): Promise<User> {
+export async function findByUsername(db: D1Database, username: string): Promise<User> {
   try {
     const result = await db
       .prepare("SELECT * FROM users WHERE username = ?")
@@ -53,10 +47,7 @@ export async function findByUsername(
 /**
  * メールアドレスでユーザーを取得
  */
-export async function findByEmail(
-  db: D1Database,
-  email: string
-): Promise<User | null> {
+export async function findByEmail(db: D1Database, email: string): Promise<User | null> {
   try {
     const result = await db
       .prepare("SELECT * FROM users WHERE email = ?")
@@ -75,7 +66,7 @@ export async function findByEmail(
 export async function findByProvider(
   db: D1Database,
   provider: "github" | "google",
-  providerId: string
+  providerId: string,
 ): Promise<User | null> {
   try {
     const result = await db
@@ -95,7 +86,7 @@ export async function findByProvider(
 export async function isUsernameTaken(
   db: D1Database,
   username: string,
-  excludeUserId?: string
+  excludeUserId?: string,
 ): Promise<boolean> {
   try {
     let query = "SELECT id FROM users WHERE username = ?";
@@ -135,7 +126,7 @@ export async function create(db: D1Database, user: UserInput): Promise<User> {
           id, username, email, name, bio, avatar_url,
           provider, provider_id, created_at, updated_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `
+      `,
       )
       .bind(
         user.id,
@@ -147,7 +138,7 @@ export async function create(db: D1Database, user: UserInput): Promise<User> {
         user.provider,
         user.provider_id,
         user.created_at,
-        user.updated_at
+        user.updated_at,
       )
       .run();
 
@@ -164,7 +155,7 @@ export async function create(db: D1Database, user: UserInput): Promise<User> {
 export async function update(
   db: D1Database,
   userId: string,
-  data: Partial<UserInput>
+  data: Partial<UserInput>,
 ): Promise<User> {
   try {
     // ユーザーの存在確認
@@ -185,18 +176,15 @@ export async function update(
       ["avatar_url", data.avatar_url],
     ] satisfies Array<[string, D1BindValue | undefined]>;
 
-    const definedUpdates = updates.filter(
-      ([, value]) => value !== undefined
-    ) as Array<[string, D1BindValue]>;
+    const definedUpdates = updates.filter(([, value]) => value !== undefined) as Array<
+      [string, D1BindValue]
+    >;
 
     if (definedUpdates.length === 0) {
       return findById(db, userId);
     }
 
-    const fields = [
-      ...definedUpdates.map(([field]) => `${field} = ?`),
-      "updated_at = ?",
-    ];
+    const fields = [...definedUpdates.map(([field]) => `${field} = ?`), "updated_at = ?"];
     const params: D1BindValue[] = [
       ...definedUpdates.map(([, value]) => value),
       new Date().toISOString(),
@@ -209,15 +197,14 @@ export async function update(
         UPDATE users 
         SET ${fields.join(", ")}
         WHERE id = ?
-      `
+      `,
       )
       .bind(...params)
       .run();
 
     return findById(db, userId);
   } catch (error) {
-    if (error instanceof NotFoundError || error instanceof DatabaseError)
-      throw error;
+    if (error instanceof NotFoundError || error instanceof DatabaseError) throw error;
     throw new DatabaseError("Failed to update user", error);
   }
 }
@@ -225,10 +212,7 @@ export async function update(
 /**
  * ユーザーを削除
  */
-export async function deleteById(
-  db: D1Database,
-  userId: string
-): Promise<void> {
+export async function deleteById(db: D1Database, userId: string): Promise<void> {
   try {
     // ユーザーの存在確認
     await findById(db, userId);
@@ -240,4 +224,3 @@ export async function deleteById(
     throw new DatabaseError("Failed to delete user", error);
   }
 }
-

@@ -30,11 +30,7 @@ export const CardHeader: FC<PropsWithChildren<{ class?: string }>> = ({
   children,
   class: className = "",
 }) => {
-  return (
-    <div class={`px-6 py-4 border-b border-zinc-100 ${className}`}>
-      {children}
-    </div>
-  );
+  return <div class={`px-6 py-4 border-b border-zinc-100 ${className}`}>{children}</div>;
 };
 
 export const CardBody: FC<PropsWithChildren<{ class?: string }>> = ({
@@ -49,9 +45,7 @@ export const CardFooter: FC<PropsWithChildren<{ class?: string }>> = ({
   class: className = "",
 }) => {
   return (
-    <div
-      class={`px-6 py-4 border-t border-zinc-100 bg-zinc-50/50 rounded-b-xl ${className}`}
-    >
+    <div class={`px-6 py-4 border-t border-zinc-100 bg-zinc-50/50 rounded-b-xl ${className}`}>
       {children}
     </div>
   );
