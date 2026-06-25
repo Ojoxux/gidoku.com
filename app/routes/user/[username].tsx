@@ -51,12 +51,7 @@ const NotFoundPage: FC<NotFoundPageProps> = ({ username, currentUser }) => (
     <div class="flex items-center justify-center min-h-[60vh]">
       <div class="text-center max-w-md mx-auto">
         <div class="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <svg
-            class="w-8 h-8 text-zinc-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
+          <svg class="w-8 h-8 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <title>ユーザーアイコン</title>
             <path
               stroke-linecap="round"
@@ -130,22 +125,32 @@ export default createRoute(async (c) => {
 
   const currentUser = await getPageUser(c);
 
-  const profileUser = await userRepo
-    .findByUsername(c.env.DB, username)
-    .catch(() => null);
+  const profileUser = await userRepo.findByUsername(c.env.DB, username).catch(() => null);
 
   if (!profileUser) {
-    return c.render(
-      <NotFoundPage username={username} currentUser={currentUser} />
-    );
+    return c.render(<NotFoundPage username={username} currentUser={currentUser} />);
   }
 
-  const [stats, { books: rawReadingBooks }, { books: rawUnreadBooks }, { books: rawCompletedBooks }] =
-    await Promise.all([
+  const [
+    stats,
+    { books: rawReadingBooks },
+    { books: rawUnreadBooks },
+    { books: rawCompletedBooks },
+  ] = await Promise.all([
     bookRepo.getStats(c.env.DB, profileUser.id),
     bookRepo.findByUserId(c.env.DB, profileUser.id, { status: "reading", limit: 12, offset: 0 }),
-    bookRepo.findByUserId(c.env.DB, profileUser.id, { status: "unread", sortBy: "updated", limit: 24, offset: 0 }),
-    bookRepo.findByUserId(c.env.DB, profileUser.id, { status: "completed", sortBy: "updated", limit: 24, offset: 0 }),
+    bookRepo.findByUserId(c.env.DB, profileUser.id, {
+      status: "unread",
+      sortBy: "updated",
+      limit: 24,
+      offset: 0,
+    }),
+    bookRepo.findByUserId(c.env.DB, profileUser.id, {
+      status: "completed",
+      sortBy: "updated",
+      limit: 24,
+      offset: 0,
+    }),
   ]);
 
   return c.render(
@@ -156,6 +161,6 @@ export default createRoute(async (c) => {
       unreadBooks={rawUnreadBooks.map(toBookListItem)}
       completedBooks={rawCompletedBooks.map(toBookListItem)}
       currentUser={currentUser}
-    />
+    />,
   );
 });

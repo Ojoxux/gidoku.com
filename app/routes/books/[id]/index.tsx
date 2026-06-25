@@ -1,10 +1,9 @@
 import { createRoute } from "honox/factory";
 import { requirePageAuth, getSidebarExpanded } from "../../../lib/page-auth";
 import { Layout } from "../../../components/layout/Layout";
-import { StatusBadge, Badge } from "../../../components/ui/Badge";
 import { BookCover } from "../../../components/book/BookCover";
 import { Button } from "../../../components/ui/Button";
-import { bookRepo, bookTagRepo } from "../../../server/db/repositories";
+import { bookRepo } from "../../../server/db/repositories";
 import ProgressSlider from "../../../islands/ProgressSlider";
 import StatusToggle from "../../../islands/StatusToggle";
 import MemoEditor from "../../../islands/MemoEditor";
@@ -26,7 +25,6 @@ export default createRoute(async (c) => {
     return c.redirect("/books");
   }
 
-  const tags = await bookTagRepo.findTagsByBookId(c.env.DB, id);
   const authors = JSON.parse(book.authors) as string[];
 
   return c.render(
@@ -62,8 +60,8 @@ export default createRoute(async (c) => {
             </a>
             <Button
               variant="danger"
-              size="sm"
-              class="bg-white text-red-600 hover:bg-red-50 border border-red-100 font-bold rounded-full shadow-sm"
+              shape="pill"
+              weight="bold"
               onClick={`if(confirm('この本を削除しますか？')) { fetch('/api/books/${book.id}', { method: 'DELETE' }).then(() => location.href = '/books') }`}
             >
               削除
@@ -96,12 +94,7 @@ export default createRoute(async (c) => {
                   class="flex items-center justify-center w-full px-4 py-3 text-sm font-bold text-white bg-[#bf0000] rounded-xl hover:bg-[#a00000] transition-colors shadow-sm"
                 >
                   <span class="mr-2">楽天ブックスで見る</span>
-                  <svg
-                    class="w-4 h-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -126,8 +119,7 @@ export default createRoute(async (c) => {
                   <p class="font-medium text-zinc-800">{authors.join(", ")}</p>
                   {book.publisher && (
                     <p class="text-sm text-zinc-500">
-                      {book.publisher} <span class="mx-1">・</span>{" "}
-                      {book.published_date}
+                      {book.publisher} <span class="mx-1">・</span> {book.published_date}
                     </p>
                   )}
                 </div>
@@ -169,9 +161,7 @@ export default createRoute(async (c) => {
                       <dt class="text-zinc-400 mb-1 font-bold text-xs uppercase tracking-wider">
                         ページ数
                       </dt>
-                      <dd class="font-mono text-zinc-900">
-                        {book.page_count}ページ
-                      </dd>
+                      <dd class="font-mono text-zinc-900">{book.page_count}ページ</dd>
                     </div>
                   )}
                 </dl>
@@ -188,6 +178,6 @@ export default createRoute(async (c) => {
           </div>
         </div>
       </div>
-    </Layout>
+    </Layout>,
   );
 });

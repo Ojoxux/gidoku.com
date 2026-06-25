@@ -1,18 +1,18 @@
-import { defineWorkersProject } from '@cloudflare/vitest-pool-workers/config'
+import { defineWorkersProject } from "@cloudflare/vitest-pool-workers/config";
 
 export default defineWorkersProject({
   test: {
     globals: true,
-    include: ['app/**/*.test.ts'],
-    setupFiles: ['./app/test/setup.ts'],
+    include: ["app/**/*.test.ts"],
+    setupFiles: ["./app/test/setup.ts"],
     poolOptions: {
       workers: {
-        wrangler: { configPath: './wrangler.test.jsonc' },
+        wrangler: { configPath: "./wrangler.test.jsonc" },
         miniflare: {
-          d1Databases: ['DB'],
-          kvNamespaces: ['KV'],
+          d1Databases: ["DB"],
+          kvNamespaces: ["KV"],
         },
       },
     },
   },
-})
+});

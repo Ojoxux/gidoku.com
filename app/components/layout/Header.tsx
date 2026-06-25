@@ -20,10 +20,7 @@ export const Header: FC<HeaderProps> = ({ user }) => {
               <Avatar src={user.avatar_url} alt={user.name} size="md" />
             </div>
             <div class="md:hidden">
-              <AvatarMenu
-                avatarUrl={user.avatar_url}
-                name={user.name}
-              />
+              <AvatarMenu avatarUrl={user.avatar_url} name={user.name} />
             </div>
           </div>
         ) : (

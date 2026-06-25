@@ -3,10 +3,7 @@ import type { BookStatus } from "../../types/database";
 /**
  * 進捗に基づいてステータスを計算
  */
-export function calculateStatus(
-  currentPage: number,
-  pageCount: number
-): BookStatus {
+export function calculateStatus(currentPage: number, pageCount: number): BookStatus {
   if (currentPage === 0) return "unread";
   if (pageCount > 0 && currentPage >= pageCount) return "completed";
   return "reading";
@@ -15,10 +12,7 @@ export function calculateStatus(
 /**
  * 進捗率を計算（0-100）
  */
-export function calculateProgress(
-  currentPage: number,
-  pageCount: number
-): number {
+export function calculateProgress(currentPage: number, pageCount: number): number {
   if (pageCount === 0) return 0;
   return Math.min(100, Math.round((currentPage / pageCount) * 100));
 }
@@ -28,7 +22,7 @@ export function calculateProgress(
  */
 export function validatePageProgress(
   currentPage: number,
-  pageCount: number
+  pageCount: number,
 ): { valid: boolean; error?: string } {
   if (currentPage < 0) {
     return { valid: false, error: "Current page cannot be negative" };
@@ -56,10 +50,6 @@ export function isReading(status: BookStatus): boolean {
 /**
  * 読了日を設定すべきか判定
  */
-export function shouldSetFinishedAt(
-  newStatus: BookStatus,
-  oldStatus: BookStatus
-): boolean {
+export function shouldSetFinishedAt(newStatus: BookStatus, oldStatus: BookStatus): boolean {
   return newStatus === "completed" && oldStatus !== "completed";
 }
-

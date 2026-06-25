@@ -35,10 +35,22 @@ jobs:
         run: gem install --no-document git-pr-release
 
       - name: Create a release pull request
-        run: git-pr-release --squashed
+        run: |
+          set +e
+          output=$(git-pr-release --squashed 2>&1)
+          exit_code=$?
+          echo "$output"
+          if [ $exit_code -eq 0 ]; then
+            exit 0
+          fi
+          if echo "$output" | grep -q "No pull requests to be released"; then
+            echo "No merged PRs to release yet. Skipping."
+            exit 0
+          fi
+          exit $exit_code
         env:
           GIT_PR_RELEASE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GIT_PR_RELEASE_BRANCH_PRODUCTION: main
           GIT_PR_RELEASE_BRANCH_STAGING: staging
-          GIT_PR_RELEASE_LABELS: release production
+          GIT_PR_RELEASE_LABELS: release
           GIT_PR_RELEASE_TEMPLATE: .github/RELEASE_PULL_REQUEST_TEMPLATE.md

@@ -27,10 +27,7 @@ export default function ProfileForm({
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const hasChanges =
-    username !== initialUsername ||
-    name !== initialName ||
-    bio !== initialBio;
+  const hasChanges = username !== initialUsername || name !== initialName || bio !== initialBio;
 
   const handleSave = async () => {
     if (!hasChanges) return;
@@ -81,18 +78,13 @@ export default function ProfileForm({
         )}
         <div class="flex-1">
           <p class="text-sm font-bold text-zinc-900 mb-1">プロフィール画像</p>
-          <p class="text-xs text-zinc-500">
-            {providerName}のアカウント写真を使用中
-          </p>
+          <p class="text-xs text-zinc-500">{providerName}のアカウント写真を使用中</p>
         </div>
       </div>
 
       <div class="space-y-6">
         <div>
-          <label
-            for="username"
-            class="mb-2 block text-sm font-bold text-zinc-700"
-          >
+          <label for="username" class="mb-2 block text-sm font-bold text-zinc-700">
             ユーザーID
           </label>
           <div class="flex rounded-xl shadow-sm ring-1 ring-zinc-200 overflow-hidden">
@@ -103,9 +95,7 @@ export default function ProfileForm({
               type="text"
               id="username"
               value={username}
-              onInput={(e) =>
-                setUsername((e.target as HTMLInputElement).value)
-              }
+              onInput={(e) => setUsername((e.target as HTMLInputElement).value)}
               class="w-full px-3 py-2 rounded-none border-0 focus:ring-0 bg-white focus:outline-none text-zinc-900"
             />
           </div>
@@ -135,16 +125,12 @@ export default function ProfileForm({
             rows={4}
             class="w-full px-3 py-2 border border-zinc-200 rounded-xl bg-zinc-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-colors resize-vertical text-zinc-900"
           />
-          <p class="mt-2 text-xs text-zinc-500 font-medium">
-            簡単な自己紹介を書いてください。
-          </p>
+          <p class="mt-2 text-xs text-zinc-500 font-medium">簡単な自己紹介を書いてください。</p>
         </div>
       </div>
 
       <div class="flex items-center justify-end gap-3 pt-4 border-t border-zinc-50">
-        {saved && (
-          <span class="text-sm text-zinc-500">保存しました</span>
-        )}
+        {saved && <span class="text-sm text-zinc-500">保存しました</span>}
         <button
           type="button"
           onClick={handleSave}

@@ -6,6 +6,18 @@ import BooksStatusTabs from "../../islands/BooksStatusTabs";
 import { bookRepo } from "../../server/db/repositories";
 import type { Book, BookStatus } from "../../types/database";
 
+const formatBooks = (bookList: Book[]) =>
+  bookList.map((book) => ({
+    id: book.id,
+    title: book.title,
+    authors: JSON.parse(book.authors),
+    publisher: book.publisher,
+    thumbnailUrl: book.thumbnail_url,
+    status: book.status,
+    currentPage: book.current_page,
+    pageCount: book.page_count,
+  }));
+
 export default createRoute(async (c) => {
   const authResult = await requirePageAuth(c);
   if (authResult instanceof Response) {
@@ -16,12 +28,7 @@ export default createRoute(async (c) => {
 
   const search = c.req.query("search");
   const initialTab = c.req.query("status") as BookStatus | undefined;
-  const sortBy = c.req.query("sort") as
-    | "title"
-    | "created"
-    | "updated"
-    | "progress"
-    | undefined;
+  const sortBy = c.req.query("sort") as "title" | "created" | "updated" | "progress" | undefined;
 
   const { books, total } = await bookRepo.findByUserId(c.env.DB, user.id, {
     search,
@@ -30,26 +37,12 @@ export default createRoute(async (c) => {
     offset: 0,
   });
 
-  const formatBooks = (books: Book[]) =>
-    books.map((book) => ({
-      id: book.id,
-      title: book.title,
-      authors: JSON.parse(book.authors),
-      publisher: book.publisher,
-      thumbnailUrl: book.thumbnail_url,
-      status: book.status,
-      currentPage: book.current_page,
-      pageCount: book.page_count,
-    }));
-
   return c.render(
     <Layout user={user} title="My Books" sidebarExpanded={sidebarExpanded}>
       <div class="space-y-8">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
           <div>
-            <h1 class="text-3xl font-bold text-zinc-900 mb-2 tracking-tight">
-              自分の本棚
-            </h1>
+            <h1 class="text-3xl font-bold text-zinc-900 mb-2 tracking-tight">自分の本棚</h1>
             <p class="text-zinc-500 font-medium">全 {total} 冊</p>
           </div>
           <a
@@ -103,17 +96,13 @@ export default createRoute(async (c) => {
             />
           </div>
 
-          <Button type="submit" class="sm:w-auto w-full font-bold py-2.5 rounded-xl">
+          <Button type="submit" shape="xl" weight="bold" class="sm:w-auto w-full py-2.5">
             検索
           </Button>
         </form>
 
-        <BooksStatusTabs
-          books={formatBooks(books)}
-          total={total}
-          initialTab={initialTab}
-        />
+        <BooksStatusTabs books={formatBooks(books)} total={total} initialTab={initialTab} />
       </div>
-    </Layout>
+    </Layout>,
   );
 });

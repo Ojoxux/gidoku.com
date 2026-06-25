@@ -53,7 +53,7 @@ export default function ProfileBookTabs({
 
   return (
     <div class="space-y-6">
-      <div class="flex items-center justify-between gap-4">
+      <div class="flex flex-col items-center gap-4">
         <h2 class="text-xl font-bold text-zinc-900">本の一覧</h2>
         <div
           class="inline-flex items-center gap-1 rounded-full bg-zinc-100 p-1"
@@ -120,9 +120,7 @@ export default function ProfileBookTabs({
                       <h3 class="font-semibold text-zinc-900 text-sm leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors">
                         {book.title}
                       </h3>
-                      <p class="text-xs text-zinc-500 line-clamp-1">
-                        {book.authors.join(", ")}
-                      </p>
+                      <p class="text-xs text-zinc-500 line-clamp-1">{book.authors.join(", ")}</p>
                     </div>
                   </a>
                 ))}
@@ -149,9 +147,7 @@ export default function ProfileBookTabs({
                   <h3 class="text-lg font-bold tracking-tight text-zinc-900 mb-2">
                     まだ公開されている本がありません
                   </h3>
-                  <p class="text-zinc-500 text-sm">
-                    {userName}さんの読書記録はまだありません
-                  </p>
+                  <p class="text-zinc-500 text-sm">{userName}さんの読書記録はまだありません</p>
                 </CardBody>
               </Card>
             )}

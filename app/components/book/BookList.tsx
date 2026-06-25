@@ -18,10 +18,7 @@ interface BookListProps {
   emptyMessage?: string;
 }
 
-export const BookList: FC<BookListProps> = ({
-  books,
-  emptyMessage = "本がありません",
-}) => {
+export const BookList: FC<BookListProps> = ({ books, emptyMessage = "本がありません" }) => {
   if (books.length === 0) {
     return (
       <div class="text-center py-12">

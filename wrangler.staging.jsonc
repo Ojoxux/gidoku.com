@@ -5,24 +5,30 @@
   "compatibility_date": "2025-12-09",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
-    "directory": "./dist"
+    "directory": "./dist",
   },
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "gidoku-db-staging",
-      "database_id": "REPLACE_WITH_STAGING_D1_DATABASE_ID"
-    }
+      "database_id": "12802069-e41c-41f6-aa59-7a339d9f0744",
+    },
   ],
   "kv_namespaces": [
     {
       "binding": "KV",
-      "id": "REPLACE_WITH_STAGING_KV_NAMESPACE_ID"
-    }
+      "id": "1378483b23f24cd59870e141a9634716",
+    },
   ],
   "vars": {
-    "GITHUB_CLIENT_ID": "Ov23li1W8sYXe7C1fWlR",
-    "GOOGLE_CLIENT_ID": "494336925174-ovnmt0b3ssdfqfvgtm1n28va40oau4n1.apps.googleusercontent.com",
-    "APP_URL": "https://gidoku-com-staging.workers.dev"
-  }
+    "GITHUB_CLIENT_ID": "Ov23liq4okvsI8w6kVsC",
+    "GOOGLE_CLIENT_ID": "494336925174-q3f41lih9r2o58unehpr312oncl3mdft.apps.googleusercontent.com",
+    "APP_URL": "https://staging.gidoku.com",
+  },
+  "routes": [
+    {
+      "pattern": "staging.gidoku.com",
+      "custom_domain": true,
+    },
+  ],
 }

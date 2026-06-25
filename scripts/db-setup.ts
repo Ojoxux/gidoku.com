@@ -31,9 +31,7 @@ function generateMigrationCommands(): string[] {
 
   migrations.forEach((migration) => {
     console.log(`📄 Migration: ${migration.name}`);
-    commands.push(
-      `wrangler d1 execute gidoku-db --local --file=migrations/${migration.name}`
-    );
+    commands.push(`wrangler d1 execute gidoku-db --local --file=migrations/${migration.name}`);
   });
 
   return commands;

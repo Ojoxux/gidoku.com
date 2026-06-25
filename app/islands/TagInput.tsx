@@ -112,8 +112,7 @@ export default function TagInput({ bookId, initialTags = [] }: TagInputProps) {
 
   const suggestions = allTags.filter(
     (t) =>
-      t.name.toLowerCase().includes(input.toLowerCase()) &&
-      !tags.some((tag) => tag.id === t.id)
+      t.name.toLowerCase().includes(input.toLowerCase()) && !tags.some((tag) => tag.id === t.id),
   );
 
   return (

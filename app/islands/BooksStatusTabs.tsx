@@ -20,10 +20,7 @@ type TabKey = "reading" | "unread" | "completed";
 
 const tabOrder: TabKey[] = ["reading", "unread", "completed"];
 
-const getDefaultTab = (
-  tabs: Record<TabKey, BookItem[]>,
-  initialTab?: BookStatus
-): TabKey => {
+const getDefaultTab = (tabs: Record<TabKey, BookItem[]>, initialTab?: BookStatus): TabKey => {
   if (initialTab && tabOrder.includes(initialTab)) {
     return initialTab;
   }
@@ -38,20 +35,14 @@ const getDefaultTab = (
 const filterByStatus = (books: BookItem[], status: TabKey) =>
   books.filter((book) => book.status === status);
 
-export default function BooksStatusTabs({
-  books,
-  total,
-  initialTab,
-}: BooksStatusTabsProps) {
+export default function BooksStatusTabs({ books, total, initialTab }: BooksStatusTabsProps) {
   const tabs = {
     reading: filterByStatus(books, "reading"),
     unread: filterByStatus(books, "unread"),
     completed: filterByStatus(books, "completed"),
   } satisfies Record<TabKey, BookItem[]>;
 
-  const [activeTab, setActiveTab] = useState<TabKey>(
-    getDefaultTab(tabs, initialTab)
-  );
+  const [activeTab, setActiveTab] = useState<TabKey>(getDefaultTab(tabs, initialTab));
 
   const tabItems = [
     { key: "reading" as const, label: "読書中", count: tabs.reading.length },
@@ -61,7 +52,7 @@ export default function BooksStatusTabs({
 
   return (
     <div class="space-y-6">
-      <div class="flex flex-col items-center sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div class="flex flex-col items-center gap-4">
         <p class="text-zinc-500 font-medium">全 {total} 冊</p>
         <div
           class="inline-flex items-center gap-1 rounded-full bg-zinc-100 p-1"
@@ -128,9 +119,7 @@ export default function BooksStatusTabs({
                       <h3 class="font-semibold text-zinc-900 text-sm leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors">
                         {book.title}
                       </h3>
-                      <p class="text-xs text-zinc-500 line-clamp-1">
-                        {book.authors.join(", ")}
-                      </p>
+                      <p class="text-xs text-zinc-500 line-clamp-1">{book.authors.join(", ")}</p>
                     </div>
                   </a>
                 ))}
@@ -154,9 +143,7 @@ export default function BooksStatusTabs({
                     />
                   </svg>
                 </div>
-                <h3 class="text-lg font-bold text-zinc-900 mb-1">
-                  本が見つかりません
-                </h3>
+                <h3 class="text-lg font-bold text-zinc-900 mb-1">本が見つかりません</h3>
                 <p class="text-zinc-500 mb-8 max-w-sm mx-auto text-sm">
                   条件に一致する本が見つかりませんでした。検索条件を変更するか、新しい本を追加してください。
                 </p>

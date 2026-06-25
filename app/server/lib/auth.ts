@@ -14,10 +14,7 @@ const USER_CACHE_TTL = 300; // 5分
 /**
  * キャッシュからユーザー情報を取得
  */
-async function getCachedUser(
-  kv: KVNamespace,
-  userId: string
-): Promise<User | null> {
+async function getCachedUser(kv: KVNamespace, userId: string): Promise<User | null> {
   try {
     const cached = await kv.get(`user_cache:${userId}`);
     if (cached) {
@@ -45,10 +42,7 @@ async function setCachedUser(kv: KVNamespace, user: User): Promise<void> {
 /**
  * ユーザーキャッシュを無効化
  */
-export async function invalidateUserCache(
-  kv: KVNamespace,
-  userId: string
-): Promise<void> {
+export async function invalidateUserCache(kv: KVNamespace, userId: string): Promise<void> {
   try {
     await kv.delete(`user_cache:${userId}`);
   } catch {
@@ -61,7 +55,7 @@ export async function invalidateUserCache(
  */
 export async function authMiddleware(
   c: Context<HonoContext>,
-  next: Next
+  next: Next,
 ): Promise<Response | void> {
   try {
     const sessionId = getCookie(c, "session_id");
@@ -97,7 +91,7 @@ export async function authMiddleware(
             code: "UNAUTHORIZED",
           },
         },
-        401
+        401,
       );
     }
 
@@ -108,10 +102,7 @@ export async function authMiddleware(
 /**
  * オプショナル認証ミドルウェア（キャッシュ対応）
  */
-export async function optionalAuthMiddleware(
-  c: Context<HonoContext>,
-  next: Next
-): Promise<void> {
+export async function optionalAuthMiddleware(c: Context<HonoContext>, next: Next): Promise<void> {
   try {
     const sessionId = getCookie(c, "session_id");
 
@@ -141,11 +132,9 @@ export async function optionalAuthMiddleware(
  * 管理者ミドルウェア
  */
 export async function adminMiddleware(
-  c: Context<HonoContext>,
-  next: Next
+  _c: Context<HonoContext>,
+  next: Next,
 ): Promise<Response | void> {
-  const user = c.get("user");
-
   // 将来的に管理者フラグを追加する場合
   // if (!user.isAdmin) {
   //   return c.json({ error: "Forbidden" }, 403);
@@ -159,8 +148,6 @@ export async function adminMiddleware(
  */
 export function checkOwnership(userId: string, resourceUserId: string): void {
   if (userId !== resourceUserId) {
-    throw new UnauthorizedError(
-      "You don't have permission to access this resource"
-    );
+    throw new UnauthorizedError("You don't have permission to access this resource");
   }
 }

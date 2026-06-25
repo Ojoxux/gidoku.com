@@ -33,12 +33,7 @@ export default createRoute(async (c) => {
               href={`/books/${id}`}
               class="text-sm font-bold text-zinc-500 hover:text-blue-600 transition-colors inline-flex items-center"
             >
-              <svg
-                class="w-4 h-4 mr-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
+              <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -52,13 +47,21 @@ export default createRoute(async (c) => {
           <h1 class="text-3xl font-bold text-zinc-900 tracking-tight">書籍情報を編集</h1>
         </div>
 
-        <form id="edit-form" class="bg-white rounded-2xl p-8 shadow-sm ring-1 ring-zinc-100 space-y-8">
+        <form
+          id="edit-form"
+          class="bg-white rounded-2xl p-8 shadow-sm ring-1 ring-zinc-100 space-y-8"
+        >
           <div class="space-y-6">
             <div>
               <Label for="title" required class="mb-2 block text-sm font-bold text-zinc-700">
                 タイトル
               </Label>
-              <Input name="title" required value={book.title} class="rounded-xl border-zinc-200 bg-zinc-50 focus:bg-white transition-colors" />
+              <Input
+                name="title"
+                required
+                value={book.title}
+                class="rounded-xl border-zinc-200 bg-zinc-50 focus:bg-white transition-colors"
+              />
             </div>
 
             <div>
@@ -76,22 +79,43 @@ export default createRoute(async (c) => {
 
             <div class="grid grid-cols-2 gap-6">
               <div>
-                <Label for="publisher" class="mb-2 block text-sm font-bold text-zinc-700">出版社</Label>
-                <Input name="publisher" value={book.publisher || ""} class="rounded-xl border-zinc-200 bg-zinc-50 focus:bg-white transition-colors" />
+                <Label for="publisher" class="mb-2 block text-sm font-bold text-zinc-700">
+                  出版社
+                </Label>
+                <Input
+                  name="publisher"
+                  value={book.publisher || ""}
+                  class="rounded-xl border-zinc-200 bg-zinc-50 focus:bg-white transition-colors"
+                />
               </div>
               <div>
-                <Label for="isbn" class="mb-2 block text-sm font-bold text-zinc-700">ISBN</Label>
-                <Input name="isbn" value={book.isbn || ""} class="rounded-xl border-zinc-200 bg-zinc-50 focus:bg-white transition-colors" />
+                <Label for="isbn" class="mb-2 block text-sm font-bold text-zinc-700">
+                  ISBN
+                </Label>
+                <Input
+                  name="isbn"
+                  value={book.isbn || ""}
+                  class="rounded-xl border-zinc-200 bg-zinc-50 focus:bg-white transition-colors"
+                />
               </div>
             </div>
 
             <div class="grid grid-cols-2 gap-6">
               <div>
-                <Label for="pageCount" class="mb-2 block text-sm font-bold text-zinc-700">ページ数</Label>
-                <Input type="number" name="pageCount" value={book.page_count} class="rounded-xl border-zinc-200 bg-zinc-50 focus:bg-white transition-colors" />
+                <Label for="pageCount" class="mb-2 block text-sm font-bold text-zinc-700">
+                  ページ数
+                </Label>
+                <Input
+                  type="number"
+                  name="pageCount"
+                  value={book.page_count}
+                  class="rounded-xl border-zinc-200 bg-zinc-50 focus:bg-white transition-colors"
+                />
               </div>
               <div>
-                <Label for="publishedDate" class="mb-2 block text-sm font-bold text-zinc-700">出版日</Label>
+                <Label for="publishedDate" class="mb-2 block text-sm font-bold text-zinc-700">
+                  出版日
+                </Label>
                 <Input
                   name="publishedDate"
                   value={book.published_date || ""}
@@ -102,7 +126,9 @@ export default createRoute(async (c) => {
             </div>
 
             <div>
-              <Label for="description" class="mb-2 block text-sm font-bold text-zinc-700">概要</Label>
+              <Label for="description" class="mb-2 block text-sm font-bold text-zinc-700">
+                概要
+              </Label>
               <Textarea
                 name="description"
                 value={book.description || ""}
@@ -112,7 +138,9 @@ export default createRoute(async (c) => {
             </div>
 
             <div>
-              <Label for="thumbnailUrl" class="mb-2 block text-sm font-bold text-zinc-700">表紙画像URL</Label>
+              <Label for="thumbnailUrl" class="mb-2 block text-sm font-bold text-zinc-700">
+                表紙画像URL
+              </Label>
               <Input
                 name="thumbnailUrl"
                 value={book.thumbnail_url || ""}
@@ -131,7 +159,9 @@ export default createRoute(async (c) => {
             </a>
             <Button
               type="button"
-              class="rounded-full px-8 py-2.5 font-bold shadow-sm"
+              shape="pill"
+              weight="bold"
+              class="px-8 py-2.5"
               onClick={`
                 const form = document.getElementById('edit-form');
                 const btn = this;
@@ -171,6 +201,6 @@ export default createRoute(async (c) => {
           </div>
         </form>
       </div>
-    </Layout>
+    </Layout>,
   );
 });
