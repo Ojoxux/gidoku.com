@@ -8,6 +8,18 @@ import { bookRepo } from "../server/db/repositories";
 import { BookCover } from "../components/book/BookCover";
 import type { Book } from "../types/database";
 
+const formatBooks = (bookList: Book[]) =>
+  bookList.map((book) => ({
+    id: book.id,
+    title: book.title,
+    authors: JSON.parse(book.authors),
+    publisher: book.publisher,
+    thumbnailUrl: book.thumbnail_url,
+    status: book.status,
+    currentPage: book.current_page,
+    pageCount: book.page_count,
+  }));
+
 export default createRoute(async (c) => {
   const user = await getPageUser(c);
   const sidebarExpanded = getSidebarExpanded(c);
@@ -162,18 +174,6 @@ export default createRoute(async (c) => {
     limit: 6,
     offset: 0,
   });
-
-  const formatBooks = (books: Book[]) =>
-    books.map((book) => ({
-      id: book.id,
-      title: book.title,
-      authors: JSON.parse(book.authors),
-      publisher: book.publisher,
-      thumbnailUrl: book.thumbnail_url,
-      status: book.status,
-      currentPage: book.current_page,
-      pageCount: book.page_count,
-    }));
 
   const formattedReadingBooks = formatBooks(readingBooks);
 
