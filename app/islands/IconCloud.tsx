@@ -99,17 +99,21 @@ export default function IconCloud({ images, width = 400, height = 400 }: IconClo
         const img = new Image();
         img.crossOrigin = "anonymous";
         img.src = imageUrl;
-        img.onload = () => {
-          offCtx.clearRect(0, 0, offscreen.width, offscreen.height);
+        img.addEventListener(
+          "load",
+          () => {
+            offCtx.clearRect(0, 0, offscreen.width, offscreen.height);
 
-          // Draw the image slightly smaller (80% of size) with transparent background
-          const padding = iconSize * 0.1; // 10% padding on each side
-          offCtx.drawImage(img, padding, padding, iconSize - padding * 2, iconSize - padding * 2);
+            // Draw the image slightly smaller (80% of size) with transparent background
+            const padding = iconSize * 0.1; // 10% padding on each side
+            offCtx.drawImage(img, padding, padding, iconSize - padding * 2, iconSize - padding * 2);
 
-          if (imagesLoadedRef.current) {
-            imagesLoadedRef.current[index] = true;
-          }
-        };
+            if (imagesLoadedRef.current) {
+              imagesLoadedRef.current[index] = true;
+            }
+          },
+          { once: true },
+        );
       }
       return offscreen;
     });
@@ -283,7 +287,7 @@ export default function IconCloud({ images, width = 400, height = 400 }: IconClo
 
       // Sort icons by z-depth for proper rendering order
       const rotation = rotationRef.current ?? { x: 0, y: 0 };
-      const sortedIcons = [...iconPositions].map((icon) => {
+      const sortedIcons = iconPositions.map((icon) => {
         const cosX = Math.cos(rotation.x);
         const sinX = Math.sin(rotation.x);
         const cosY = Math.cos(rotation.y);
@@ -293,7 +297,17 @@ export default function IconCloud({ images, width = 400, height = 400 }: IconClo
         const rotatedZ = icon.x * sinY + icon.z * cosY;
         const rotatedY = icon.y * cosX + rotatedZ * sinX;
 
-        return { ...icon, rotatedX, rotatedY, rotatedZ };
+        return {
+          x: icon.x,
+          y: icon.y,
+          z: icon.z,
+          scale: icon.scale,
+          opacity: icon.opacity,
+          id: icon.id,
+          rotatedX,
+          rotatedY,
+          rotatedZ,
+        };
       });
 
       sortedIcons.sort((a, b) => a.rotatedZ - b.rotatedZ);

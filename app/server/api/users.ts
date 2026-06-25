@@ -96,11 +96,11 @@ app.get("/:username/books", optionalAuthMiddleware, async (c) => {
 
   return successResponse(
     c,
-    books.map((book) => ({
-      ...toBookResponse(book),
-      // 公開用に一部フィールドを隠す
-      memo: null,
-    })),
+    books.map((book) => {
+      const response = toBookResponse(book);
+      response.memo = null;
+      return response;
+    }),
   );
 });
 

@@ -1,4 +1,4 @@
-import type {} from "hono";
+import "hono";
 import type { Env as AppEnv, Variables as AppVariables } from "./types/env";
 
 declare module "hono" {

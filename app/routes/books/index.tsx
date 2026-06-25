@@ -6,6 +6,18 @@ import BooksStatusTabs from "../../islands/BooksStatusTabs";
 import { bookRepo } from "../../server/db/repositories";
 import type { Book, BookStatus } from "../../types/database";
 
+const formatBooks = (bookList: Book[]) =>
+  bookList.map((book) => ({
+    id: book.id,
+    title: book.title,
+    authors: JSON.parse(book.authors),
+    publisher: book.publisher,
+    thumbnailUrl: book.thumbnail_url,
+    status: book.status,
+    currentPage: book.current_page,
+    pageCount: book.page_count,
+  }));
+
 export default createRoute(async (c) => {
   const authResult = await requirePageAuth(c);
   if (authResult instanceof Response) {
@@ -24,18 +36,6 @@ export default createRoute(async (c) => {
     limit: 50,
     offset: 0,
   });
-
-  const formatBooks = (books: Book[]) =>
-    books.map((book) => ({
-      id: book.id,
-      title: book.title,
-      authors: JSON.parse(book.authors),
-      publisher: book.publisher,
-      thumbnailUrl: book.thumbnail_url,
-      status: book.status,
-      currentPage: book.current_page,
-      pageCount: book.page_count,
-    }));
 
   return c.render(
     <Layout user={user} title="My Books" sidebarExpanded={sidebarExpanded}>
