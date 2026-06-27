@@ -15,18 +15,14 @@ app.use(
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: [
-        "'self'",
-        "https://api.github.com",
-        "https://accounts.google.com",
-      ],
+      connectSrc: ["'self'", "https://api.github.com", "https://accounts.google.com"],
       baseUri: ["'self'"],
       formAction: ["'self'"],
       frameAncestors: ["'none'"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: [],
     },
-  })
+  }),
 );
 
 // CSRF保護（Origin/Sec-Fetch-Site検証）
@@ -39,7 +35,7 @@ app.use(
       const allowedOrigins = [appUrl, "http://localhost:5173"];
       return allowedOrigins.includes(origin);
     },
-  })
+  }),
 );
 
 app.route("/api", api);

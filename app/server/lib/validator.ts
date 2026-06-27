@@ -1,18 +1,14 @@
 import type { Context, MiddlewareHandler } from "hono";
 import { type, type Type } from "arktype";
 
-type ValidatedDataKey =
-  | "validated_json"
-  | "validated_query"
-  | "validated_param"
-  | "validated_form";
+type ValidatedDataKey = "validated_json" | "validated_query" | "validated_param" | "validated_form";
 
 /*
  * Hono用のバリデーターミドルウェア
  */
 export function validator<T>(
   target: "json" | "query" | "param" | "form",
-  schema: Type<T>
+  schema: Type<T>,
 ): MiddlewareHandler {
   return async (c: Context, next) => {
     let data: unknown;
@@ -27,8 +23,11 @@ export function validator<T>(
           Object.entries(c.req.query()).map(([key, value]) => {
             if (!numericKeys.has(key) || value == null) return [key, value];
             const num = Number(value);
-            return [key, !isNaN(num) && isFinite(num) && String(num) === String(value).trim() ? num : value];
-          })
+            return [
+              key,
+              !isNaN(num) && isFinite(num) && String(num) === String(value).trim() ? num : value,
+            ];
+          }),
         );
         break;
       case "param":
@@ -53,7 +52,7 @@ export function validator<T>(
             details: result.summary,
           },
         },
-        400
+        400,
       );
     }
 
@@ -68,10 +67,7 @@ export function validator<T>(
 /**
  * 検証済みデータを取得するヘルパー
  */
-export function getValidated<T>(
-  c: Context,
-  target: "json" | "query" | "param" | "form"
-): T {
+export function getValidated<T>(c: Context, target: "json" | "query" | "param" | "form"): T {
   const key = `validated_${target}` as ValidatedDataKey;
   return c.get(key) as T;
 }

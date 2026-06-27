@@ -130,7 +130,7 @@ export async function seedDatabase(db: D1Database): Promise<void> {
       `
     INSERT OR IGNORE INTO users (id, username, email, name, bio, avatar_url, provider, provider_id, created_at, updated_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `
+  `,
     )
     .bind(
       "user-1",
@@ -142,7 +142,7 @@ export async function seedDatabase(db: D1Database): Promise<void> {
       "github",
       "12345",
       now,
-      now
+      now,
     )
     .run();
 
@@ -155,7 +155,7 @@ export async function seedDatabase(db: D1Database): Promise<void> {
       page_count, description, thumbnail_url, status, current_page,
       memo, created_at, updated_at
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `
+  `,
     )
     .bind(
       "book-1",
@@ -172,7 +172,7 @@ export async function seedDatabase(db: D1Database): Promise<void> {
       120,
       "第3章まで読了。命名規則が参考になる",
       now,
-      now
+      now,
     )
     .run();
 
@@ -184,7 +184,7 @@ export async function seedDatabase(db: D1Database): Promise<void> {
       page_count, description, thumbnail_url, status, current_page,
       created_at, updated_at
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `
+  `,
     )
     .bind(
       "book-2",
@@ -200,7 +200,7 @@ export async function seedDatabase(db: D1Database): Promise<void> {
       "completed",
       528,
       now,
-      now
+      now,
     )
     .run();
 
@@ -210,7 +210,7 @@ export async function seedDatabase(db: D1Database): Promise<void> {
       `
     INSERT OR IGNORE INTO tags (id, user_id, name, created_at)
     VALUES (?, ?, ?, ?)
-  `
+  `,
     )
     .bind("tag-1", "user-1", "設計", now)
     .run();
@@ -220,7 +220,7 @@ export async function seedDatabase(db: D1Database): Promise<void> {
       `
     INSERT OR IGNORE INTO tags (id, user_id, name, created_at)
     VALUES (?, ?, ?, ?)
-  `
+  `,
     )
     .bind("tag-2", "user-1", "データベース", now)
     .run();
@@ -231,7 +231,7 @@ export async function seedDatabase(db: D1Database): Promise<void> {
       `
     INSERT OR IGNORE INTO book_tags (book_id, tag_id)
     VALUES (?, ?)
-  `
+  `,
     )
     .bind("book-1", "tag-1")
     .run();
@@ -241,9 +241,8 @@ export async function seedDatabase(db: D1Database): Promise<void> {
       `
     INSERT OR IGNORE INTO book_tags (book_id, tag_id)
     VALUES (?, ?)
-  `
+  `,
     )
     .bind("book-2", "tag-2")
     .run();
 }
-

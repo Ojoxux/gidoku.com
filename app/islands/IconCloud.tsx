@@ -45,11 +45,7 @@ function useResponsiveSize(baseWidth: number, baseHeight: number) {
   return { containerRef, ...size };
 }
 
-export default function IconCloud({
-  images,
-  width = 400,
-  height = 400,
-}: IconCloudProps) {
+export default function IconCloud({ images, width = 400, height = 400 }: IconCloudProps) {
   const {
     containerRef,
     width: resolvedWidth,
@@ -91,7 +87,7 @@ export default function IconCloud({
   useEffect(() => {
     if (!images || images.length === 0) return;
 
-    imagesLoadedRef.current = new Array(images.length).fill(false);
+    imagesLoadedRef.current = Array.from({ length: images.length }, () => false);
 
     const newIconCanvases = images.map((imageUrl, index) => {
       const offscreen = document.createElement("canvas");
@@ -103,23 +99,21 @@ export default function IconCloud({
         const img = new Image();
         img.crossOrigin = "anonymous";
         img.src = imageUrl;
-        img.onload = () => {
-          offCtx.clearRect(0, 0, offscreen.width, offscreen.height);
+        img.addEventListener(
+          "load",
+          () => {
+            offCtx.clearRect(0, 0, offscreen.width, offscreen.height);
 
-          // Draw the image slightly smaller (80% of size) with transparent background
-          const padding = iconSize * 0.1; // 10% padding on each side
-          offCtx.drawImage(
-            img,
-            padding,
-            padding,
-            iconSize - padding * 2,
-            iconSize - padding * 2,
-          );
+            // Draw the image slightly smaller (80% of size) with transparent background
+            const padding = iconSize * 0.1; // 10% padding on each side
+            offCtx.drawImage(img, padding, padding, iconSize - padding * 2, iconSize - padding * 2);
 
-          if (imagesLoadedRef.current) {
-            imagesLoadedRef.current[index] = true;
-          }
-        };
+            if (imagesLoadedRef.current) {
+              imagesLoadedRef.current[index] = true;
+            }
+          },
+          { once: true },
+        );
       }
       return offscreen;
     });
@@ -193,10 +187,7 @@ export default function IconCloud({
       const dy = y - screenY;
 
       if (dx * dx + dy * dy < clickRadius * clickRadius) {
-        const targetX = -Math.atan2(
-          icon.y,
-          Math.sqrt(icon.x * icon.x + icon.z * icon.z),
-        );
+        const targetX = -Math.atan2(icon.y, Math.sqrt(icon.x * icon.x + icon.z * icon.z));
         const targetY = Math.atan2(icon.x, icon.z);
 
         const currentX = rot.x;
@@ -279,12 +270,8 @@ export default function IconCloud({
         const easedProgress = easeOutCubic(progress);
 
         rotationRef.current = {
-          x:
-            targetRotation.startX +
-            (targetRotation.x - targetRotation.startX) * easedProgress,
-          y:
-            targetRotation.startY +
-            (targetRotation.y - targetRotation.startY) * easedProgress,
+          x: targetRotation.startX + (targetRotation.x - targetRotation.startX) * easedProgress,
+          y: targetRotation.startY + (targetRotation.y - targetRotation.startY) * easedProgress,
         };
 
         if (progress >= 1) {
@@ -300,7 +287,7 @@ export default function IconCloud({
 
       // Sort icons by z-depth for proper rendering order
       const rotation = rotationRef.current ?? { x: 0, y: 0 };
-      const sortedIcons = [...iconPositions].map((icon) => {
+      const sortedIcons = iconPositions.map((icon) => {
         const cosX = Math.cos(rotation.x);
         const sinX = Math.sin(rotation.x);
         const cosY = Math.cos(rotation.y);
@@ -310,7 +297,17 @@ export default function IconCloud({
         const rotatedZ = icon.x * sinY + icon.z * cosY;
         const rotatedY = icon.y * cosX + rotatedZ * sinX;
 
-        return { ...icon, rotatedX, rotatedY, rotatedZ };
+        return {
+          x: icon.x,
+          y: icon.y,
+          z: icon.z,
+          scale: icon.scale,
+          opacity: icon.opacity,
+          id: icon.id,
+          rotatedX,
+          rotatedY,
+          rotatedZ,
+        };
       });
 
       sortedIcons.sort((a, b) => a.rotatedZ - b.rotatedZ);
@@ -320,23 +317,14 @@ export default function IconCloud({
         const opacity = Math.max(0.2, Math.min(1, (icon.rotatedZ + 150) / 200));
 
         ctx.save();
-        ctx.translate(
-          canvas.width / 2 + icon.rotatedX,
-          canvas.height / 2 + icon.rotatedY,
-        );
+        ctx.translate(canvas.width / 2 + icon.rotatedX, canvas.height / 2 + icon.rotatedY);
         ctx.scale(scale, scale);
         ctx.globalAlpha = opacity;
 
         const iconCanvases = iconCanvasesRef.current ?? [];
         const imagesLoaded = imagesLoadedRef.current ?? [];
         if (iconCanvases[icon.id] && imagesLoaded[icon.id]) {
-          ctx.drawImage(
-            iconCanvases[icon.id],
-            -iconRadius,
-            -iconRadius,
-            iconSize,
-            iconSize,
-          );
+          ctx.drawImage(iconCanvases[icon.id], -iconRadius, -iconRadius, iconSize, iconSize);
         } else {
           // Fallback: show a placeholder circle while loading
           ctx.beginPath();
@@ -361,11 +349,7 @@ export default function IconCloud({
   }, [images, iconPositions, isDragging, mousePos, targetRotation, isMobile]);
 
   return (
-    <div
-      ref={containerRef}
-      class="w-full aspect-square mx-auto"
-      style={{ maxWidth: `${width}px` }}
-    >
+    <div ref={containerRef} class="w-full aspect-square mx-auto" style={{ maxWidth: `${width}px` }}>
       <canvas
         ref={canvasRef}
         width={resolvedWidth}

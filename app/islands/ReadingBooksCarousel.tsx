@@ -14,9 +14,7 @@ interface ReadingBooksCarouselProps {
   books: ReadingBook[];
 }
 
-export default function ReadingBooksCarousel({
-  books,
-}: ReadingBooksCarouselProps) {
+export default function ReadingBooksCarousel({ books }: ReadingBooksCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: "left" | "right") => {
@@ -73,12 +71,7 @@ export default function ReadingBooksCarousel({
           >
             <div class="flex gap-4 mb-4">
               <div class="shrink-0">
-                <BookCover
-                  src={book.thumbnailUrl}
-                  alt={book.title}
-                  size="md"
-                  class="shadow-sm"
-                />
+                <BookCover src={book.thumbnailUrl} alt={book.title} size="md" class="shadow-sm" />
               </div>
               <div class="flex-1 min-w-0">
                 <h3
@@ -100,9 +93,7 @@ export default function ReadingBooksCarousel({
             {book.pageCount > 0 && (
               <div class="mt-auto pt-2">
                 <div class="flex justify-between text-[10px] font-bold uppercase tracking-wider text-zinc-900 mb-2">
-                  <span style={{ fontFamily: '"Arial", sans-serif' }}>
-                    Progress
-                  </span>
+                  <span style={{ fontFamily: '"Arial", sans-serif' }}>Progress</span>
                   <span style={{ fontFamily: '"Arial", sans-serif' }}>
                     {Math.round((book.currentPage / book.pageCount) * 100)}%
                   </span>
@@ -111,10 +102,7 @@ export default function ReadingBooksCarousel({
                   <div
                     class="h-full bg-zinc-900 transition-all duration-500 ease-out"
                     style={{
-                      width: `${Math.min(
-                        100,
-                        (book.currentPage / book.pageCount) * 100,
-                      )}%`,
+                      width: `${Math.min(100, (book.currentPage / book.pageCount) * 100)}%`,
                     }}
                   />
                 </div>

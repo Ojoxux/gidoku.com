@@ -33,7 +33,7 @@ export const RESERVED_USERNAMES = [
  * ユーザー名が予約語かどうかチェック
  */
 export function isReservedUsername(username: string): boolean {
-  return RESERVED_USERNAMES.includes(username.toLowerCase() as typeof RESERVED_USERNAMES[number]);
+  return RESERVED_USERNAMES.includes(username.toLowerCase() as (typeof RESERVED_USERNAMES)[number]);
 }
 
 /**

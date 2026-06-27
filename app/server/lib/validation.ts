@@ -20,7 +20,7 @@ export function validate<T>(schema: Type<T>, data: unknown): T {
  */
 export function validateSafe<T>(
   schema: Type<T>,
-  data: unknown
+  data: unknown,
 ): { success: true; data: T } | { success: false; error: string } {
   const result = schema(data);
 
@@ -38,8 +38,7 @@ export function validateSafe<T>(
  * UUIDが有効かどうか
  */
 export function isValidUUID(uuid: string): boolean {
-  const uuidRegex =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return uuidRegex.test(uuid);
 }
 

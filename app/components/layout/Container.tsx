@@ -19,10 +19,6 @@ export const Container: FC<PropsWithChildren<ContainerProps>> = ({
   size = "xl",
 }) => {
   return (
-    <div
-      class={`${sizeStyles[size]} mx-auto px-4 sm:px-6 lg:px-8 ${className}`}
-    >
-      {children}
-    </div>
+    <div class={`${sizeStyles[size]} mx-auto px-4 sm:px-6 lg:px-8 ${className}`}>{children}</div>
   );
 };

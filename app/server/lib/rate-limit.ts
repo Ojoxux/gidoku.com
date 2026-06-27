@@ -23,15 +23,8 @@ interface RateLimitEntry {
 /**
  * レートリミット用ミドルウェア
  */
-export function rateLimiter(
-  config: RateLimitConfig
-): MiddlewareHandler<HonoContext> {
-  const {
-    windowSec,
-    limit,
-    keyPrefix,
-    keyGenerator = defaultKeyGenerator,
-  } = config;
+export function rateLimiter(config: RateLimitConfig): MiddlewareHandler<HonoContext> {
+  const { windowSec, limit, keyPrefix, keyGenerator = defaultKeyGenerator } = config;
 
   return async (c: Context<HonoContext>, next: Next) => {
     const kv = c.env.KV;
@@ -73,10 +66,7 @@ export function rateLimiter(
     // 制限を超えている場合
     if (entry.count > limit) {
       c.header("Retry-After", String(retryAfter));
-      throw new RateLimitError(
-        "Too many requests. Please try again later.",
-        retryAfter
-      );
+      throw new RateLimitError("Too many requests. Please try again later.", retryAfter);
     }
 
     // エントリを更新（TTLをウィンドウサイズに設定）

@@ -8,6 +8,18 @@ import { bookRepo } from "../server/db/repositories";
 import { BookCover } from "../components/book/BookCover";
 import type { Book } from "../types/database";
 
+const formatBooks = (bookList: Book[]) =>
+  bookList.map((book) => ({
+    id: book.id,
+    title: book.title,
+    authors: JSON.parse(book.authors),
+    publisher: book.publisher,
+    thumbnailUrl: book.thumbnail_url,
+    status: book.status,
+    currentPage: book.current_page,
+    pageCount: book.page_count,
+  }));
+
 export default createRoute(async (c) => {
   const user = await getPageUser(c);
   const sidebarExpanded = getSidebarExpanded(c);
@@ -55,14 +67,8 @@ export default createRoute(async (c) => {
           <nav class="flex items-center justify-between w-full max-w-6xl mx-auto bg-white/80 backdrop-blur-xl border border-zinc-200/60 rounded-full px-4 sm:px-6 py-3 sm:py-3.5 shadow-lg shadow-zinc-900/5">
             {/* Logo */}
             <div class="flex items-center gap-2.5">
-              <img
-                src="/favicon128.ico"
-                alt="gidoku"
-                class="w-8 h-8 rounded-lg"
-              />
-              <span class="text-xl font-bold tracking-tight text-zinc-900">
-                gidoku
-              </span>
+              <img src="/favicon128.ico" alt="gidoku" class="w-8 h-8 rounded-lg" />
+              <span class="text-xl font-bold tracking-tight text-zinc-900">gidoku</span>
             </div>
 
             {/* Navigation */}
@@ -157,37 +163,17 @@ export default createRoute(async (c) => {
   // ログイン済みの場合はダッシュボード
   const stats = await bookRepo.getStats(c.env.DB, user.id);
 
-  const { books: readingBooks } = await bookRepo.findByUserId(
-    c.env.DB,
-    user.id,
-    {
-      status: "reading",
-      limit: 6,
-      offset: 0,
-    },
-  );
+  const { books: readingBooks } = await bookRepo.findByUserId(c.env.DB, user.id, {
+    status: "reading",
+    limit: 6,
+    offset: 0,
+  });
 
-  const { books: recentBooks } = await bookRepo.findByUserId(
-    c.env.DB,
-    user.id,
-    {
-      sortBy: "updated",
-      limit: 6,
-      offset: 0,
-    },
-  );
-
-  const formatBooks = (books: Book[]) =>
-    books.map((book) => ({
-      id: book.id,
-      title: book.title,
-      authors: JSON.parse(book.authors),
-      publisher: book.publisher,
-      thumbnailUrl: book.thumbnail_url,
-      status: book.status,
-      currentPage: book.current_page,
-      pageCount: book.page_count,
-    }));
+  const { books: recentBooks } = await bookRepo.findByUserId(c.env.DB, user.id, {
+    sortBy: "updated",
+    limit: 6,
+    offset: 0,
+  });
 
   const formattedReadingBooks = formatBooks(readingBooks);
 
@@ -209,9 +195,7 @@ export default createRoute(async (c) => {
         {formattedReadingBooks.length > 0 && (
           <section>
             <div class="flex items-center justify-between mb-4 sm:mb-6">
-              <h2 class="text-lg sm:text-xl font-bold text-zinc-900">
-                読んでいる本
-              </h2>
+              <h2 class="text-lg sm:text-xl font-bold text-zinc-900">読んでいる本</h2>
               <a
                 href="/books?status=reading"
                 class="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
@@ -226,9 +210,7 @@ export default createRoute(async (c) => {
 
         <section>
           <div class="flex items-center justify-between mb-4 sm:mb-6">
-            <h2 class="text-lg sm:text-xl font-bold text-zinc-900">
-              最近の読書
-            </h2>
+            <h2 class="text-lg sm:text-xl font-bold text-zinc-900">最近の読書</h2>
             <a
               href="/books"
               class="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
@@ -278,9 +260,7 @@ export default createRoute(async (c) => {
                     />
                   </svg>
                 </div>
-                <p class="text-zinc-500 mb-6 font-medium">
-                  読書記録をはじめましょう
-                </p>
+                <p class="text-zinc-500 mb-6 font-medium">読書記録をはじめましょう</p>
                 <a
                   href="/books/new"
                   class="inline-flex items-center justify-center px-6 py-2.5 text-sm font-bold text-white bg-zinc-900 hover:bg-zinc-800 transition-colors shadow-sm rounded-full"

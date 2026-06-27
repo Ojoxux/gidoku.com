@@ -48,20 +48,15 @@ app.post("/", validator("json", createTagSchema), async (c) => {
  * タグ更新
  * PUT /api/tags/:id
  */
-app.put(
-  "/:id",
-  validator("param", tagIdSchema),
-  validator("json", updateTagSchema),
-  async (c) => {
-    const userId = c.get("userId");
-    const { id } = getValidated<{ id: string }>(c, "param");
-    const data = getValidated<UpdateTagInput>(c, "json");
+app.put("/:id", validator("param", tagIdSchema), validator("json", updateTagSchema), async (c) => {
+  const userId = c.get("userId");
+  const { id } = getValidated<{ id: string }>(c, "param");
+  const data = getValidated<UpdateTagInput>(c, "json");
 
-    const tag = await tagRepo.update(c.env.DB, id, userId, data.name);
+  const tag = await tagRepo.update(c.env.DB, id, userId, data.name);
 
-    return successResponse(c, toTagResponse(tag));
-  }
-);
+  return successResponse(c, toTagResponse(tag));
+});
 
 /**
  * タグ削除
@@ -92,7 +87,7 @@ app.post(
     await bookTagRepo.addTagToBook(c.env.DB, bookId, tagId, userId);
 
     return successResponse(c, { added: true }, 201);
-  }
+  },
 );
 
 /**
@@ -114,7 +109,6 @@ app.delete("/books/:bookId/:tagId", async (c) => {
  * GET /api/tags/books/:bookId
  */
 app.get("/books/:bookId", async (c) => {
-  const userId = c.get("userId");
   const bookId = c.req.param("bookId");
 
   const tags = await bookTagRepo.findTagsByBookId(c.env.DB, bookId);
@@ -123,4 +117,3 @@ app.get("/books/:bookId", async (c) => {
 });
 
 export default app;
-

@@ -1,36 +1,34 @@
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "gidoku-com-staging",
-	"main": "./dist/index.js",
-	"compatibility_date": "2025-12-09",
-	"compatibility_flags": [
-		"nodejs_compat"
-	],
-	"assets": {
-		"directory": "./dist"
-	},
-	"d1_databases": [
-		{
-			"binding": "DB",
-			"database_name": "gidoku-db-staging",
-			"database_id": "12802069-e41c-41f6-aa59-7a339d9f0744"
-		}
-	],
-	"kv_namespaces": [
-		{
-			"binding": "KV",
-			"id": "1378483b23f24cd59870e141a9634716",
-		}
-	],
-	"vars": {
-		"GITHUB_CLIENT_ID": "Ov23liq4okvsI8w6kVsC",
-		"GOOGLE_CLIENT_ID": "494336925174-q3f41lih9r2o58unehpr312oncl3mdft.apps.googleusercontent.com",
-		"APP_URL": "https://staging.gidoku.com"
-	},
-	"routes": [
-		{
-			"pattern": "staging.gidoku.com",
-			"custom_domain": true
-		}
-	]
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "gidoku-com-staging",
+  "main": "./dist/index.js",
+  "compatibility_date": "2025-12-09",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist",
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "gidoku-db-staging",
+      "database_id": "12802069-e41c-41f6-aa59-7a339d9f0744",
+    },
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "1378483b23f24cd59870e141a9634716",
+    },
+  ],
+  "vars": {
+    "GITHUB_CLIENT_ID": "Ov23liq4okvsI8w6kVsC",
+    "GOOGLE_CLIENT_ID": "494336925174-q3f41lih9r2o58unehpr312oncl3mdft.apps.googleusercontent.com",
+    "APP_URL": "https://staging.gidoku.com",
+  },
+  "routes": [
+    {
+      "pattern": "staging.gidoku.com",
+      "custom_domain": true,
+    },
+  ],
 }

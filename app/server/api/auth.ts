@@ -6,11 +6,7 @@ import { authMiddleware } from "../lib/auth";
 import { validator, getValidated } from "../lib/validator";
 import { oauthProviderParamSchema, oauthCallbackSchema } from "./schemas";
 import type { OAuthProvider, OAuthCallbackInput } from "./schemas/auth";
-import {
-  deleteSession,
-  regenerateSession,
-  SESSION_COOKIE_OPTIONS,
-} from "../lib/session";
+import { deleteSession, regenerateSession, SESSION_COOKIE_OPTIONS } from "../lib/session";
 import { toUserResponse } from "../lib/mapper";
 import { successResponse, errorResponse } from "../lib/response";
 import * as oauthService from "../services/oauth";
@@ -94,21 +90,13 @@ app.get(
 
     try {
       // アクセストークン取得
-      const accessToken = await oauthService.getAccessToken(
-        provider,
-        code,
-        c.env
-      );
+      const accessToken = await oauthService.getAccessToken(provider, code, c.env);
 
       // ユーザー情報取得
       const oauthUser = await oauthService.getUser(provider, accessToken);
 
       // 既存ユーザー検索
-      let user = await userRepo.findByProvider(
-        c.env.DB,
-        provider,
-        oauthUser.providerId
-      );
+      let user = await userRepo.findByProvider(c.env.DB, provider, oauthUser.providerId);
 
       if (!user) {
         // 新規ユーザー作成
@@ -130,11 +118,7 @@ app.get(
       // セッションを再生成
       // 既存のセッションがあれば削除して新しいセッションを作成
       const oldSessionId = getCookie(c, "session_id");
-      const sessionId = await regenerateSession(
-        c.env.KV,
-        oldSessionId,
-        user.id
-      );
+      const sessionId = await regenerateSession(c.env.KV, oldSessionId, user.id);
 
       // Cookie設定
       setCookie(c, "session_id", sessionId, SESSION_COOKIE_OPTIONS);
@@ -145,16 +129,13 @@ app.get(
       console.error("OAuth error:", error);
       return c.redirect(`${c.env.APP_URL}/login?error=auth_failed`);
     }
-  }
+  },
 );
 
 /**
  * ユニークなユーザー名を生成
  */
-async function generateUniqueUsername(
-  db: D1Database,
-  baseUsername: string
-): Promise<string> {
+async function generateUniqueUsername(db: D1Database, baseUsername: string): Promise<string> {
   // 無効な文字を除去
   let username = baseUsername.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 20);
 

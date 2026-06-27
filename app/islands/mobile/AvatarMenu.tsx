@@ -6,11 +6,7 @@ interface AvatarMenuProps {
   showLogout?: boolean;
 }
 
-export default function AvatarMenu({
-  avatarUrl,
-  name,
-  showLogout = true,
-}: AvatarMenuProps) {
+export default function AvatarMenu({ avatarUrl, name, showLogout = true }: AvatarMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -53,11 +49,7 @@ export default function AvatarMenu({
         aria-label="ユーザーメニュー"
       >
         {avatarUrl ? (
-          <img
-            src={avatarUrl}
-            alt={name}
-            class="w-10 h-10 rounded-full object-cover"
-          />
+          <img src={avatarUrl} alt={name} class="w-10 h-10 rounded-full object-cover" />
         ) : (
           <div class="w-10 h-10 rounded-full bg-zinc-200 flex items-center justify-center font-medium text-sm text-zinc-600">
             {initials}
