@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { env } from "cloudflare:test";
 import * as userRepo from "./user";
 import { createTestUser, cleanupDatabase } from "../../../test/helpers";
+import type { UserId } from "../../../types/domain";
 
 describe("User Repository", () => {
   beforeEach(async () => {
@@ -16,7 +17,9 @@ describe("User Repository", () => {
   });
 
   it("should throw when user id is missing", async () => {
-    await expect(userRepo.findById(env.DB, "missing-user-id")).rejects.toThrow("User not found");
+    await expect(userRepo.findById(env.DB, "missing-user-id" as UserId)).rejects.toThrow(
+      "User not found",
+    );
   });
 
   it("should find user by username", async () => {
@@ -55,7 +58,7 @@ describe("User Repository", () => {
   it("should create a new user", async () => {
     const now = new Date().toISOString();
     const created = await userRepo.create(env.DB, {
-      id: "user-1",
+      id: "user-1" as UserId,
       username: "new_user",
       email: "new_user@example.com",
       name: "New User",
@@ -77,7 +80,7 @@ describe("User Repository", () => {
 
     await expect(
       userRepo.create(env.DB, {
-        id: "user-2",
+        id: "user-2" as UserId,
         username: "dupe",
         email: "dupe@example.com",
         name: "Dupe",

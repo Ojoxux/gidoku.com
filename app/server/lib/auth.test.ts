@@ -4,6 +4,7 @@ import { env } from "cloudflare:test";
 import { authMiddleware, optionalAuthMiddleware, invalidateUserCache } from "./auth";
 import { createTestSession, createTestUser, cleanupDatabase } from "../../test/helpers";
 import type { HonoContext } from "../../types/env";
+import type { UserId } from "../../types/domain";
 
 describe("Auth middleware", () => {
   const warnSpy = vi.spyOn(console, "warn");
@@ -68,7 +69,7 @@ describe("Auth middleware", () => {
 
   it("should invalidate cached user", async () => {
     await env.KV.put("user_cache:user-1", JSON.stringify({ id: "user-1" }));
-    await invalidateUserCache(env.KV, "user-1");
+    await invalidateUserCache(env.KV, "user-1" as UserId);
     const cached = await env.KV.get("user_cache:user-1");
     expect(cached).toBeNull();
   });

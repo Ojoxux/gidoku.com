@@ -1,5 +1,6 @@
 import { UnauthorizedError } from "./errors";
 import type { Env } from "../../types/env";
+import type { UserId, SessionId } from "../../types/domain";
 
 type KVNamespace = Env["KV"];
 
@@ -23,10 +24,10 @@ export const SESSION_COOKIE_OPTIONS = {
  */
 export async function createSession(
   kv: KVNamespace,
-  userId: string,
+  userId: UserId,
   ttl: number = SESSION_TTL,
-): Promise<string> {
-  const sessionId = crypto.randomUUID();
+): Promise<SessionId> {
+  const sessionId = crypto.randomUUID() as SessionId;
   const key = `${SESSION_PREFIX}${sessionId}`;
 
   await kv.put(key, userId, {
@@ -39,15 +40,16 @@ export async function createSession(
 /**
  * セッションを取得
  */
-export async function getSession(kv: KVNamespace, sessionId: string): Promise<string | null> {
+export async function getSession(kv: KVNamespace, sessionId: string): Promise<UserId | null> {
   const key = `${SESSION_PREFIX}${sessionId}`;
-  return await kv.get(key);
+  const userId = await kv.get(key);
+  return userId as UserId | null;
 }
 
 /**
  * セッションを検証してユーザーIDを取得（存在しない場合はエラー）
  */
-export async function validateSession(kv: KVNamespace, sessionId: string): Promise<string> {
+export async function validateSession(kv: KVNamespace, sessionId: string): Promise<UserId> {
   const userId = await getSession(kv, sessionId);
 
   if (!userId) {
@@ -100,14 +102,12 @@ export async function deleteAllUserSessions(kv: KVNamespace, sessionIds: string[
 export async function regenerateSession(
   kv: KVNamespace,
   oldSessionId: string | undefined,
-  userId: string,
+  userId: UserId,
   ttl: number = SESSION_TTL,
-): Promise<string> {
-  // 既存のセッションがあれば削除
+): Promise<SessionId> {
   if (oldSessionId) {
     await deleteSession(kv, oldSessionId);
   }
 
-  // 新しいセッションを作成
   return createSession(kv, userId, ttl);
 }

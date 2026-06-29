@@ -9,16 +9,17 @@ import {
   deleteAllUserSessions,
   regenerateSession,
 } from "./session";
+import type { UserId } from "../../types/domain";
 
 describe("Session helpers", () => {
   it("should create and get a session", async () => {
-    const sessionId = await createSession(env.KV, "user-1");
+    const sessionId = await createSession(env.KV, "user-1" as UserId);
     const userId = await getSession(env.KV, sessionId);
     expect(userId).toBe("user-1");
   });
 
   it("should validate existing session", async () => {
-    const sessionId = await createSession(env.KV, "user-2");
+    const sessionId = await createSession(env.KV, "user-2" as UserId);
     const userId = await validateSession(env.KV, sessionId);
     expect(userId).toBe("user-2");
   });
@@ -28,14 +29,14 @@ describe("Session helpers", () => {
   });
 
   it("should delete a session", async () => {
-    const sessionId = await createSession(env.KV, "user-3");
+    const sessionId = await createSession(env.KV, "user-3" as UserId);
     await deleteSession(env.KV, sessionId);
     const userId = await getSession(env.KV, sessionId);
     expect(userId).toBeNull();
   });
 
   it("should refresh an existing session", async () => {
-    const sessionId = await createSession(env.KV, "user-4", 60);
+    const sessionId = await createSession(env.KV, "user-4" as UserId, 60);
     await refreshSession(env.KV, sessionId, 60);
     const userId = await getSession(env.KV, sessionId);
     expect(userId).toBe("user-4");
@@ -46,8 +47,8 @@ describe("Session helpers", () => {
   });
 
   it("should regenerate session and remove old session", async () => {
-    const oldSessionId = await createSession(env.KV, "user-5");
-    const newSessionId = await regenerateSession(env.KV, oldSessionId, "user-5");
+    const oldSessionId = await createSession(env.KV, "user-5" as UserId);
+    const newSessionId = await regenerateSession(env.KV, oldSessionId, "user-5" as UserId);
 
     expect(newSessionId).not.toBe(oldSessionId);
     expect(await getSession(env.KV, oldSessionId)).toBeNull();
@@ -55,8 +56,8 @@ describe("Session helpers", () => {
   });
 
   it("should delete all user sessions", async () => {
-    const sessionA = await createSession(env.KV, "user-6");
-    const sessionB = await createSession(env.KV, "user-6");
+    const sessionA = await createSession(env.KV, "user-6" as UserId);
+    const sessionB = await createSession(env.KV, "user-6" as UserId);
 
     await deleteAllUserSessions(env.KV, [sessionA, sessionB]);
 

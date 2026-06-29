@@ -4,6 +4,7 @@ import { Layout } from "../../../components/layout/Layout";
 import { BookCover } from "../../../components/book/BookCover";
 import { Button } from "../../../components/ui/Button";
 import { bookRepo } from "../../../server/db/repositories";
+import type { BookId } from "../../../types/domain";
 import ProgressSlider from "../../../islands/ProgressSlider";
 import StatusToggle from "../../../islands/StatusToggle";
 import MemoEditor from "../../../islands/MemoEditor";
@@ -16,7 +17,7 @@ export default createRoute(async (c) => {
   const user = authResult;
   const sidebarExpanded = getSidebarExpanded(c);
 
-  const id = c.req.param("id")!;
+  const id = c.req.param("id")! as BookId;
 
   let book;
   try {

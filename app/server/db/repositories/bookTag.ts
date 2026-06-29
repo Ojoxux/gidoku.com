@@ -1,6 +1,7 @@
 import type { BookTag, Tag } from "../../../types/database";
 import { DatabaseError, NotFoundError, ForbiddenError } from "../../lib/errors";
 import type { Env } from "../../../types/env";
+import type { UserId, BookId, TagId } from "../../../types/domain";
 
 type D1Database = Env["DB"];
 
@@ -9,9 +10,9 @@ type D1Database = Env["DB"];
  */
 export async function addTagToBook(
   db: D1Database,
-  bookId: string,
-  tagId: string,
-  userId: string,
+  bookId: BookId,
+  tagId: TagId,
+  userId: UserId,
 ): Promise<void> {
   try {
     // 書籍の所有権チェック
@@ -68,9 +69,9 @@ export async function addTagToBook(
  */
 export async function removeTagFromBook(
   db: D1Database,
-  bookId: string,
-  tagId: string,
-  userId: string,
+  bookId: BookId,
+  tagId: TagId,
+  userId: UserId,
 ): Promise<void> {
   try {
     // 書籍の所有権チェック
@@ -101,7 +102,7 @@ export async function removeTagFromBook(
 /**
  * 書籍に紐づくタグ一覧を取得
  */
-export async function findTagsByBookId(db: D1Database, bookId: string): Promise<Tag[]> {
+export async function findTagsByBookId(db: D1Database, bookId: BookId): Promise<Tag[]> {
   try {
     const result = await db
       .prepare(
@@ -124,7 +125,7 @@ export async function findTagsByBookId(db: D1Database, bookId: string): Promise<
 /**
  * 書籍の全タグを削除
  */
-export async function removeAllTagsFromBook(db: D1Database, bookId: string): Promise<void> {
+export async function removeAllTagsFromBook(db: D1Database, bookId: BookId): Promise<void> {
   try {
     await db.prepare("DELETE FROM book_tags WHERE book_id = ?").bind(bookId).run();
   } catch (error) {
@@ -137,8 +138,8 @@ export async function removeAllTagsFromBook(db: D1Database, bookId: string): Pro
  */
 export async function isTagAttached(
   db: D1Database,
-  bookId: string,
-  tagId: string,
+  bookId: BookId,
+  tagId: TagId,
 ): Promise<boolean> {
   try {
     const result = await db
@@ -155,7 +156,7 @@ export async function isTagAttached(
 /**
  * 書籍に紐づくタグの数を取得
  */
-export async function countTagsByBook(db: D1Database, bookId: string): Promise<number> {
+export async function countTagsByBook(db: D1Database, bookId: BookId): Promise<number> {
   try {
     const result = await db
       .prepare("SELECT COUNT(*) as count FROM book_tags WHERE book_id = ?")
@@ -171,7 +172,7 @@ export async function countTagsByBook(db: D1Database, bookId: string): Promise<n
 /**
  * タグに紐づく書籍の数を取得
  */
-export async function countBooksByTag(db: D1Database, tagId: string): Promise<number> {
+export async function countBooksByTag(db: D1Database, tagId: TagId): Promise<number> {
   try {
     const result = await db
       .prepare("SELECT COUNT(*) as count FROM book_tags WHERE tag_id = ?")
@@ -189,8 +190,8 @@ export async function countBooksByTag(db: D1Database, tagId: string): Promise<nu
  */
 export async function updateBookTags(
   db: D1Database,
-  bookId: string,
-  tagIds: string[],
+  bookId: BookId,
+  tagIds: TagId[],
 ): Promise<void> {
   try {
     // 既存のタグを削除

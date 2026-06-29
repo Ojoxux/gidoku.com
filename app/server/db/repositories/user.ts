@@ -1,6 +1,7 @@
 import { DatabaseError, NotFoundError } from "../../lib/errors";
 import type { User, UserInput } from "../../../types/database";
 import type { Env } from "../../../types/env";
+import type { UserId } from "../../../types/domain";
 
 type D1Database = Env["DB"];
 type D1BindValue = string | number | null;
@@ -8,7 +9,7 @@ type D1BindValue = string | number | null;
 /**
  * IDでユーザーを取得
  */
-export async function findById(db: D1Database, userId: string): Promise<User> {
+export async function findById(db: D1Database, userId: UserId): Promise<User> {
   try {
     const result = await db.prepare("SELECT * FROM users WHERE id = ?").bind(userId).first<User>();
 
@@ -86,7 +87,7 @@ export async function findByProvider(
 export async function isUsernameTaken(
   db: D1Database,
   username: string,
-  excludeUserId?: string,
+  excludeUserId?: UserId,
 ): Promise<boolean> {
   try {
     let query = "SELECT id FROM users WHERE username = ?";
@@ -154,7 +155,7 @@ export async function create(db: D1Database, user: UserInput): Promise<User> {
  */
 export async function update(
   db: D1Database,
-  userId: string,
+  userId: UserId,
   data: Partial<UserInput>,
 ): Promise<User> {
   try {
@@ -212,7 +213,7 @@ export async function update(
 /**
  * ユーザーを削除
  */
-export async function deleteById(db: D1Database, userId: string): Promise<void> {
+export async function deleteById(db: D1Database, userId: UserId): Promise<void> {
   try {
     // ユーザーの存在確認
     await findById(db, userId);

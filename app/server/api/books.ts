@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import type { HonoContext } from "../../types/env";
+import type { BookId } from "../../types/domain";
 import { bookRepo, bookTagRepo } from "../db/repositories";
 import { authMiddleware } from "../lib/auth";
 import { validator, getValidated } from "../lib/validator";
@@ -47,10 +48,6 @@ app.get("/", validator("query", bookFilterSchema), async (c) => {
 });
 
 /**
- * 書籍詳細取得
- * GET /api/books/:id
- */
-/**
  * 書籍統計取得
  * GET /api/books/stats
  */
@@ -69,8 +66,8 @@ app.get("/:id", validator("param", bookIdSchema), async (c) => {
   const userId = c.get("userId");
   const { id } = getValidated<{ id: string }>(c, "param");
 
-  const book = await bookRepo.findById(c.env.DB, id, userId);
-  const tags = await bookTagRepo.findTagsByBookId(c.env.DB, id);
+  const book = await bookRepo.findById(c.env.DB, id as BookId, userId);
+  const tags = await bookTagRepo.findTagsByBookId(c.env.DB, id as BookId);
 
   return successResponse(c, {
     ...toBookResponse(book),
@@ -106,7 +103,7 @@ app.put(
     const data = getValidated<UpdateBookInput>(c, "json");
 
     const updateData = toBookUpdateInput(data);
-    const book = await bookRepo.update(c.env.DB, id, userId, updateData);
+    const book = await bookRepo.update(c.env.DB, id as BookId, userId, updateData);
 
     return successResponse(c, toBookResponse(book));
   },
@@ -126,7 +123,7 @@ app.patch(
     const { currentPage } = getValidated<ProgressInput>(c, "json");
 
     // 書籍を取得してページ数を検証
-    const existingBook = await bookRepo.findById(c.env.DB, id, userId);
+    const existingBook = await bookRepo.findById(c.env.DB, id as BookId, userId);
     const validation = bookDomain.validatePageProgress(currentPage, existingBook.page_count);
 
     if (!validation.valid) {
@@ -141,7 +138,7 @@ app.patch(
       ? new Date().toISOString()
       : existingBook.finished_at;
 
-    const book = await bookRepo.update(c.env.DB, id, userId, {
+    const book = await bookRepo.update(c.env.DB, id as BookId, userId, {
       currentPage: currentPage,
       status: newStatus,
       finishedAt,
@@ -160,7 +157,7 @@ app.delete("/:id", validator("param", bookIdSchema), async (c) => {
   const userId = c.get("userId");
   const { id } = getValidated<{ id: string }>(c, "param");
 
-  await bookRepo.deleteById(c.env.DB, id, userId);
+  await bookRepo.deleteById(c.env.DB, id as BookId, userId);
 
   return successResponse(c, { deleted: true });
 });

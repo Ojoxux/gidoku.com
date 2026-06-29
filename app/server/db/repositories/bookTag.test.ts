@@ -7,11 +7,12 @@ import {
   createTestUser,
   cleanupDatabase,
 } from "../../../test/helpers";
+import type { UserId, BookId, TagId } from "../../../types/domain";
 
 describe("BookTag Repository", () => {
-  let userId: string;
-  let bookId: string;
-  let tagId: string;
+  let userId: UserId;
+  let bookId: BookId;
+  let tagId: TagId;
 
   beforeEach(async () => {
     await cleanupDatabase(env.DB);
@@ -47,15 +48,15 @@ describe("BookTag Repository", () => {
   });
 
   it("should reject adding tag for missing book", async () => {
-    await expect(bookTagRepo.addTagToBook(env.DB, "missing-book", tagId, userId)).rejects.toThrow(
-      "Book not found",
-    );
+    await expect(
+      bookTagRepo.addTagToBook(env.DB, "missing-book" as BookId, tagId, userId),
+    ).rejects.toThrow("Book not found");
   });
 
   it("should reject adding tag for missing tag", async () => {
-    await expect(bookTagRepo.addTagToBook(env.DB, bookId, "missing-tag", userId)).rejects.toThrow(
-      "Tag not found",
-    );
+    await expect(
+      bookTagRepo.addTagToBook(env.DB, bookId, "missing-tag" as TagId, userId),
+    ).rejects.toThrow("Tag not found");
   });
 
   it("should reject adding tag for other user book", async () => {

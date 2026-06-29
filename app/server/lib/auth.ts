@@ -2,6 +2,7 @@ import type { Context, Next } from "hono";
 import { getCookie } from "hono/cookie";
 import type { Env, HonoContext } from "../../types/env";
 import type { User } from "../../types/database";
+import type { UserId } from "../../types/domain";
 import { userRepo } from "../db/repositories";
 import { validateSession } from "./session";
 import { UnauthorizedError } from "./errors";
@@ -14,7 +15,7 @@ const USER_CACHE_TTL = 300; // 5分
 /**
  * キャッシュからユーザー情報を取得
  */
-async function getCachedUser(kv: KVNamespace, userId: string): Promise<User | null> {
+async function getCachedUser(kv: KVNamespace, userId: UserId): Promise<User | null> {
   try {
     const cached = await kv.get(`user_cache:${userId}`);
     if (cached) {
@@ -42,7 +43,7 @@ async function setCachedUser(kv: KVNamespace, user: User): Promise<void> {
 /**
  * ユーザーキャッシュを無効化
  */
-export async function invalidateUserCache(kv: KVNamespace, userId: string): Promise<void> {
+export async function invalidateUserCache(kv: KVNamespace, userId: UserId): Promise<void> {
   try {
     await kv.delete(`user_cache:${userId}`);
   } catch {
@@ -146,7 +147,7 @@ export async function adminMiddleware(
 /**
  * リソース所有権チェック
  */
-export function checkOwnership(userId: string, resourceUserId: string): void {
+export function checkOwnership(userId: UserId, resourceUserId: UserId): void {
   if (userId !== resourceUserId) {
     throw new UnauthorizedError("You don't have permission to access this resource");
   }

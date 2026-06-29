@@ -9,10 +9,11 @@ import {
 } from "../../test/helpers";
 import type { SuccessResponse } from "../lib/response";
 import type { TagResponse } from "../../types/database";
+import type { UserId, SessionId } from "../../types/domain";
 
 describe("Tags API Integration", () => {
-  let userId: string;
-  let sessionId: string;
+  let userId: UserId;
+  let sessionId: SessionId;
 
   beforeEach(async () => {
     await env.DB.prepare("DELETE FROM book_tags").run();
