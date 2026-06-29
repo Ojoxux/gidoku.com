@@ -32,10 +32,7 @@ interface ScoreOptions {
   now?: Date;
 }
 
-type ScoreRule = (
-  book: BookSearchResult,
-  context: ScoreContext
-) => ScoreReason[];
+type ScoreRule = (book: BookSearchResult, context: ScoreContext) => ScoreReason[];
 
 const SCORE = {
   isbnExactMatch: 100,
@@ -201,7 +198,7 @@ const SCORE_RULES: ScoreRule[] = [
 export function rankTechBooks(
   books: BookSearchResult[],
   query: string,
-  options: { includeReasons?: boolean; now?: Date } = {}
+  options: { includeReasons?: boolean; now?: Date } = {},
 ): ScoredBookSearchResult[] {
   return books
     .map((book) => {
@@ -229,7 +226,7 @@ export function rankTechBooks(
 export function calculateTechScore(
   book: BookSearchResult,
   query: string,
-  options: ScoreOptions = {}
+  options: ScoreOptions = {},
 ): { techScore: number; scoreReasons: ScoreReason[] } {
   const context: ScoreContext = {
     normalizedQuery: normalizeIsbn(query),
@@ -243,10 +240,7 @@ export function calculateTechScore(
   };
 }
 
-function matchExactIsbn(
-  book: BookSearchResult,
-  context: ScoreContext
-): ScoreReason[] {
+function matchExactIsbn(book: BookSearchResult, context: ScoreContext): ScoreReason[] {
   const normalizedBookIsbn = normalizeIsbn(book.isbn);
 
   if (context.normalizedQuery && normalizedBookIsbn === context.normalizedQuery) {
@@ -264,7 +258,7 @@ function matchExactIsbn(
 
 function matchTechPublisher(book: BookSearchResult): ScoreReason[] {
   const publisher = TECH_PUBLISHERS.find((publisherName) =>
-    includesNormalized(book.publisher, publisherName)
+    includesNormalized(book.publisher, publisherName),
   );
   if (!publisher) return [];
 
@@ -305,9 +299,7 @@ function penalizeNegativeTitleKeywords(book: BookSearchResult): ScoreReason[] {
   });
 }
 
-function penalizeNegativeDescriptionKeywords(
-  book: BookSearchResult
-): ScoreReason[] {
+function penalizeNegativeDescriptionKeywords(book: BookSearchResult): ScoreReason[] {
   return getKeywordReasons(book.description, NEGATIVE_KEYWORDS, {
     type: "negative_description_keyword",
     score: SCORE.negativeDescriptionKeyword,
@@ -326,14 +318,8 @@ function penalizeMissingPageCount(book: BookSearchResult): ScoreReason[] {
   ];
 }
 
-function scorePublicationRecency(
-  book: BookSearchResult,
-  context: ScoreContext
-): ScoreReason[] {
-  const recencyReason = getPublicationRecencyReason(
-    book.publishedDate,
-    context.now
-  );
+function scorePublicationRecency(book: BookSearchResult, context: ScoreContext): ScoreReason[] {
+  const recencyReason = getPublicationRecencyReason(book.publishedDate, context.now);
 
   return recencyReason ? [recencyReason] : [];
 }
@@ -341,7 +327,7 @@ function scorePublicationRecency(
 function getKeywordReasons(
   text: string,
   keywords: string[],
-  reason: { type: ScoreReasonType; score: number }
+  reason: { type: ScoreReasonType; score: number },
 ): ScoreReason[] {
   return keywords
     .filter((keyword) => hasKeyword(text, keyword))
@@ -358,9 +344,9 @@ function hasKeyword(text: string, keyword: string): boolean {
   const normalizedKeyword = keyword.toLowerCase();
 
   if (isAsciiKeyword(normalizedKeyword)) {
-    return new RegExp(
-      `(^|[^a-z0-9])${escapeRegExp(normalizedKeyword)}([^a-z0-9]|$)`
-    ).test(text.toLowerCase());
+    return new RegExp(`(^|[^a-z0-9])${escapeRegExp(normalizedKeyword)}([^a-z0-9]|$)`).test(
+      text.toLowerCase(),
+    );
   }
 
   const normalizedText = normalizeText(text);
@@ -387,10 +373,7 @@ function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function getPublicationRecencyReason(
-  publishedDate: string,
-  now: Date
-): ScoreReason | null {
+function getPublicationRecencyReason(publishedDate: string, now: Date): ScoreReason | null {
   const date = parsePublishedDate(publishedDate);
   if (!date) return null;
 

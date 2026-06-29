@@ -35,7 +35,7 @@ describe("calculateTechScore", () => {
         publisher: "技術評論社",
         description: "JavaScriptとReactを使ったWeb開発を解説します",
       }),
-      "typescript"
+      "typescript",
     );
 
     expect(result.techScore).toBeGreaterThan(0);
@@ -45,20 +45,17 @@ describe("calculateTechScore", () => {
         { type: "title_keyword", label: "TypeScript", score: 15 },
         { type: "description_keyword", label: "JavaScript", score: 6 },
         { type: "description_keyword", label: "React", score: 6 },
-      ])
+      ]),
     );
     expect(result.scoreReasons).not.toEqual(
       expect.arrayContaining([
         expect.objectContaining({ type: "description_keyword", label: "Java" }),
-      ])
+      ]),
     );
   });
 
   it("should strongly prefer exact ISBN matches", () => {
-    const result = calculateTechScore(
-      createBook({ isbn: "978-4-87311-565-8" }),
-      "9784873115658"
-    );
+    const result = calculateTechScore(createBook({ isbn: "978-4-87311-565-8" }), "9784873115658");
 
     expect(result.techScore).toBeGreaterThanOrEqual(100);
     expect(result.scoreReasons[0]).toEqual({
@@ -74,7 +71,7 @@ describe("calculateTechScore", () => {
         title: "人気漫画で学ぶ旅行レシピ",
         description: "コミックと料理のムック",
       }),
-      "旅行"
+      "旅行",
     );
 
     expect(result.techScore).toBeLessThan(0);
@@ -83,7 +80,7 @@ describe("calculateTechScore", () => {
         { type: "negative_title_keyword", label: "漫画", score: -40 },
         { type: "negative_title_keyword", label: "レシピ", score: -40 },
         { type: "negative_description_keyword", label: "コミック", score: -15 },
-      ])
+      ]),
     );
   });
 
@@ -93,13 +90,11 @@ describe("calculateTechScore", () => {
         title: "Googleサービス仕事術",
         description: "",
       }),
-      "google"
+      "google",
     );
 
     expect(result.scoreReasons).not.toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ type: "title_keyword", label: "Go" }),
-      ])
+      expect.arrayContaining([expect.objectContaining({ type: "title_keyword", label: "Go" })]),
     );
   });
 
@@ -107,13 +102,11 @@ describe("calculateTechScore", () => {
     const recent = calculateTechScore(
       createBook({ publishedDate: publishedYearsAgo(0) }),
       "query",
-      { now: TEST_NOW }
+      { now: TEST_NOW },
     );
-    const old = calculateTechScore(
-      createBook({ publishedDate: publishedYearsAgo(11) }),
-      "query",
-      { now: TEST_NOW }
-    );
+    const old = calculateTechScore(createBook({ publishedDate: publishedYearsAgo(11) }), "query", {
+      now: TEST_NOW,
+    });
 
     expect(recent.scoreReasons).toContainEqual({
       type: "recent_publication",
@@ -143,7 +136,7 @@ describe("rankTechBooks", () => {
           publishedDate: "2020年1月1日",
         }),
       ],
-      "react"
+      "react",
     );
 
     expect(ranked[0].title).toBe("React設計パターン");
@@ -154,14 +147,14 @@ describe("rankTechBooks", () => {
     const ranked = rankTechBooks(
       [createBook({ title: "Docker入門", publisher: "翔泳社" })],
       "docker",
-      { includeReasons: true }
+      { includeReasons: true },
     );
 
     expect(ranked[0].scoreReasons).toEqual(
       expect.arrayContaining([
         { type: "tech_publisher", label: "翔泳社", score: 30 },
         { type: "title_keyword", label: "Docker", score: 15 },
-      ])
+      ]),
     );
   });
 
@@ -180,7 +173,7 @@ describe("rankTechBooks", () => {
         }),
       ],
       "react",
-      { now: TEST_NOW }
+      { now: TEST_NOW },
     );
 
     expect(ranked[0].title).toBe("React設計パターン 改訂版");
