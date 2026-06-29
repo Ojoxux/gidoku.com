@@ -8,6 +8,7 @@ import { successResponse } from "../lib/response";
 import { isValidISBN } from "../lib/validation";
 import * as rakutenService from "../services/rakuten";
 import { searchRateLimiter } from "../lib/rate-limit";
+import { rankTechBooks } from "../domain/tech-book-search";
 
 const app = new Hono<HonoContext>();
 
@@ -23,7 +24,7 @@ app.use("*", searchRateLimiter);
  */
 app.get("/books", validator("query", rakutenSearchSchema), async (c) => {
   // バリデーション済みのデータを取得
-  const { query, limit, page } = getValidated<RakutenSearchInput>(c, "query");
+  const { query, limit, page, debug } = getValidated<RakutenSearchInput>(c, "query");
 
   // queryがundefinedの場合はエラーを返す
   if (!query) {
@@ -37,7 +38,9 @@ app.get("/books", validator("query", rakutenSearchSchema), async (c) => {
     page ?? 1,
   );
 
-  const sortedResults = rakutenService.sortByPublishedDateDesc(results);
+  const sortedResults = rankTechBooks(results, query, {
+    includeReasons: debug === "1" || debug === "true",
+  });
 
   return successResponse(c, {
     results: sortedResults,

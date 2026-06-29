@@ -50,6 +50,12 @@ export interface BookSearchResult {
   description: string;
   thumbnailUrl: string;
   rakutenAffiliateUrl: string;
+  techScore?: number;
+  scoreReasons?: Array<{
+    type: string;
+    label: string;
+    score: number;
+  }>;
 }
 
 // API リクエスト/レスポンス
