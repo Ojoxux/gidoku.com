@@ -87,9 +87,8 @@ app.get("/:username/books", optionalAuthMiddleware, async (c) => {
   const username = c.req.param("username");
   const user = await userRepo.findByUsername(c.env.DB, username);
 
-  // 完了した書籍のみ公開
+  // 公開プロフィールと同じく、積読/読書中/読了の書籍を公開
   const { books } = await bookRepo.findByUserId(c.env.DB, user.id, {
-    status: "completed",
     limit: 50,
     offset: 0,
   });

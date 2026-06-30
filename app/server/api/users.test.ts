@@ -121,10 +121,17 @@ describe("Users API Integration", () => {
     expect("provider" in body.data).toBe(false);
   });
 
-  it("should return only completed books for public profile", async () => {
+  it("should return unread, reading, and completed books for public profile", async () => {
     const user = await createTestUser(env.DB);
-    await createTestBook(env.DB, user.id, { status: "completed" });
-    await createTestBook(env.DB, user.id, { status: "reading" });
+    const otherUser = await createTestUser(env.DB, {
+      username: "other_user",
+      email: "other@example.com",
+    });
+
+    await createTestBook(env.DB, user.id, { status: "completed", memo: "private completed memo" });
+    await createTestBook(env.DB, user.id, { status: "reading", memo: "private reading memo" });
+    await createTestBook(env.DB, user.id, { status: "unread", memo: "private unread memo" });
+    await createTestBook(env.DB, otherUser.id, { status: "completed" });
 
     const res = await api.request(`/users/${user.username}/books`, {}, env);
     expect(res.status).toBe(200);
@@ -132,9 +139,13 @@ describe("Users API Integration", () => {
       success: boolean;
       data: Array<{ status: string; memo: string | null }>;
     };
-    expect(body.data).toHaveLength(1);
-    expect(body.data[0].status).toBe("completed");
-    expect(body.data[0].memo).toBeNull();
+    expect(body.data).toHaveLength(3);
+    expect(body.data.map((book) => book.status).toSorted()).toEqual([
+      "completed",
+      "reading",
+      "unread",
+    ]);
+    expect(body.data.every((book) => book.memo === null)).toBe(true);
   });
 
   it("should delete user account", async () => {
