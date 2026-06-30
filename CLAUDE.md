@@ -114,7 +114,7 @@
 
 ### 公開プロフィール
 
-- `/@:username` - 公開プロフィールページ（読了本 + 読書中の本を表示）
+- `/user/:username` - 公開プロフィールページ（読了本 + 読書中の本を表示）
 
 ### 設定
 
@@ -189,7 +189,7 @@
 
 ### URL 形式
 
-`gidoku.com/@username`
+`gidoku.com/user/username`
 
 ### 表示内容
 
