@@ -89,7 +89,7 @@ export default function ProfileForm({
           </label>
           <div class="flex rounded-xl shadow-sm ring-1 ring-zinc-200 overflow-hidden">
             <span class="inline-flex items-center px-4 border-r border-zinc-200 bg-zinc-50 text-zinc-500 text-sm font-medium">
-              gidoku.com/@
+              gidoku.com/user/
             </span>
             <input
               type="text"
