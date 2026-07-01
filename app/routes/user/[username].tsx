@@ -103,6 +103,7 @@ const ProfilePage: FC<ProfilePageProps> = ({
         <h2 class="text-xl font-bold text-zinc-900 mb-6">本棚</h2>
         <UserStats
           totalBooks={stats.total}
+          unreadBooks={stats.unread}
           readingBooks={stats.reading}
           completedBooks={stats.completed}
         />
