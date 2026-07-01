@@ -131,6 +131,7 @@ describe("Users API Integration", () => {
     await createTestBook(env.DB, user.id, { status: "completed", memo: "private completed memo" });
     await createTestBook(env.DB, user.id, { status: "reading", memo: "private reading memo" });
     await createTestBook(env.DB, user.id, { status: "unread", memo: "private unread memo" });
+    // 別ユーザーの本がレスポンスに混ざらないことを確認する
     await createTestBook(env.DB, otherUser.id, { status: "completed" });
 
     const res = await api.request(`/users/${user.username}/books`, {}, env);
