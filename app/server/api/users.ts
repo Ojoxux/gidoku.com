@@ -1,14 +1,15 @@
 import { Hono } from "hono";
 import type { HonoContext } from "../../types/env";
-import { userRepo, bookRepo } from "../db/repositories";
+import { userRepo } from "../db/repositories";
 import { authMiddleware, optionalAuthMiddleware } from "../lib/auth";
 import { validator, getValidated } from "../lib/validator";
 import { updateUserSchema, usernameSchema } from "./schemas";
 import type { UpdateUserInput } from "./schemas/user";
 import { isReservedUsername } from "./schemas/user";
-import { toUserResponse, toBookResponse } from "../lib/mapper";
+import { toUserResponse } from "../lib/mapper";
 import { successResponse } from "../lib/response";
 import { invalidateUserCache } from "../lib/auth";
+import { publicProfileService } from "../services";
 
 const app = new Hono<HonoContext>();
 
@@ -87,20 +88,9 @@ app.get("/:username/books", optionalAuthMiddleware, async (c) => {
   const username = c.req.param("username");
   const user = await userRepo.findByUsername(c.env.DB, username);
 
-  // 公開プロフィールと同じく、積読/読書中/読了の書籍を公開
-  const { books } = await bookRepo.findByUserId(c.env.DB, user.id, {
-    limit: 50,
-    offset: 0,
-  });
+  const books = await publicProfileService.getPublicBookResponses(c.env.DB, user.id);
 
-  return successResponse(
-    c,
-    books.map((book) => {
-      const response = toBookResponse(book);
-      response.memo = null;
-      return response;
-    }),
-  );
+  return successResponse(c, books);
 });
 
 /**
