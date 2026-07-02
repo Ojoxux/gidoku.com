@@ -25,18 +25,6 @@ export interface UserInput {
   updated_at: string;
 }
 
-export interface UserResponse {
-  id: string;
-  username: string;
-  email: string;
-  name: string;
-  bio: string | null;
-  avatarUrl: string | null;
-  provider: "github" | "google";
-  createdAt: string;
-  updatedAt: string;
-}
-
 // 書籍
 export type BookStatus = "unread" | "reading" | "completed";
 

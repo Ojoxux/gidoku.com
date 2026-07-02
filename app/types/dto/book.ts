@@ -1,4 +1,5 @@
 import type { BookStatus } from "../database";
+import type { TagDto } from "./tag";
 
 export interface BookDto {
   id: string;
@@ -22,7 +23,7 @@ export interface BookDto {
 }
 
 export interface BookDetailDto extends BookDto {
-  tags: string[];
+  tags: TagDto[];
 }
 
 export interface CreateBookRequestDto {

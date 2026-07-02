@@ -1,16 +1,21 @@
 import type { Context } from "hono";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
-import type { ApiResponseDto, PaginatedDto } from "../../types/dto";
+import type {
+  ApiResponseDto,
+  ErrorResponseDto,
+  PaginatedDto,
+  SuccessResponseDto,
+} from "../../types/dto";
 
 /**
  * 成功レスポンスの型
  */
-export type SuccessResponse<T = unknown> = Extract<ApiResponseDto<T>, { success: true }>;
+export type SuccessResponse<T = unknown> = SuccessResponseDto<T>;
 
 /**
  * エラーレスポンスの型
  */
-export type ErrorResponse = Extract<ApiResponseDto, { success: false }>;
+export type ErrorResponse = ErrorResponseDto;
 
 /**
  * APIレスポンスの型（成功またはエラー）

@@ -1,5 +1,6 @@
 import { useState } from "hono/jsx";
 import { getApiErrorMessage, readApiResponse } from "../lib/api-client";
+import type { UserDto } from "../types/dto";
 
 interface ProfileFormProps {
   avatarUrl: string | null;
@@ -40,11 +41,7 @@ export default function ProfileForm({
         body: JSON.stringify(body),
       });
 
-      const data = await readApiResponse<{
-        username: string;
-        name: string;
-        bio: string | null;
-      }>(res);
+      const data = await readApiResponse<UserDto>(res);
 
       if (res.ok) {
         setSaved(true);

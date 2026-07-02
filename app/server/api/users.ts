@@ -6,7 +6,7 @@ import { validator, getValidated } from "../lib/validator";
 import { updateUserSchema, usernameSchema } from "./schemas";
 import type { UpdateUserInput } from "./schemas/user";
 import { isReservedUsername } from "./schemas/user";
-import { toBookDto, toUserResponse } from "../lib/mapper";
+import { toBookDto, toUserDto } from "../lib/mapper";
 import { successResponse } from "../lib/response";
 import { invalidateUserCache } from "../lib/auth";
 
@@ -18,7 +18,7 @@ const app = new Hono<HonoContext>();
  */
 app.get("/me", authMiddleware, async (c) => {
   const user = c.get("user");
-  return successResponse(c, toUserResponse(user));
+  return successResponse(c, toUserDto(user));
 });
 
 /**
@@ -42,7 +42,7 @@ app.put("/me", authMiddleware, validator("json", updateUserSchema), async (c) =>
 
   await invalidateUserCache(c.env.KV, userId);
 
-  return successResponse(c, toUserResponse(updatedUser));
+  return successResponse(c, toUserDto(updatedUser));
 });
 
 /**

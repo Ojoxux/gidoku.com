@@ -7,6 +7,14 @@ import {
   createTestUser,
   cleanupDatabase,
 } from "../../test/helpers";
+import type {
+  DeletedResponseDto,
+  PublicBookDto,
+  PublicProfileDto,
+  SuccessResponseDto,
+  UserDto,
+  UsernameAvailabilityDto,
+} from "../../types/dto";
 
 describe("Users API Integration", () => {
   beforeEach(async () => {
@@ -31,7 +39,7 @@ describe("Users API Integration", () => {
     );
 
     expect(res.status).toBe(200);
-    const body = (await res.json()) as { success: boolean; data: { id: string; username: string } };
+    const body = (await res.json()) as SuccessResponseDto<UserDto>;
     expect(body.success).toBe(true);
     expect(body.data.id).toBe(user.id);
     expect(body.data.username).toBe(user.username);
@@ -81,10 +89,7 @@ describe("Users API Integration", () => {
     );
 
     expect(res.status).toBe(200);
-    const body = (await res.json()) as {
-      success: boolean;
-      data: { name: string; bio: string; avatarUrl: string };
-    };
+    const body = (await res.json()) as SuccessResponseDto<UserDto>;
     expect(body.data.name).toBe("Updated Name");
     expect(body.data.bio).toBe("Updated bio");
     expect(body.data.avatarUrl).toBe("https://example.com/avatar.png");
@@ -93,10 +98,7 @@ describe("Users API Integration", () => {
   it("should return unavailable for reserved username check", async () => {
     const res = await api.request("/users/check/admin", {}, env);
     expect(res.status).toBe(200);
-    const body = (await res.json()) as {
-      success: boolean;
-      data: { available: boolean; reason?: string };
-    };
+    const body = (await res.json()) as SuccessResponseDto<UsernameAvailabilityDto>;
     expect(body.data.available).toBe(false);
     expect(body.data.reason).toBe("reserved");
   });
@@ -106,7 +108,7 @@ describe("Users API Integration", () => {
 
     const res = await api.request(`/users/check/${user.username}`, {}, env);
     expect(res.status).toBe(200);
-    const body = (await res.json()) as { success: boolean; data: { available: boolean } };
+    const body = (await res.json()) as SuccessResponseDto<UsernameAvailabilityDto>;
     expect(body.data.available).toBe(false);
   });
 
@@ -115,7 +117,7 @@ describe("Users API Integration", () => {
 
     const res = await api.request(`/users/${user.username}`, {}, env);
     expect(res.status).toBe(200);
-    const body = (await res.json()) as { success: boolean; data: Record<string, unknown> };
+    const body = (await res.json()) as SuccessResponseDto<PublicProfileDto>;
     expect(body.data.username).toBe(user.username);
     expect("email" in body.data).toBe(false);
     expect("provider" in body.data).toBe(false);
@@ -128,10 +130,7 @@ describe("Users API Integration", () => {
 
     const res = await api.request(`/users/${user.username}/books`, {}, env);
     expect(res.status).toBe(200);
-    const body = (await res.json()) as {
-      success: boolean;
-      data: Array<{ status: string; memo: string | null }>;
-    };
+    const body = (await res.json()) as SuccessResponseDto<PublicBookDto[]>;
     expect(body.data).toHaveLength(1);
     expect(body.data[0].status).toBe("completed");
     expect(body.data[0].memo).toBeNull();
@@ -151,6 +150,8 @@ describe("Users API Integration", () => {
     );
 
     expect(res.status).toBe(200);
+    const body = (await res.json()) as SuccessResponseDto<DeletedResponseDto>;
+    expect(body.data.deleted).toBe(true);
     const result = await env.DB.prepare("SELECT id FROM users WHERE id = ?").bind(user.id).first();
     expect(result).toBeNull();
   });
