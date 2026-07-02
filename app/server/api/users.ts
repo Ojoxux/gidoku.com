@@ -6,7 +6,7 @@ import { validator, getValidated } from "../lib/validator";
 import { updateUserSchema, usernameSchema } from "./schemas";
 import type { UpdateUserInput } from "./schemas/user";
 import { isReservedUsername } from "./schemas/user";
-import { toUserResponse, toBookResponse } from "../lib/mapper";
+import { toBookDto, toUserResponse } from "../lib/mapper";
 import { successResponse } from "../lib/response";
 import { invalidateUserCache } from "../lib/auth";
 
@@ -97,7 +97,7 @@ app.get("/:username/books", optionalAuthMiddleware, async (c) => {
   return successResponse(
     c,
     books.map((book) => {
-      const response = toBookResponse(book);
+      const response = toBookDto(book);
       response.memo = null;
       return response;
     }),

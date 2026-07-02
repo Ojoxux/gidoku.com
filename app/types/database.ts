@@ -88,27 +88,6 @@ export interface BookFilter {
   sortBy?: "title" | "created" | "updated" | "progress";
 }
 
-export interface BookResponse {
-  id: string;
-  userId: string;
-  rakutenBooksId: string | null;
-  title: string;
-  authors: string[];
-  publisher: string | null;
-  publishedDate: string | null;
-  isbn: string | null;
-  pageCount: number;
-  description: string | null;
-  thumbnailUrl: string | null;
-  rakutenAffiliateUrl: string | null;
-  status: BookStatus;
-  currentPage: number;
-  memo: string | null;
-  finishedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
 // タグ
 export interface Tag {
   id: string;

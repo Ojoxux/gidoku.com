@@ -3,7 +3,7 @@ import { env } from "cloudflare:test";
 import api from "./index";
 import { createTestUser, createTestSession, createTestBook } from "../../test/helpers";
 import type { SuccessResponse, PaginatedResponse } from "../lib/response";
-import type { BookResponse } from "../../types/database";
+import type { BookDto, BookStatsDto } from "../../types/dto";
 
 describe("Books API Integration", () => {
   let userId: string;
@@ -49,7 +49,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookResponse>>;
+      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookDto>>;
       expect(body.success).toBe(true);
       expect(body.data.items).toEqual([]);
       expect(body.data.total).toBe(0);
@@ -68,7 +68,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookResponse>>;
+      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookDto>>;
       expect(body.data.items).toHaveLength(2);
       expect(body.data.total).toBe(2);
     });
@@ -88,7 +88,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookResponse>>;
+      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookDto>>;
       expect(body.data.items).toHaveLength(1);
       expect(body.data.items[0].status).toBe("reading");
     });
@@ -106,7 +106,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookResponse>>;
+      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookDto>>;
       expect(body.data.items).toHaveLength(1);
       expect(body.data.items[0].title).toBe("JavaScript Guide");
     });
@@ -124,7 +124,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookResponse>>;
+      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookDto>>;
       expect(body.data.items[0].title).toBe("Alpha Book");
     });
 
@@ -142,7 +142,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookResponse>>;
+      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookDto>>;
       expect(body.data.items).toHaveLength(1);
       expect(body.data.total).toBe(3);
       expect(body.data.limit).toBe(1);
@@ -171,7 +171,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(201);
-      const body = (await res.json()) as SuccessResponse<BookResponse>;
+      const body = (await res.json()) as SuccessResponse<BookDto>;
       expect(body.success).toBe(true);
       expect(body.data.title).toBe("New Test Book");
     });
@@ -199,7 +199,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<BookResponse>;
+      const body = (await res.json()) as SuccessResponse<BookDto>;
       expect(body.data.title).toBe("New Title");
       expect(body.data.status).toBe("reading");
       expect(body.data.currentPage).toBe(10);
@@ -219,7 +219,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<BookResponse>;
+      const body = (await res.json()) as SuccessResponse<BookDto>;
       expect(body.data.title).toBe("My Book");
     });
 
@@ -261,7 +261,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<BookResponse>;
+      const body = (await res.json()) as SuccessResponse<BookDto>;
       expect(body.data.currentPage).toBe(150);
       expect(body.data.status).toBe("reading");
     });
@@ -287,7 +287,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<BookResponse>;
+      const body = (await res.json()) as SuccessResponse<BookDto>;
       expect(body.data.status).toBe("completed");
       expect(body.data.finishedAt).toBeTruthy();
     });
@@ -328,12 +328,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<{
-        total: number;
-        reading: number;
-        completed: number;
-        unread: number;
-      }>;
+      const body = (await res.json()) as SuccessResponse<BookStatsDto>;
       expect(body.data.total).toBe(4);
       expect(body.data.reading).toBe(2);
       expect(body.data.completed).toBe(1);

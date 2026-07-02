@@ -16,7 +16,7 @@ import type {
   ProgressInput,
   BookFilterInput,
 } from "./schemas/book";
-import { toBookInput, toBookUpdateInput, toBookResponse } from "../lib/mapper";
+import { toBookDto, toBookInput, toBookUpdateInput } from "../lib/mapper";
 import { bookDomain } from "../domain";
 import { successResponse, paginatedResponse } from "../lib/response";
 import { ValidationError } from "../lib/errors";
@@ -42,7 +42,7 @@ app.get("/", validator("query", bookFilterSchema), async (c) => {
     offset: filter.offset ?? 0,
   });
 
-  const items = books.map(toBookResponse);
+  const items = books.map(toBookDto);
   return paginatedResponse(c, items, total, filter.limit ?? 20, filter.offset ?? 0);
 });
 
@@ -73,7 +73,7 @@ app.get("/:id", validator("param", bookIdSchema), async (c) => {
   const tags = await bookTagRepo.findTagsByBookId(c.env.DB, id);
 
   return successResponse(c, {
-    ...toBookResponse(book),
+    ...toBookDto(book),
     tags,
   });
 });
@@ -89,7 +89,7 @@ app.post("/", validator("json", createBookSchema), async (c) => {
   const bookInput = toBookInput(data, userId);
   const book = await bookRepo.create(c.env.DB, bookInput);
 
-  return successResponse(c, toBookResponse(book), 201);
+  return successResponse(c, toBookDto(book), 201);
 });
 
 /**
@@ -108,7 +108,7 @@ app.put(
     const updateData = toBookUpdateInput(data);
     const book = await bookRepo.update(c.env.DB, id, userId, updateData);
 
-    return successResponse(c, toBookResponse(book));
+    return successResponse(c, toBookDto(book));
   },
 );
 
@@ -148,7 +148,7 @@ app.patch(
       updatedAt: new Date().toISOString(),
     });
 
-    return successResponse(c, toBookResponse(book));
+    return successResponse(c, toBookDto(book));
   },
 );
 

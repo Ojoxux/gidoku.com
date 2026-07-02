@@ -1,41 +1,29 @@
 import type { Context } from "hono";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
+import type { ApiResponseDto, PaginatedDto } from "../../types/dto";
 
 /**
  * 成功レスポンスの型
  */
-export interface SuccessResponse<T = unknown> {
-  success: true;
-  data: T;
-}
+export type SuccessResponse<T = unknown> = Extract<
+  ApiResponseDto<T>,
+  { success: true }
+>;
 
 /**
  * エラーレスポンスの型
  */
-export interface ErrorResponse {
-  success: false;
-  error: {
-    message: string;
-    code: string;
-    details?: unknown;
-  };
-}
+export type ErrorResponse = Extract<ApiResponseDto, { success: false }>;
 
 /**
  * APIレスポンスの型（成功またはエラー）
  */
-export type ApiResponse<T = unknown> = SuccessResponse<T> | ErrorResponse;
+export type ApiResponse<T = unknown> = ApiResponseDto<T>;
 
 /**
  * ページネーション付きレスポンスの型
  */
-export interface PaginatedResponse<T> {
-  items: T[];
-  total: number;
-  limit: number;
-  offset: number;
-  hasMore: boolean;
-}
+export type PaginatedResponse<T> = PaginatedDto<T>;
 
 /**
  * 成功レスポンスを返す

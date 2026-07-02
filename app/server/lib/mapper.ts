@@ -1,13 +1,13 @@
 import type {
   Book,
   BookInput,
-  BookResponse,
   Tag,
   TagInput,
   TagResponse,
   User,
   UserResponse,
 } from "../../types/database";
+import type { BookDto } from "../../types/dto";
 import type { CreateBookInput, UpdateBookInput } from "../api/schemas/book";
 import type { CreateTagInput } from "../api/schemas/tag";
 import { removeUndefined } from "./utils";
@@ -64,7 +64,7 @@ export function toBookUpdateInput(data: UpdateBookInput): Partial<BookInput> {
 /**
  * DB形式のBookをAPI形式に変換
  */
-export function toBookResponse(book: Book): BookResponse {
+export function toBookDto(book: Book): BookDto {
   return {
     id: book.id,
     userId: book.user_id,
