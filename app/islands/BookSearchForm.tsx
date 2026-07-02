@@ -1,9 +1,5 @@
 import { useState } from "hono/jsx";
-import type {
-  BookDto,
-  BookSearchResultDto,
-  SearchBooksResponseDto,
-} from "../types/dto";
+import type { BookDto, BookSearchResultDto, SearchBooksResponseDto } from "../types/dto";
 import { readApiResponse } from "../lib/api-client";
 
 export default function BookSearchForm() {
