@@ -1,19 +1,7 @@
 import { ExternalApiError } from "../lib/errors";
+import type { BookSearchResultDto } from "../../types/dto";
 
-export interface BookSearchResult {
-  rakutenBooksId: string;
-  title: string;
-  authors: string[];
-  publisher: string;
-  publishedDate: string;
-  isbn: string;
-  pageCount: number;
-  description: string;
-  thumbnailUrl: string;
-  rakutenAffiliateUrl: string;
-}
-
-interface RakutenBookItem {
+interface RakutenBookApiItem {
   isbn: string;
   title: string;
   author: string;
@@ -25,8 +13,8 @@ interface RakutenBookItem {
   affiliateUrl: string;
 }
 
-interface RakutenBookResponse {
-  Items: Array<{ Item: RakutenBookItem }>;
+interface RakutenBookApiResponse {
+  Items: Array<{ Item: RakutenBookApiItem }>;
   pageCount: number;
   hits: number;
 }
@@ -41,7 +29,7 @@ export async function searchBooks(
   applicationId: string,
   limit: number = 20,
   page: number = 1,
-): Promise<{ results: BookSearchResult[]; hits: number; pageCount: number }> {
+): Promise<{ results: BookSearchResultDto[]; hits: number; pageCount: number }> {
   // 戻り値を変更
   const url = new URL(RAKUTEN_API_BASE);
   url.searchParams.set("applicationId", applicationId);
@@ -57,7 +45,7 @@ export async function searchBooks(
       throw new ExternalApiError(`Rakuten API returned ${response.status}`, "Rakuten");
     }
 
-    const data: RakutenBookResponse = await response.json();
+    const data = (await response.json()) as RakutenBookApiResponse;
 
     return {
       results: data.Items.map((item) => mapRakutenItem(item.Item)),
@@ -76,7 +64,7 @@ export async function searchBooks(
 export async function searchByISBN(
   isbn: string,
   applicationId: string,
-): Promise<BookSearchResult | null> {
+): Promise<BookSearchResultDto | null> {
   const url = new URL(RAKUTEN_API_BASE);
   url.searchParams.set("applicationId", applicationId);
   url.searchParams.set("isbn", isbn);
@@ -89,7 +77,7 @@ export async function searchByISBN(
       throw new ExternalApiError(`Rakuten API returned ${response.status}`, "Rakuten");
     }
 
-    const data: RakutenBookResponse = await response.json();
+    const data = (await response.json()) as RakutenBookApiResponse;
 
     if (data.Items.length === 0) {
       return null;
@@ -109,7 +97,7 @@ export async function searchByAuthor(
   author: string,
   applicationId: string,
   limit: number = 20,
-): Promise<BookSearchResult[]> {
+): Promise<BookSearchResultDto[]> {
   const url = new URL(RAKUTEN_API_BASE);
   url.searchParams.set("applicationId", applicationId);
   url.searchParams.set("author", author);
@@ -123,7 +111,7 @@ export async function searchByAuthor(
       throw new ExternalApiError(`Rakuten API returned ${response.status}`, "Rakuten");
     }
 
-    const data: RakutenBookResponse = await response.json();
+    const data = (await response.json()) as RakutenBookApiResponse;
 
     return data.Items.map((item) => mapRakutenItem(item.Item));
   } catch (error) {
@@ -135,7 +123,7 @@ export async function searchByAuthor(
 /**
  * 楽天APIのレスポンスを内部形式にマッピング
  */
-function mapRakutenItem(item: RakutenBookItem): BookSearchResult {
+function mapRakutenItem(item: RakutenBookApiItem): BookSearchResultDto {
   return {
     rakutenBooksId: item.isbn,
     title: item.title,
@@ -194,7 +182,9 @@ function parsePublishedDate(publishedDate: string): Date | null {
 /**
  * 本の配列を、出版日が新しい順に並び替え
  */
-export function sortByPublishedDateDesc(books: BookSearchResult[]): BookSearchResult[] {
+export function sortByPublishedDateDesc(
+  books: BookSearchResultDto[],
+): BookSearchResultDto[] {
   return [...books].sort((before, after) => {
     const beforeDate = parsePublishedDate(before.publishedDate);
     const afterDate = parsePublishedDate(after.publishedDate);
