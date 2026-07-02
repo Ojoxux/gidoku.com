@@ -1,11 +1,4 @@
-import type {
-  Book,
-  BookInput,
-  Tag,
-  TagInput,
-  User,
-  UserResponse,
-} from "../../types/database";
+import type { Book, BookInput, Tag, TagInput, User, UserResponse } from "../../types/database";
 import type { BookDto, TagDto } from "../../types/dto";
 import type { CreateBookInput, UpdateBookInput } from "../api/schemas/book";
 import type { CreateTagInput } from "../api/schemas/tag";
