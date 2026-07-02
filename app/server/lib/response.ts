@@ -5,10 +5,7 @@ import type { ApiResponseDto, PaginatedDto } from "../../types/dto";
 /**
  * 成功レスポンスの型
  */
-export type SuccessResponse<T = unknown> = Extract<
-  ApiResponseDto<T>,
-  { success: true }
->;
+export type SuccessResponse<T = unknown> = Extract<ApiResponseDto<T>, { success: true }>;
 
 /**
  * エラーレスポンスの型
