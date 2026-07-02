@@ -1,5 +1,5 @@
 import type { FC } from "hono/jsx";
-import type { BookSearchResult as SearchResult } from "../../types/api";
+import type { BookSearchResultDto as SearchResult } from "../../types/dto";
 import { Card, CardBody } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { BookCover } from "./BookCover";
