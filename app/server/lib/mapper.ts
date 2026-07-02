@@ -3,11 +3,10 @@ import type {
   BookInput,
   Tag,
   TagInput,
-  TagResponse,
   User,
   UserResponse,
 } from "../../types/database";
-import type { BookDto } from "../../types/dto";
+import type { BookDto, TagDto } from "../../types/dto";
 import type { CreateBookInput, UpdateBookInput } from "../api/schemas/book";
 import type { CreateTagInput } from "../api/schemas/tag";
 import { removeUndefined } from "./utils";
@@ -102,7 +101,7 @@ export function toTagInput(data: CreateTagInput, userId: string): TagInput {
 /**
  * DB形式のTagをAPI形式に変換
  */
-export function toTagResponse(tag: Tag): TagResponse {
+export function toTagDto(tag: Tag): TagDto {
   return {
     id: tag.id,
     userId: tag.user_id,

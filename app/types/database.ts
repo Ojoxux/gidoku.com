@@ -103,13 +103,6 @@ export interface TagInput {
   createdAt: string;
 }
 
-export interface TagResponse {
-  id: string;
-  userId: string;
-  name: string;
-  createdAt: string;
-}
-
 // 書籍-タグ
 export interface BookTag {
   book_id: string;

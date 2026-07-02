@@ -1,26 +1,22 @@
 import { useState, useEffect } from "hono/jsx";
 import { getApiErrorMessage, readApiResponse } from "../lib/api-client";
-
-interface Tag {
-  id: string;
-  name: string;
-}
+import type { TagDto } from "../types/dto";
 
 interface TagInputProps {
   bookId: string;
-  initialTags?: Tag[];
+  initialTags?: TagDto[];
 }
 
 export default function TagInput({ bookId, initialTags = [] }: TagInputProps) {
-  const [tags, setTags] = useState<Tag[]>(initialTags);
-  const [allTags, setAllTags] = useState<Tag[]>([]);
+  const [tags, setTags] = useState<TagDto[]>(initialTags);
+  const [allTags, setAllTags] = useState<TagDto[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // ユーザーのタグ一覧を取得
     fetch("/api/tags")
-      .then((res) => readApiResponse<Tag[]>(res))
+      .then((res) => readApiResponse<TagDto[]>(res))
       .then((data) => {
         if (data.success) {
           setAllTags(data.data);
@@ -52,7 +48,7 @@ export default function TagInput({ bookId, initialTags = [] }: TagInputProps) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name }),
         });
-        const createData = await readApiResponse<Tag>(createRes);
+        const createData = await readApiResponse<TagDto>(createRes);
         if (createData.success) {
           tag = createData.data;
           setAllTags([...allTags, tag]);
