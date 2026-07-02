@@ -1,4 +1,5 @@
 import { useState, useEffect } from "hono/jsx";
+import { getApiErrorMessage, readApiResponse } from "../lib/api-client";
 
 interface Tag {
   id: string;
@@ -10,12 +11,6 @@ interface TagInputProps {
   initialTags?: Tag[];
 }
 
-interface ApiResponse<T = unknown> {
-  success: boolean;
-  data?: T;
-  error?: { message: string };
-}
-
 export default function TagInput({ bookId, initialTags = [] }: TagInputProps) {
   const [tags, setTags] = useState<Tag[]>(initialTags);
   const [allTags, setAllTags] = useState<Tag[]>([]);
@@ -25,11 +20,10 @@ export default function TagInput({ bookId, initialTags = [] }: TagInputProps) {
   useEffect(() => {
     // ユーザーのタグ一覧を取得
     fetch("/api/tags")
-      .then((res) => res.json())
-      .then((json: unknown) => {
-        const data = json as ApiResponse<Tag[]>;
+      .then((res) => readApiResponse<Tag[]>(res))
+      .then((data) => {
         if (data.success) {
-          setAllTags(data.data || []);
+          setAllTags(data.data);
         }
       })
       .catch(() => {});
@@ -58,8 +52,8 @@ export default function TagInput({ bookId, initialTags = [] }: TagInputProps) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name }),
         });
-        const createData = (await createRes.json()) as ApiResponse<Tag>;
-        if (createData.success && createData.data) {
+        const createData = await readApiResponse<Tag>(createRes);
+        if (createData.success) {
           tag = createData.data;
           setAllTags([...allTags, tag]);
         } else {
@@ -79,8 +73,8 @@ export default function TagInput({ bookId, initialTags = [] }: TagInputProps) {
         setTags([...tags, tag]);
         setInput("");
       } else {
-        const data = (await res.json()) as ApiResponse;
-        alert(data.error?.message || "タグの追加に失敗しました");
+        const data = await readApiResponse(res);
+        alert(getApiErrorMessage(data, "タグの追加に失敗しました"));
       }
     } catch {
       alert("タグの追加中にエラーが発生しました");
@@ -100,8 +94,8 @@ export default function TagInput({ bookId, initialTags = [] }: TagInputProps) {
       if (res.ok) {
         setTags(tags.filter((t) => t.id !== tagId));
       } else {
-        const data = (await res.json()) as ApiResponse;
-        alert(data.error?.message || "タグの削除に失敗しました");
+        const data = await readApiResponse(res);
+        alert(getApiErrorMessage(data, "タグの削除に失敗しました"));
       }
     } catch {
       alert("タグの削除中にエラーが発生しました");

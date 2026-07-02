@@ -1,14 +1,11 @@
 import { useState } from "hono/jsx";
+import { getApiErrorMessage, readApiResponse } from "../lib/api-client";
+import type { BookDto } from "../types/dto";
 
 interface ProgressSliderProps {
   bookId: string;
   initialPage: number;
   totalPages: number;
-}
-
-interface ApiResponse {
-  success: boolean;
-  error?: { message: string };
 }
 
 export default function ProgressSlider({ bookId, initialPage, totalPages }: ProgressSliderProps) {
@@ -35,8 +32,8 @@ export default function ProgressSlider({ bookId, initialPage, totalPages }: Prog
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);
       } else {
-        const data = (await res.json()) as ApiResponse;
-        alert(data.error?.message || "更新に失敗しました");
+        const data = await readApiResponse<BookDto>(res);
+        alert(getApiErrorMessage(data, "更新に失敗しました"));
       }
     } catch {
       alert("更新中にエラーが発生しました");

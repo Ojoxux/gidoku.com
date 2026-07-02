@@ -1,10 +1,10 @@
 import { useState } from "hono/jsx";
 import type {
-  ApiResponseDto,
   BookDto,
   BookSearchResultDto,
   SearchBooksResponseDto,
 } from "../types/dto";
+import { readApiResponse } from "../lib/api-client";
 
 export default function BookSearchForm() {
   const [query, setQuery] = useState("");
@@ -24,7 +24,7 @@ export default function BookSearchForm() {
 
     try {
       const res = await fetch(`/api/search/books?query=${encodeURIComponent(query)}&page=1`);
-      const data = (await res.json()) as ApiResponseDto<SearchBooksResponseDto>;
+      const data = await readApiResponse<SearchBooksResponseDto>(res);
 
       if (data.success) {
         setResults(data.data.results);
@@ -50,7 +50,7 @@ export default function BookSearchForm() {
       const res = await fetch(
         `/api/search/books?query=${encodeURIComponent(query)}&page=${nextPage}`,
       );
-      const data = (await res.json()) as ApiResponseDto<SearchBooksResponseDto>;
+      const data = await readApiResponse<SearchBooksResponseDto>(res);
 
       if (data.success) {
         setResults((prev) => [...prev, ...data.data.results]);
@@ -86,7 +86,7 @@ export default function BookSearchForm() {
         }),
       });
 
-      const data = (await res.json()) as ApiResponseDto<BookDto>;
+      const data = await readApiResponse<BookDto>(res);
 
       if (data.success) {
         window.location.href = `/books/${data.data.id}`;
