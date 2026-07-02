@@ -182,9 +182,7 @@ function parsePublishedDate(publishedDate: string): Date | null {
 /**
  * 本の配列を、出版日が新しい順に並び替え
  */
-export function sortByPublishedDateDesc(
-  books: BookSearchResultDto[],
-): BookSearchResultDto[] {
+export function sortByPublishedDateDesc(books: BookSearchResultDto[]): BookSearchResultDto[] {
   return [...books].sort((before, after) => {
     const beforeDate = parsePublishedDate(before.publishedDate);
     const afterDate = parsePublishedDate(after.publishedDate);
