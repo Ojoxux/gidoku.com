@@ -16,7 +16,7 @@ import type {
   ProgressInput,
   BookFilterInput,
 } from "./schemas/book";
-import { toBookDto, toBookInput, toBookUpdateInput } from "../lib/mapper";
+import { toBookDto, toBookInput, toBookUpdateInput, toTagDto } from "../lib/mapper";
 import { bookDomain } from "../domain";
 import { successResponse, paginatedResponse } from "../lib/response";
 import { ValidationError } from "../lib/errors";
@@ -74,7 +74,7 @@ app.get("/:id", validator("param", bookIdSchema), async (c) => {
 
   return successResponse(c, {
     ...toBookDto(book),
-    tags,
+    tags: tags.map(toTagDto),
   });
 });
 

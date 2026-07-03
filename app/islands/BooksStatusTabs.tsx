@@ -1,5 +1,5 @@
 import { useState } from "hono/jsx/dom";
-import type { BookStatus } from "../types/database";
+import type { BookStatus } from "../types/book";
 import { BookCover } from "../components/book/BookCover";
 
 interface BookItem {

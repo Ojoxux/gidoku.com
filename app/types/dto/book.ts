@@ -1,4 +1,4 @@
-import type { BookStatus } from "../database";
+import type { BookStatus } from "../book";
 import type { TagDto } from "./tag";
 
 export interface BookDto {
