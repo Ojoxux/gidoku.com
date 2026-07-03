@@ -267,9 +267,9 @@ export async function getStats(db: D1Database, userId: string): Promise<BookStat
         `
         SELECT 
           COUNT(*) as total,
-          SUM(CASE WHEN status = 'reading' THEN 1 ELSE 0 END) as reading,
-          SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed,
-          SUM(CASE WHEN status = 'unread' THEN 1 ELSE 0 END) as unread
+          COALESCE(SUM(CASE WHEN status = 'reading' THEN 1 ELSE 0 END), 0) as reading,
+          COALESCE(SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END), 0) as completed,
+          COALESCE(SUM(CASE WHEN status = 'unread' THEN 1 ELSE 0 END), 0) as unread
         FROM books 
         WHERE user_id = ?
       `,

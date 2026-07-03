@@ -5,20 +5,10 @@ import { PublicProfileLayout } from "../../components/layout/PublicProfileLayout
 import { UserProfile } from "../../components/user/UserProfile";
 import { UserStats } from "../../components/user/UserStats";
 import ProfileBookTabs from "../../islands/ProfileBookTabs";
-import { userRepo, bookRepo } from "../../server/db/repositories";
-import type { BookStatus } from "../../types/book";
-import type { User, Book, BookStats } from "../../types/database";
-
-interface BookListItem {
-  id: string;
-  title: string;
-  authors: string[];
-  publisher: string | null;
-  thumbnailUrl: string | null;
-  status: BookStatus;
-  currentPage: number;
-  pageCount: number;
-}
+import { userRepo } from "../../server/db/repositories";
+import { publicProfileService } from "../../server/services";
+import type { PublicProfileBookListItem } from "../../server/services/publicProfile";
+import type { User, BookStats } from "../../types/database";
 
 interface PageProps {
   currentUser: User | null;
@@ -31,21 +21,10 @@ interface NotFoundPageProps extends PageProps {
 interface ProfilePageProps extends PageProps {
   profileUser: User;
   stats: BookStats;
-  readingBooks: BookListItem[];
-  unreadBooks: BookListItem[];
-  completedBooks: BookListItem[];
+  readingBooks: PublicProfileBookListItem[];
+  unreadBooks: PublicProfileBookListItem[];
+  completedBooks: PublicProfileBookListItem[];
 }
-
-const toBookListItem = (book: Book): BookListItem => ({
-  id: book.id,
-  title: book.title,
-  authors: JSON.parse(book.authors) as string[],
-  publisher: book.publisher,
-  thumbnailUrl: book.thumbnail_url,
-  status: book.status,
-  currentPage: book.current_page,
-  pageCount: book.page_count,
-});
 
 const NotFoundPage: FC<NotFoundPageProps> = ({ username, currentUser }) => (
   <PublicProfileLayout user={currentUser} title="ユーザーが見つかりません">
@@ -104,6 +83,7 @@ const ProfilePage: FC<ProfilePageProps> = ({
         <h2 class="text-xl font-bold text-zinc-900 mb-6">本棚</h2>
         <UserStats
           totalBooks={stats.total}
+          unreadBooks={stats.unread}
           readingBooks={stats.reading}
           completedBooks={stats.completed}
         />
@@ -132,35 +112,16 @@ export default createRoute(async (c) => {
     return c.render(<NotFoundPage username={username} currentUser={currentUser} />);
   }
 
-  const [
-    stats,
-    { books: rawReadingBooks },
-    { books: rawUnreadBooks },
-    { books: rawCompletedBooks },
-  ] = await Promise.all([
-    bookRepo.getStats(c.env.DB, profileUser.id),
-    bookRepo.findByUserId(c.env.DB, profileUser.id, { status: "reading", limit: 12, offset: 0 }),
-    bookRepo.findByUserId(c.env.DB, profileUser.id, {
-      status: "unread",
-      sortBy: "updated",
-      limit: 24,
-      offset: 0,
-    }),
-    bookRepo.findByUserId(c.env.DB, profileUser.id, {
-      status: "completed",
-      sortBy: "updated",
-      limit: 24,
-      offset: 0,
-    }),
-  ]);
+  const { stats, readingBooks, unreadBooks, completedBooks } =
+    await publicProfileService.getPublicProfileBooks(c.env.DB, profileUser.id);
 
   return c.render(
     <ProfilePage
       profileUser={profileUser}
       stats={stats}
-      readingBooks={rawReadingBooks.map(toBookListItem)}
-      unreadBooks={rawUnreadBooks.map(toBookListItem)}
-      completedBooks={rawCompletedBooks.map(toBookListItem)}
+      readingBooks={readingBooks}
+      unreadBooks={unreadBooks}
+      completedBooks={completedBooks}
       currentUser={currentUser}
     />,
   );

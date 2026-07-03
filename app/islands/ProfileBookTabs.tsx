@@ -106,8 +106,8 @@ export default function ProfileBookTabs({
             {books.length > 0 ? (
               <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-10">
                 {books.map((book) => (
-                  <a href={`/books/${book.id}`} class="group flex flex-col gap-3">
-                    <div class="relative aspect-2/3 w-full bg-zinc-100 rounded-xl shadow-sm group-hover:shadow-md transition-all duration-300 ring-1 ring-black/5 overflow-hidden">
+                  <div class="flex flex-col gap-3">
+                    <div class="relative aspect-2/3 w-full bg-zinc-100 rounded-xl shadow-sm ring-1 ring-black/5 overflow-hidden">
                       <BookCover
                         src={book.thumbnailUrl}
                         alt={book.title}
@@ -117,12 +117,12 @@ export default function ProfileBookTabs({
                     </div>
 
                     <div class="space-y-1">
-                      <h3 class="font-semibold text-zinc-900 text-sm leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors">
+                      <h3 class="font-semibold text-zinc-900 text-sm leading-snug line-clamp-2">
                         {book.title}
                       </h3>
                       <p class="text-xs text-zinc-500 line-clamp-1">{book.authors.join(", ")}</p>
                     </div>
-                  </a>
+                  </div>
                 ))}
               </div>
             ) : (
