@@ -1,9 +1,14 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { env } from "cloudflare:test";
 import api from "./index";
-import { createTestUser, createTestSession, createTestBook } from "../../test/helpers";
+import {
+  createTestUser,
+  createTestSession,
+  createTestBook,
+  createTestTag,
+} from "../../test/helpers";
 import type { SuccessResponse, PaginatedResponse } from "../lib/response";
-import type { BookDto, BookStatsDto } from "../../types/dto";
+import type { BookDetailDto, BookDto, BookStatsDto } from "../../types/dto";
 
 describe("Books API Integration", () => {
   let userId: string;
@@ -209,6 +214,10 @@ describe("Books API Integration", () => {
   describe("GET /books/:id", () => {
     it("should return a book by id", async () => {
       const book = await createTestBook(env.DB, userId, { title: "My Book" });
+      const tag = await createTestTag(env.DB, userId, "API");
+      await env.DB.prepare("INSERT INTO book_tags (book_id, tag_id) VALUES (?, ?)")
+        .bind(book.id, tag.id)
+        .run();
 
       const res = await api.request(
         `/books/${book.id}`,
@@ -219,8 +228,13 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<BookDto>;
+      const body = (await res.json()) as SuccessResponse<BookDetailDto>;
       expect(body.data.title).toBe("My Book");
+      expect(body.data.tags).toHaveLength(1);
+      expect(body.data.tags[0].name).toBe("API");
+      expect(body.data.tags[0].createdAt).toBe(tag.created_at);
+      expect("created_at" in body.data.tags[0]).toBe(false);
+      expect("user_id" in body.data.tags[0]).toBe(false);
     });
 
     // Note: 404 test is skipped because the current error handler wraps NotFoundError in DatabaseError

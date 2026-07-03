@@ -1,4 +1,4 @@
-import type { BookDto } from "./book";
+import type { BookStatus } from "../book";
 
 export interface UserDto {
   id: string;
@@ -32,6 +32,20 @@ export interface PublicProfileDto {
   avatarUrl: string | null;
 }
 
-export interface PublicBookDto extends BookDto {
+export interface PublicBookDto {
+  id: string;
+  title: string;
+  authors: string[];
+  publisher: string | null;
+  publishedDate: string | null;
+  isbn: string | null;
+  pageCount: number;
+  description: string | null;
+  thumbnailUrl: string | null;
+  status: BookStatus;
+  currentPage: number;
   memo: null;
+  finishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
 }

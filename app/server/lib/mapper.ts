@@ -1,5 +1,5 @@
 import type { Book, BookInput, Tag, TagInput, User } from "../../types/database";
-import type { BookDto, TagDto, UserDto } from "../../types/dto";
+import type { BookDto, PublicBookDto, TagDto, UserDto } from "../../types/dto";
 import type { CreateBookInput, UpdateBookInput } from "../api/schemas/book";
 import type { CreateTagInput } from "../api/schemas/tag";
 import { removeUndefined } from "./utils";
@@ -73,6 +73,29 @@ export function toBookDto(book: Book): BookDto {
     status: book.status,
     currentPage: book.current_page,
     memo: book.memo,
+    finishedAt: book.finished_at,
+    createdAt: book.created_at,
+    updatedAt: book.updated_at,
+  };
+}
+
+/**
+ * DB形式のBookを公開プロフィール用のAPI形式に変換
+ */
+export function toPublicBookDto(book: Book): PublicBookDto {
+  return {
+    id: book.id,
+    title: book.title,
+    authors: JSON.parse(book.authors),
+    publisher: book.publisher,
+    publishedDate: book.published_date,
+    isbn: book.isbn,
+    pageCount: book.page_count,
+    description: book.description,
+    thumbnailUrl: book.thumbnail_url,
+    status: book.status,
+    currentPage: book.current_page,
+    memo: null,
     finishedAt: book.finished_at,
     createdAt: book.created_at,
     updatedAt: book.updated_at,

@@ -9,6 +9,7 @@ import {
 } from "../../test/helpers";
 import type {
   DeletedResponseDto,
+  ErrorResponseDto,
   PublicBookDto,
   PublicProfileDto,
   SuccessResponseDto,
@@ -63,8 +64,10 @@ describe("Users API Integration", () => {
     );
 
     expect(res.status).toBe(400);
-    const body = (await res.json()) as { error?: string };
-    expect(body.error).toBe("このユーザー名は使用できません");
+    const body = (await res.json()) as ErrorResponseDto;
+    expect(body.success).toBe(false);
+    expect(body.error.code).toBe("RESERVED_USERNAME");
+    expect(body.error.message).toBe("このユーザー名は使用できません");
   });
 
   it("should update user profile fields", async () => {
@@ -134,6 +137,9 @@ describe("Users API Integration", () => {
     expect(body.data).toHaveLength(1);
     expect(body.data[0].status).toBe("completed");
     expect(body.data[0].memo).toBeNull();
+    expect("userId" in body.data[0]).toBe(false);
+    expect("rakutenBooksId" in body.data[0]).toBe(false);
+    expect("rakutenAffiliateUrl" in body.data[0]).toBe(false);
   });
 
   it("should delete user account", async () => {

@@ -1,5 +1,5 @@
 import type { FC } from "hono/jsx";
-import type { BookStatus } from "../../types/database";
+import type { BookStatus } from "../../types/book";
 import { Card, CardBody } from "../ui/Card";
 import { StatusBadge } from "../ui/Badge";
 import { ProgressBar } from "../ui/ProgressBar";

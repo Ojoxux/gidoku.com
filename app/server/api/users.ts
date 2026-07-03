@@ -6,8 +6,8 @@ import { validator, getValidated } from "../lib/validator";
 import { updateUserSchema, usernameSchema } from "./schemas";
 import type { UpdateUserInput } from "./schemas/user";
 import { isReservedUsername } from "./schemas/user";
-import { toBookDto, toUserDto } from "../lib/mapper";
-import { successResponse } from "../lib/response";
+import { toPublicBookDto, toUserDto } from "../lib/mapper";
+import { errorResponse, successResponse } from "../lib/response";
 import { invalidateUserCache } from "../lib/auth";
 
 const app = new Hono<HonoContext>();
@@ -30,7 +30,7 @@ app.put("/me", authMiddleware, validator("json", updateUserSchema), async (c) =>
   const data = getValidated<UpdateUserInput>(c, "json");
 
   if (data.username && isReservedUsername(data.username)) {
-    return c.json({ error: "このユーザー名は使用できません" }, 400);
+    return errorResponse(c, "このユーザー名は使用できません", "RESERVED_USERNAME", 400);
   }
 
   const updatedUser = await userRepo.update(c.env.DB, userId, {
@@ -94,14 +94,7 @@ app.get("/:username/books", optionalAuthMiddleware, async (c) => {
     offset: 0,
   });
 
-  return successResponse(
-    c,
-    books.map((book) => {
-      const response = toBookDto(book);
-      response.memo = null;
-      return response;
-    }),
-  );
+  return successResponse(c, books.map(toPublicBookDto));
 });
 
 /**

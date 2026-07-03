@@ -1,3 +1,5 @@
+import type { BookStatus } from "./book";
+
 // ユーザー
 export interface User {
   id: string;
@@ -24,9 +26,6 @@ export interface UserInput {
   created_at: string;
   updated_at: string;
 }
-
-// 書籍
-export type BookStatus = "unread" | "reading" | "completed";
 
 export interface Book {
   id: string;

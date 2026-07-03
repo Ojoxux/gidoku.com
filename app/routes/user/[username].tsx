@@ -6,7 +6,8 @@ import { UserProfile } from "../../components/user/UserProfile";
 import { UserStats } from "../../components/user/UserStats";
 import ProfileBookTabs from "../../islands/ProfileBookTabs";
 import { userRepo, bookRepo } from "../../server/db/repositories";
-import type { User, Book, BookStats, BookStatus } from "../../types/database";
+import type { BookStatus } from "../../types/book";
+import type { User, Book, BookStats } from "../../types/database";
 
 interface BookListItem {
   id: string;

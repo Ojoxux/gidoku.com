@@ -1,4 +1,5 @@
-import type { Book, BookInput, BookFilter, BookStats, BookStatus } from "../../../types/database";
+import type { BookStatus } from "../../../types/book";
+import type { Book, BookInput, BookFilter, BookStats } from "../../../types/database";
 import { NotFoundError, DatabaseError } from "../../lib/errors";
 
 import type { Env } from "../../../types/env";
