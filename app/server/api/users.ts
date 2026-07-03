@@ -6,8 +6,8 @@ import { validator, getValidated } from "../lib/validator";
 import { updateUserSchema, usernameSchema } from "./schemas";
 import type { UpdateUserInput } from "./schemas/user";
 import { isReservedUsername } from "./schemas/user";
-import { toUserResponse } from "../lib/mapper";
-import { successResponse } from "../lib/response";
+import { toUserDto } from "../lib/mapper";
+import { errorResponse, successResponse } from "../lib/response";
 import { invalidateUserCache } from "../lib/auth";
 import { publicProfileService } from "../services";
 
@@ -19,7 +19,7 @@ const app = new Hono<HonoContext>();
  */
 app.get("/me", authMiddleware, async (c) => {
   const user = c.get("user");
-  return successResponse(c, toUserResponse(user));
+  return successResponse(c, toUserDto(user));
 });
 
 /**
@@ -31,7 +31,7 @@ app.put("/me", authMiddleware, validator("json", updateUserSchema), async (c) =>
   const data = getValidated<UpdateUserInput>(c, "json");
 
   if (data.username && isReservedUsername(data.username)) {
-    return c.json({ error: "このユーザー名は使用できません" }, 400);
+    return errorResponse(c, "このユーザー名は使用できません", "RESERVED_USERNAME", 400);
   }
 
   const updatedUser = await userRepo.update(c.env.DB, userId, {
@@ -43,7 +43,7 @@ app.put("/me", authMiddleware, validator("json", updateUserSchema), async (c) =>
 
   await invalidateUserCache(c.env.KV, userId);
 
-  return successResponse(c, toUserResponse(updatedUser));
+  return successResponse(c, toUserDto(updatedUser));
 });
 
 /**

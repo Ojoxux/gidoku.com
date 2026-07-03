@@ -17,3 +17,5 @@ export interface SearchBooksResponseDto {
   pageCount: number;
   currentPage: number;
 }
+
+export type SearchBookByIsbnResponseDto = BookSearchResultDto | null;

@@ -1,9 +1,14 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { env } from "cloudflare:test";
 import api from "./index";
-import { createTestUser, createTestSession, createTestBook } from "../../test/helpers";
+import {
+  createTestUser,
+  createTestSession,
+  createTestBook,
+  createTestTag,
+} from "../../test/helpers";
 import type { SuccessResponse, PaginatedResponse } from "../lib/response";
-import type { BookResponse } from "../../types/database";
+import type { BookDetailDto, BookDto, BookStatsDto } from "../../types/dto";
 
 describe("Books API Integration", () => {
   let userId: string;
@@ -49,7 +54,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookResponse>>;
+      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookDto>>;
       expect(body.success).toBe(true);
       expect(body.data.items).toEqual([]);
       expect(body.data.total).toBe(0);
@@ -68,7 +73,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookResponse>>;
+      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookDto>>;
       expect(body.data.items).toHaveLength(2);
       expect(body.data.total).toBe(2);
     });
@@ -88,7 +93,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookResponse>>;
+      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookDto>>;
       expect(body.data.items).toHaveLength(1);
       expect(body.data.items[0].status).toBe("reading");
     });
@@ -106,7 +111,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookResponse>>;
+      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookDto>>;
       expect(body.data.items).toHaveLength(1);
       expect(body.data.items[0].title).toBe("JavaScript Guide");
     });
@@ -124,7 +129,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookResponse>>;
+      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookDto>>;
       expect(body.data.items[0].title).toBe("Alpha Book");
     });
 
@@ -142,7 +147,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookResponse>>;
+      const body = (await res.json()) as SuccessResponse<PaginatedResponse<BookDto>>;
       expect(body.data.items).toHaveLength(1);
       expect(body.data.total).toBe(3);
       expect(body.data.limit).toBe(1);
@@ -171,7 +176,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(201);
-      const body = (await res.json()) as SuccessResponse<BookResponse>;
+      const body = (await res.json()) as SuccessResponse<BookDto>;
       expect(body.success).toBe(true);
       expect(body.data.title).toBe("New Test Book");
     });
@@ -199,7 +204,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<BookResponse>;
+      const body = (await res.json()) as SuccessResponse<BookDto>;
       expect(body.data.title).toBe("New Title");
       expect(body.data.status).toBe("reading");
       expect(body.data.currentPage).toBe(10);
@@ -209,6 +214,10 @@ describe("Books API Integration", () => {
   describe("GET /books/:id", () => {
     it("should return a book by id", async () => {
       const book = await createTestBook(env.DB, userId, { title: "My Book" });
+      const tag = await createTestTag(env.DB, userId, "API");
+      await env.DB.prepare("INSERT INTO book_tags (book_id, tag_id) VALUES (?, ?)")
+        .bind(book.id, tag.id)
+        .run();
 
       const res = await api.request(
         `/books/${book.id}`,
@@ -219,8 +228,13 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<BookResponse>;
+      const body = (await res.json()) as SuccessResponse<BookDetailDto>;
       expect(body.data.title).toBe("My Book");
+      expect(body.data.tags).toHaveLength(1);
+      expect(body.data.tags[0].name).toBe("API");
+      expect(body.data.tags[0].createdAt).toBe(tag.created_at);
+      expect("created_at" in body.data.tags[0]).toBe(false);
+      expect("user_id" in body.data.tags[0]).toBe(false);
     });
 
     // Note: 404 test is skipped because the current error handler wraps NotFoundError in DatabaseError
@@ -261,7 +275,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<BookResponse>;
+      const body = (await res.json()) as SuccessResponse<BookDto>;
       expect(body.data.currentPage).toBe(150);
       expect(body.data.status).toBe("reading");
     });
@@ -287,7 +301,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<BookResponse>;
+      const body = (await res.json()) as SuccessResponse<BookDto>;
       expect(body.data.status).toBe("completed");
       expect(body.data.finishedAt).toBeTruthy();
     });
@@ -328,12 +342,7 @@ describe("Books API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<{
-        total: number;
-        reading: number;
-        completed: number;
-        unread: number;
-      }>;
+      const body = (await res.json()) as SuccessResponse<BookStatsDto>;
       expect(body.data.total).toBe(4);
       expect(body.data.reading).toBe(2);
       expect(body.data.completed).toBe(1);

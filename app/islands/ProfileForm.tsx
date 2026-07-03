@@ -1,4 +1,6 @@
 import { useState } from "hono/jsx";
+import { getApiErrorMessage, readApiResponse } from "../lib/api-client";
+import type { UserDto } from "../types/dto";
 
 interface ProfileFormProps {
   avatarUrl: string | null;
@@ -6,12 +8,6 @@ interface ProfileFormProps {
   initialUsername: string;
   initialName: string;
   initialBio: string;
-}
-
-interface ApiResponse {
-  success: boolean;
-  data?: { username: string; name: string; bio: string | null };
-  error?: { message: string };
 }
 
 export default function ProfileForm({
@@ -45,13 +41,13 @@ export default function ProfileForm({
         body: JSON.stringify(body),
       });
 
-      const data = (await res.json()) as ApiResponse;
+      const data = await readApiResponse<UserDto>(res);
 
       if (res.ok) {
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);
       } else {
-        alert(data.error?.message || "保存に失敗しました");
+        alert(getApiErrorMessage(data, "保存に失敗しました"));
       }
     } catch {
       alert("通信エラーが発生しました");

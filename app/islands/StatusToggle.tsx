@@ -1,15 +1,12 @@
 import { useState } from "hono/jsx";
+import { getApiErrorMessage, readApiResponse } from "../lib/api-client";
+import type { BookDto } from "../types/dto";
 
 type BookStatus = "unread" | "reading" | "completed";
 
 interface StatusToggleProps {
   bookId: string;
   currentStatus: BookStatus;
-}
-
-interface ApiResponse {
-  success: boolean;
-  error?: { message: string };
 }
 
 const statusOptions: { value: BookStatus; label: string }[] = [
@@ -37,8 +34,8 @@ export default function StatusToggle({ bookId, currentStatus }: StatusToggleProp
       if (res.ok) {
         setStatus(newStatus);
       } else {
-        const data = (await res.json()) as ApiResponse;
-        alert(data.error?.message || "更新に失敗しました");
+        const data = await readApiResponse<BookDto>(res);
+        alert(getApiErrorMessage(data, "更新に失敗しました"));
       }
     } catch {
       alert("更新中にエラーが発生しました");

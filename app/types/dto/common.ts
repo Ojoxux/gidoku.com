@@ -14,6 +14,10 @@ export type ApiResponseDto<T = unknown> =
       error: ApiErrorDto;
     };
 
+export type SuccessResponseDto<T = unknown> = Extract<ApiResponseDto<T>, { success: true }>;
+
+export type ErrorResponseDto = Extract<ApiResponseDto, { success: false }>;
+
 export interface PaginatedDto<T> {
   items: T[];
   total: number;

@@ -1,7 +1,9 @@
 import type { Env } from "../../types/env";
-import type { Book, BookResponse, BookStats, BookStatus } from "../../types/database";
+import type { BookStatus } from "../../types/book";
+import type { Book, BookStats } from "../../types/database";
+import type { PublicBookDto } from "../../types/dto";
 import { bookRepo } from "../db/repositories";
-import { toBookResponse } from "../lib/mapper";
+import { toPublicBookDto } from "../lib/mapper";
 
 type D1Database = Env["DB"];
 
@@ -60,11 +62,8 @@ function toPublicProfileBookListItem(book: Book): PublicProfileBookListItem {
   };
 }
 
-export function toPublicBookResponse(book: Book): BookResponse {
-  return {
-    ...toBookResponse(book),
-    memo: null,
-  };
+export function toPublicBookResponse(book: Book): PublicBookDto {
+  return toPublicBookDto(book);
 }
 
 export async function getPublicProfileBooks(
@@ -108,7 +107,7 @@ export async function getPublicProfileBooks(
 export async function getPublicBookResponses(
   db: D1Database,
   userId: string,
-): Promise<BookResponse[]> {
+): Promise<PublicBookDto[]> {
   const { books } = await bookRepo.findByUserId(db, userId, {
     limit: 50,
     offset: 0,
