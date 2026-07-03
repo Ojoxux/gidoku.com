@@ -1,4 +1,5 @@
 import type { Env } from "../types/env";
+import type { UserId, BookId, TagId, BookStatus, SessionId } from "../types/domain";
 
 type D1Database = Env["DB"];
 type KVNamespace = Env["KV"];
@@ -18,7 +19,7 @@ export async function createTestUser(
   }> = {},
 ) {
   const now = new Date().toISOString();
-  const userId = overrides.id || crypto.randomUUID();
+  const userId = (overrides.id || crypto.randomUUID()) as UserId;
   const user = {
     id: userId,
     username: overrides.username || `test_user_${userId.slice(0, 8)}`,
@@ -57,8 +58,8 @@ export async function createTestUser(
 /**
  * テスト用のセッションを作成
  */
-export async function createTestSession(kv: KVNamespace, userId: string): Promise<string> {
-  const sessionId = crypto.randomUUID();
+export async function createTestSession(kv: KVNamespace, userId: UserId): Promise<SessionId> {
+  const sessionId = crypto.randomUUID() as SessionId;
   await kv.put(`session:${sessionId}`, userId, { expirationTtl: 3600 });
   return sessionId;
 }
@@ -68,19 +69,19 @@ export async function createTestSession(kv: KVNamespace, userId: string): Promis
  */
 export async function createTestBook(
   db: D1Database,
-  userId: string,
+  userId: UserId,
   overrides: Partial<{
     id: string;
     title: string;
     authors: string[];
-    status: "unread" | "reading" | "completed";
+    status: BookStatus;
     pageCount: number;
     currentPage: number;
     memo: string | null;
   }> = {},
 ) {
   const now = new Date().toISOString();
-  const bookId = overrides.id || crypto.randomUUID();
+  const bookId = (overrides.id || crypto.randomUUID()) as BookId;
   const book = {
     id: bookId,
     user_id: userId,
@@ -135,9 +136,9 @@ export async function createTestBook(
 /**
  * テスト用のタグを作成
  */
-export async function createTestTag(db: D1Database, userId: string, name?: string) {
+export async function createTestTag(db: D1Database, userId: UserId, name?: string) {
   const now = new Date().toISOString();
-  const tagId = crypto.randomUUID();
+  const tagId = crypto.randomUUID() as TagId;
   const tag = {
     id: tagId,
     user_id: userId,

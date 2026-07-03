@@ -2,9 +2,10 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { env } from "cloudflare:test";
 import * as bookRepo from "./book";
 import { createTestUser, createTestBook } from "../../../test/helpers";
+import type { UserId, BookId } from "../../../types/domain";
 
 describe("Book Repository", () => {
-  let userId: string;
+  let userId: UserId;
 
   beforeEach(async () => {
     // テストデータをクリーンアップ
@@ -21,7 +22,7 @@ describe("Book Repository", () => {
   describe("create", () => {
     it("should create a book", async () => {
       const now = new Date().toISOString();
-      const bookId = crypto.randomUUID();
+      const bookId = crypto.randomUUID() as BookId;
 
       const book = await bookRepo.create(env.DB, {
         id: bookId,
@@ -51,9 +52,9 @@ describe("Book Repository", () => {
     });
 
     it("should throw NotFoundError for non-existent book", async () => {
-      await expect(bookRepo.findById(env.DB, "non-existent", userId)).rejects.toThrow(
-        "Book not found",
-      );
+      await expect(
+        bookRepo.findById(env.DB, "non-existent" as BookId, userId),
+      ).rejects.toThrow("Book not found");
     });
 
     it("should not return books from other users", async () => {

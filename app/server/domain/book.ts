@@ -1,4 +1,4 @@
-import type { BookStatus } from "../../types/database";
+import type { BookStatus } from "../../types/domain";
 
 /**
  * 進捗に基づいてステータスを計算

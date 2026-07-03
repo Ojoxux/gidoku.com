@@ -8,6 +8,7 @@ import type {
   User,
   UserResponse,
 } from "../../types/database";
+import type { UserId, BookId, TagId } from "../../types/domain";
 import type { CreateBookInput, UpdateBookInput } from "../api/schemas/book";
 import type { CreateTagInput } from "../api/schemas/tag";
 import { removeUndefined } from "./utils";
@@ -15,10 +16,10 @@ import { removeUndefined } from "./utils";
 /**
  * API入力からBookInputへ変換
  */
-export function toBookInput(data: CreateBookInput, userId: string): BookInput {
+export function toBookInput(data: CreateBookInput, userId: UserId): BookInput {
   const now = new Date().toISOString();
   return {
-    id: crypto.randomUUID(),
+    id: crypto.randomUUID() as BookId,
     userId,
     title: data.title,
     authors: data.authors,
@@ -90,9 +91,9 @@ export function toBookResponse(book: Book): BookResponse {
 /**
  * API入力からTagInputへ変換
  */
-export function toTagInput(data: CreateTagInput, userId: string): TagInput {
+export function toTagInput(data: CreateTagInput, userId: UserId): TagInput {
   return {
-    id: crypto.randomUUID(),
+    id: crypto.randomUUID() as TagId,
     userId,
     name: data.name,
     createdAt: new Date().toISOString(),

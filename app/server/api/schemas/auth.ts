@@ -1,5 +1,7 @@
 import { regex, type } from "arktype";
 
+export type { OAuthProvider } from "../../../types/domain";
+
 /**
  * OAuth認証プロバイダー
  */
@@ -26,7 +28,7 @@ export const oauthCallbackSchema = type({
 export const rakutenSearchSchema = type({
   query: "1 <= string <= 100",
   "limit?": "1 <= (number % 1) <= 10",
-  "page?": "1 <= (number % 1) <= 1000", // 追加
+  "page?": "1 <= (number % 1) <= 1000",
 });
 
 /**
@@ -39,7 +41,6 @@ export const isbnSearchSchema = type({
 });
 
 // 型エクスポート
-export type OAuthProvider = typeof oauthProviderSchema.infer;
 export type OAuthProviderParam = typeof oauthProviderParamSchema.infer;
 export type OAuthCallbackInput = typeof oauthCallbackSchema.infer;
 export type RakutenSearchInput = typeof rakutenSearchSchema.infer;

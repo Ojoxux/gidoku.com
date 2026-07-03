@@ -1,7 +1,9 @@
-import type { Book, BookInput, BookFilter, BookStats, BookStatus } from "../../../types/database";
+import type { Book, BookInput, BookFilter, BookStats } from "../../../types/database";
+import type { BookStatus } from "../../../types/domain";
 import { NotFoundError, DatabaseError } from "../../lib/errors";
 
 import type { Env } from "../../../types/env";
+import type { UserId, BookId } from "../../../types/domain";
 
 type D1Database = Env["DB"];
 type D1BindValue = string | number | null;
@@ -11,7 +13,7 @@ type D1BindValue = string | number | null;
  */
 export async function findByUserId(
   db: D1Database,
-  userId: string,
+  userId: UserId,
   filter?: BookFilter & { limit?: number; offset?: number },
 ): Promise<{ books: Book[]; total: number }> {
   try {
@@ -82,7 +84,7 @@ export async function findByUserId(
 /**
  * IDで書籍を取得
  */
-export async function findById(db: D1Database, bookId: string, userId: string): Promise<Book> {
+export async function findById(db: D1Database, bookId: BookId, userId: UserId): Promise<Book> {
   try {
     const result = await db
       .prepare("SELECT * FROM books WHERE id = ? AND user_id = ?")
@@ -149,8 +151,8 @@ export async function create(db: D1Database, book: BookInput): Promise<Book> {
  */
 export async function update(
   db: D1Database,
-  bookId: string,
-  userId: string,
+  bookId: BookId,
+  userId: UserId,
   data: Partial<BookInput>,
 ): Promise<Book> {
   try {
@@ -210,8 +212,8 @@ export async function update(
  */
 export async function updateProgress(
   db: D1Database,
-  bookId: string,
-  userId: string,
+  bookId: BookId,
+  userId: UserId,
   currentPage: number,
   status: BookStatus,
 ): Promise<Book> {
@@ -240,7 +242,7 @@ export async function updateProgress(
 /**
  * 書籍を削除（関連するタグも削除）
  */
-export async function deleteById(db: D1Database, bookId: string, userId: string): Promise<void> {
+export async function deleteById(db: D1Database, bookId: BookId, userId: UserId): Promise<void> {
   try {
     // 書籍の存在確認
     await findById(db, bookId, userId);
@@ -259,7 +261,7 @@ export async function deleteById(db: D1Database, bookId: string, userId: string)
 /**
  * ユーザーの統計情報を取得
  */
-export async function getStats(db: D1Database, userId: string): Promise<BookStats> {
+export async function getStats(db: D1Database, userId: UserId): Promise<BookStats> {
   try {
     const result = await db
       .prepare(
@@ -294,8 +296,8 @@ export async function getStats(db: D1Database, userId: string): Promise<BookStat
  */
 export async function belongsToUser(
   db: D1Database,
-  bookId: string,
-  userId: string,
+  bookId: BookId,
+  userId: UserId,
 ): Promise<boolean> {
   try {
     const result = await db

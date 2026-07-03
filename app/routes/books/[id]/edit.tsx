@@ -4,6 +4,7 @@ import { Layout } from "../../../components/layout/Layout";
 import { Input, Textarea, Label } from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
 import { bookRepo } from "../../../server/db/repositories";
+import type { BookId } from "../../../types/domain";
 
 export default createRoute(async (c) => {
   const authResult = await requirePageAuth(c);
@@ -13,7 +14,7 @@ export default createRoute(async (c) => {
   const user = authResult;
   const sidebarExpanded = getSidebarExpanded(c);
 
-  const id = c.req.param("id")!;
+  const id = c.req.param("id")! as BookId;
 
   let book;
   try {

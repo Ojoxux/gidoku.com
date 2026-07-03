@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { setCookie, deleteCookie, getCookie } from "hono/cookie";
 import type { HonoContext } from "../../types/env";
+import type { UserId } from "../../types/domain";
 import { userRepo } from "../db/repositories";
 import { authMiddleware } from "../lib/auth";
 import { validator, getValidated } from "../lib/validator";
@@ -102,7 +103,7 @@ app.get(
         // 新規ユーザー作成
         const now = new Date().toISOString();
         user = await userRepo.create(c.env.DB, {
-          id: crypto.randomUUID(),
+          id: crypto.randomUUID() as UserId,
           username: await generateUniqueUsername(c.env.DB, oauthUser.username),
           email: oauthUser.email,
           name: oauthUser.name,

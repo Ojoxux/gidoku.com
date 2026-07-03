@@ -1,48 +1,50 @@
+import type { UserId, BookId, TagId, SessionId, OAuthProvider, BookStatus, BookSortOrder } from "./domain";
+
+export type { BookStatus, BookSortOrder } from "./domain";
+
 // ユーザー
 export interface User {
-  id: string;
+  id: UserId;
   username: string;
   email: string;
   name: string;
   bio: string | null;
   avatar_url: string | null;
-  provider: "github" | "google";
+  provider: OAuthProvider;
   provider_id: string;
   created_at: string;
   updated_at: string;
 }
 
 export interface UserInput {
-  id: string;
+  id: UserId;
   username: string;
   email: string;
   name: string;
   bio?: string | null;
   avatar_url?: string | null;
-  provider: "github" | "google";
+  provider: OAuthProvider;
   provider_id: string;
   created_at: string;
   updated_at: string;
 }
 
 export interface UserResponse {
-  id: string;
+  id: UserId;
   username: string;
   email: string;
   name: string;
   bio: string | null;
   avatarUrl: string | null;
-  provider: "github" | "google";
+  provider: OAuthProvider;
   createdAt: string;
   updatedAt: string;
 }
 
 // 書籍
-export type BookStatus = "unread" | "reading" | "completed";
-
 export interface Book {
-  id: string;
-  user_id: string;
+  id: BookId;
+  user_id: UserId;
   rakuten_books_id: string | null;
   title: string;
   authors: string; // JSON文字列
@@ -62,8 +64,8 @@ export interface Book {
 }
 
 export interface BookInput {
-  id: string;
-  userId: string;
+  id: BookId;
+  userId: UserId;
   rakutenBooksId?: string | null;
   title: string;
   authors: string[]; // 配列（保存時にJSON化）
@@ -85,12 +87,12 @@ export interface BookInput {
 export interface BookFilter {
   status?: BookStatus;
   search?: string;
-  sortBy?: "title" | "created" | "updated" | "progress";
+  sortBy?: BookSortOrder;
 }
 
 export interface BookResponse {
-  id: string;
-  userId: string;
+  id: BookId;
+  userId: UserId;
   rakutenBooksId: string | null;
   title: string;
   authors: string[];
@@ -111,43 +113,43 @@ export interface BookResponse {
 
 // タグ
 export interface Tag {
-  id: string;
-  user_id: string;
+  id: TagId;
+  user_id: UserId;
   name: string;
   created_at: string;
 }
 
 export interface TagInput {
-  id: string;
-  userId: string;
+  id: TagId;
+  userId: UserId;
   name: string;
   createdAt: string;
 }
 
 export interface TagResponse {
-  id: string;
-  userId: string;
+  id: TagId;
+  userId: UserId;
   name: string;
   createdAt: string;
 }
 
 // 書籍-タグ
 export interface BookTag {
-  book_id: string;
-  tag_id: string;
+  book_id: BookId;
+  tag_id: TagId;
 }
 
 // セッション
 export interface Session {
-  id: string;
-  user_id: string;
+  id: SessionId;
+  user_id: UserId;
   expires_at: string;
   created_at: string;
 }
 
 export interface SessionInput {
-  id: string;
-  userId: string;
+  id: SessionId;
+  userId: UserId;
   expiresAt: string;
   createdAt: string;
 }

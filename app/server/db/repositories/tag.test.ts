@@ -2,9 +2,10 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { env } from "cloudflare:test";
 import * as tagRepo from "./tag";
 import { createTestTag, createTestUser, cleanupDatabase } from "../../../test/helpers";
+import type { UserId, TagId } from "../../../types/domain";
 
 describe("Tag Repository", () => {
-  let userId: string;
+  let userId: UserId;
 
   beforeEach(async () => {
     await cleanupDatabase(env.DB);
@@ -28,7 +29,9 @@ describe("Tag Repository", () => {
   });
 
   it("should throw when tag not found", async () => {
-    await expect(tagRepo.findById(env.DB, "missing-tag", userId)).rejects.toThrow("Tag not found");
+    await expect(
+      tagRepo.findById(env.DB, "missing-tag" as TagId, userId),
+    ).rejects.toThrow("Tag not found");
   });
 
   it("should find tag by name", async () => {
@@ -45,7 +48,7 @@ describe("Tag Repository", () => {
 
   it("should create a tag", async () => {
     const created = await tagRepo.create(env.DB, {
-      id: "tag-1",
+      id: "tag-1" as TagId,
       userId,
       name: "NewTag",
       createdAt: new Date().toISOString(),
@@ -59,7 +62,7 @@ describe("Tag Repository", () => {
 
     await expect(
       tagRepo.create(env.DB, {
-        id: "tag-2",
+        id: "tag-2" as TagId,
         userId,
         name: "Duplicate",
         createdAt: new Date().toISOString(),

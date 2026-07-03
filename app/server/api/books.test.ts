@@ -4,10 +4,11 @@ import api from "./index";
 import { createTestUser, createTestSession, createTestBook } from "../../test/helpers";
 import type { SuccessResponse, PaginatedResponse } from "../lib/response";
 import type { BookResponse } from "../../types/database";
+import type { UserId, SessionId } from "../../types/domain";
 
 describe("Books API Integration", () => {
-  let userId: string;
-  let sessionId: string;
+  let userId: UserId;
+  let sessionId: SessionId;
 
   beforeEach(async () => {
     await env.DB.prepare("DELETE FROM book_tags").run();

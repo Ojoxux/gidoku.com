@@ -1,13 +1,14 @@
 import type { Tag, TagInput } from "../../../types/database";
 import { NotFoundError, DatabaseError } from "../../lib/errors";
 import type { Env } from "../../../types/env";
+import type { UserId, TagId } from "../../../types/domain";
 
 type D1Database = Env["DB"];
 
 /**
  * ユーザーのタグ一覧を取得
  */
-export async function findByUserId(db: D1Database, userId: string): Promise<Tag[]> {
+export async function findByUserId(db: D1Database, userId: UserId): Promise<Tag[]> {
   try {
     const result = await db
       .prepare("SELECT * FROM tags WHERE user_id = ? ORDER BY name ASC")
@@ -23,7 +24,7 @@ export async function findByUserId(db: D1Database, userId: string): Promise<Tag[
 /**
  * IDでタグを取得
  */
-export async function findById(db: D1Database, tagId: string, userId: string): Promise<Tag> {
+export async function findById(db: D1Database, tagId: TagId, userId: UserId): Promise<Tag> {
   try {
     const result = await db
       .prepare("SELECT * FROM tags WHERE id = ? AND user_id = ?")
@@ -47,7 +48,7 @@ export async function findById(db: D1Database, tagId: string, userId: string): P
 export async function findByName(
   db: D1Database,
   name: string,
-  userId: string,
+  userId: UserId,
 ): Promise<Tag | null> {
   try {
     const result = await db
@@ -117,8 +118,8 @@ export async function create(db: D1Database, tag: TagInput): Promise<Tag> {
  */
 export async function update(
   db: D1Database,
-  tagId: string,
-  userId: string,
+  tagId: TagId,
+  userId: UserId,
   name: string,
 ): Promise<Tag> {
   try {
@@ -146,7 +147,7 @@ export async function update(
 /**
  * タグを削除
  */
-export async function deleteById(db: D1Database, tagId: string, userId: string): Promise<void> {
+export async function deleteById(db: D1Database, tagId: TagId, userId: UserId): Promise<void> {
   try {
     // タグの存在確認
     await findById(db, tagId, userId);
@@ -164,8 +165,8 @@ export async function deleteById(db: D1Database, tagId: string, userId: string):
  */
 export async function belongsToUser(
   db: D1Database,
-  tagId: string,
-  userId: string,
+  tagId: TagId,
+  userId: UserId,
 ): Promise<boolean> {
   try {
     const result = await db

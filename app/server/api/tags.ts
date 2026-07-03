@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import type { HonoContext } from "../../types/env";
+import type { BookId, TagId } from "../../types/domain";
 import { tagRepo, bookTagRepo } from "../db/repositories";
 import { authMiddleware } from "../lib/auth";
 import { validator, getValidated } from "../lib/validator";
@@ -53,7 +54,7 @@ app.put("/:id", validator("param", tagIdSchema), validator("json", updateTagSche
   const { id } = getValidated<{ id: string }>(c, "param");
   const data = getValidated<UpdateTagInput>(c, "json");
 
-  const tag = await tagRepo.update(c.env.DB, id, userId, data.name);
+  const tag = await tagRepo.update(c.env.DB, id as TagId, userId, data.name);
 
   return successResponse(c, toTagResponse(tag));
 });
@@ -66,7 +67,7 @@ app.delete("/:id", validator("param", tagIdSchema), async (c) => {
   const userId = c.get("userId");
   const { id } = getValidated<{ id: string }>(c, "param");
 
-  await tagRepo.deleteById(c.env.DB, id, userId);
+  await tagRepo.deleteById(c.env.DB, id as TagId, userId);
 
   return successResponse(c, { deleted: true });
 });
@@ -84,7 +85,7 @@ app.post(
     const { bookId } = getValidated<{ bookId: string }>(c, "param");
     const { tagId } = getValidated<AddTagToBookInput>(c, "json");
 
-    await bookTagRepo.addTagToBook(c.env.DB, bookId, tagId, userId);
+    await bookTagRepo.addTagToBook(c.env.DB, bookId as BookId, tagId as TagId, userId);
 
     return successResponse(c, { added: true }, 201);
   },
@@ -99,7 +100,7 @@ app.delete("/books/:bookId/:tagId", async (c) => {
   const bookId = c.req.param("bookId");
   const tagId = c.req.param("tagId");
 
-  await bookTagRepo.removeTagFromBook(c.env.DB, bookId, tagId, userId);
+  await bookTagRepo.removeTagFromBook(c.env.DB, bookId as BookId, tagId as TagId, userId);
 
   return successResponse(c, { removed: true });
 });
@@ -111,7 +112,7 @@ app.delete("/books/:bookId/:tagId", async (c) => {
 app.get("/books/:bookId", async (c) => {
   const bookId = c.req.param("bookId");
 
-  const tags = await bookTagRepo.findTagsByBookId(c.env.DB, bookId);
+  const tags = await bookTagRepo.findTagsByBookId(c.env.DB, bookId as BookId);
 
   return successResponse(c, tags.map(toTagResponse));
 });

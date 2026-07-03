@@ -1,7 +1,6 @@
-import type { BookStatus } from "./database";
+import type { BookId, OAuthProvider, BookStatus } from "./domain";
 
-// OAuth関連
-export type OAuthProvider = "github" | "google";
+export type { OAuthProvider } from "./domain";
 
 export interface OAuthUser {
   provider: OAuthProvider;
@@ -113,7 +112,7 @@ export interface PublicProfile {
 }
 
 export interface PublicBook {
-  id: string;
+  id: BookId;
   title: string;
   authors: string[];
   publisher: string | null;
