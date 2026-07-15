@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "hono/jsx/dom";
+import { getScrollChromeState } from "../../lib/scroll-chrome";
 
 interface SidebarProps {
   showLogout?: boolean;
@@ -8,6 +9,7 @@ export default function Sidebar({ showLogout = true }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [visible, setVisible] = useState(true);
   const lastScrollTop = useRef(0);
+  const visibleRef = useRef(true);
 
   useEffect(() => {
     const scrollTarget = document.querySelector("main");
@@ -16,9 +18,14 @@ export default function Sidebar({ showLogout = true }: SidebarProps) {
     const layout = document.getElementById("main-layout");
     const onScroll = () => {
       const st = scrollTarget.scrollTop;
-      const show = st <= 10 || st < (lastScrollTop.current ?? 0);
+      const { show, scrolledDataset } = getScrollChromeState({
+        scrollTop: st,
+        lastScrollTop: lastScrollTop.current,
+        currentlyShown: visibleRef.current,
+      });
+      visibleRef.current = show;
       setVisible(show);
-      if (layout) layout.dataset.scrolled = show ? "" : "down";
+      if (layout) layout.dataset.scrolled = scrolledDataset;
       lastScrollTop.current = st;
     };
 
