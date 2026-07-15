@@ -20,8 +20,8 @@ export default function Sidebar({ showLogout = true }: SidebarProps) {
       const st = scrollTarget.scrollTop;
       const { show, scrolledDataset } = getScrollChromeState({
         scrollTop: st,
-        lastScrollTop: lastScrollTop.current,
-        currentlyShown: visibleRef.current,
+        lastScrollTop: lastScrollTop.current ?? 0,
+        currentlyShown: visibleRef.current ?? true,
       });
       visibleRef.current = show;
       setVisible(show);
