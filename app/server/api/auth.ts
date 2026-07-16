@@ -7,7 +7,7 @@ import { validator, getValidated } from "../lib/validator";
 import { oauthProviderParamSchema, oauthCallbackSchema } from "./schemas";
 import type { OAuthProvider, OAuthCallbackInput } from "./schemas/auth";
 import { deleteSession, regenerateSession, SESSION_COOKIE_OPTIONS } from "../lib/session";
-import { toUserResponse } from "../lib/mapper";
+import { toUserDto } from "../lib/mapper";
 import { successResponse, errorResponse } from "../lib/response";
 import * as oauthService from "../services/oauth";
 import { authRateLimiter } from "../lib/rate-limit";
@@ -41,7 +41,7 @@ app.get("/session", authMiddleware, async (c) => {
   const user = c.get("user");
   return successResponse(c, {
     authenticated: true,
-    user: toUserResponse(user),
+    user: toUserDto(user),
   });
 });
 

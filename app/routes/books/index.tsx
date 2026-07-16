@@ -4,7 +4,8 @@ import { Layout } from "../../components/layout/Layout";
 import { Button } from "../../components/ui/Button";
 import BooksStatusTabs from "../../islands/BooksStatusTabs";
 import { bookRepo } from "../../server/db/repositories";
-import type { Book, BookStatus } from "../../types/database";
+import type { BookStatus } from "../../types/book";
+import type { Book } from "../../types/database";
 
 const formatBooks = (bookList: Book[]) =>
   bookList.map((book) => ({

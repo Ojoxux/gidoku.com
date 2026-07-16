@@ -2,6 +2,12 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { env } from "cloudflare:test";
 import api from "./index";
 import { createTestSession, createTestUser, cleanupDatabase } from "../../test/helpers";
+import type {
+  ErrorResponseDto,
+  SearchBookByIsbnResponseDto,
+  SearchBooksResponseDto,
+  SuccessResponseDto,
+} from "../../types/dto";
 
 describe("Search API Integration", () => {
   beforeEach(async () => {
@@ -30,6 +36,9 @@ describe("Search API Integration", () => {
     );
 
     expect(res.status).toBe(400);
+    const body = (await res.json()) as ErrorResponseDto;
+    expect(body.success).toBe(false);
+    expect(body.error.code).toBe("VALIDATION_ERROR");
   });
 
   it("should return search results sorted by published date", async () => {
@@ -89,14 +98,7 @@ describe("Search API Integration", () => {
     );
 
     expect(res.status).toBe(200);
-    const body = (await res.json()) as {
-      success: boolean;
-      data: {
-        results: Array<{ title: string; publishedDate: string }>;
-        hits: number;
-        pageCount: number;
-      };
-    };
+    const body = (await res.json()) as SuccessResponseDto<SearchBooksResponseDto>;
     expect(body.success).toBe(true);
     expect(body.data.results).toHaveLength(2);
     expect(body.data.results[0].title).toBe("Newer Book");
@@ -118,6 +120,10 @@ describe("Search API Integration", () => {
     );
 
     expect(res.status).toBe(400);
+    const body = (await res.json()) as ErrorResponseDto;
+    expect(body.success).toBe(false);
+    expect(body.error.code).toBe("VALIDATION_ERROR");
+    expect(body.error.details).toBe("Invalid ISBN");
   });
 
   it("should return null when ISBN search has no results", async () => {
@@ -145,7 +151,7 @@ describe("Search API Integration", () => {
     );
 
     expect(res.status).toBe(200);
-    const body = (await res.json()) as { success: boolean; data: null };
+    const body = (await res.json()) as SuccessResponseDto<SearchBookByIsbnResponseDto>;
     expect(body.success).toBe(true);
     expect(body.data).toBeNull();
   });
