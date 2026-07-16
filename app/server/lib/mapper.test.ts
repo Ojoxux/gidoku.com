@@ -2,10 +2,10 @@ import { describe, it, expect } from "vitest";
 import {
   toBookInput,
   toBookUpdateInput,
-  toBookResponse,
+  toBookDto,
   toTagInput,
-  toTagResponse,
-  toUserResponse,
+  toTagDto,
+  toUserDto,
 } from "./mapper";
 import type { Book, Tag, User } from "../../types/database";
 
@@ -70,7 +70,7 @@ describe("toBookUpdateInput", () => {
   });
 });
 
-describe("toBookResponse", () => {
+describe("toBookDto", () => {
   it("should map snake_case DB fields to camelCase API fields", () => {
     const book: Book = {
       id: "book-1",
@@ -93,7 +93,7 @@ describe("toBookResponse", () => {
       updated_at: "2024-01-02T00:00:00.000Z",
     };
 
-    expect(toBookResponse(book)).toEqual({
+    expect(toBookDto(book)).toEqual({
       id: "book-1",
       userId: "user-1",
       rakutenBooksId: "rakuten-1",
@@ -127,7 +127,7 @@ describe("toTagInput", () => {
   });
 });
 
-describe("toTagResponse", () => {
+describe("toTagDto", () => {
   it("should map tag fields to API response", () => {
     const tag: Tag = {
       id: "tag-1",
@@ -136,7 +136,7 @@ describe("toTagResponse", () => {
       created_at: "2024-01-01T00:00:00.000Z",
     };
 
-    expect(toTagResponse(tag)).toEqual({
+    expect(toTagDto(tag)).toEqual({
       id: "tag-1",
       userId: "user-1",
       name: "Rust",
@@ -145,7 +145,7 @@ describe("toTagResponse", () => {
   });
 });
 
-describe("toUserResponse", () => {
+describe("toUserDto", () => {
   it("should map user fields to API response", () => {
     const user: User = {
       id: "user-1",
@@ -160,7 +160,7 @@ describe("toUserResponse", () => {
       updated_at: "2024-01-02T00:00:00.000Z",
     };
 
-    expect(toUserResponse(user)).toEqual({
+    expect(toUserDto(user)).toEqual({
       id: "user-1",
       username: "reader",
       email: "reader@example.com",
