@@ -1,4 +1,5 @@
 import type { Env } from "../types/env";
+import type { BookStatus } from "../types/book";
 
 type D1Database = Env["DB"];
 type KVNamespace = Env["KV"];
@@ -73,9 +74,10 @@ export async function createTestBook(
     id: string;
     title: string;
     authors: string[];
-    status: "unread" | "reading" | "completed";
+    status: BookStatus;
     pageCount: number;
     currentPage: number;
+    memo: string | null;
   }> = {},
 ) {
   const now = new Date().toISOString();
@@ -95,7 +97,7 @@ export async function createTestBook(
     rakuten_affiliate_url: null,
     status: overrides.status || "unread",
     current_page: overrides.currentPage || 0,
-    memo: null,
+    memo: overrides.memo ?? null,
     finished_at: null,
     created_at: now,
     updated_at: now,

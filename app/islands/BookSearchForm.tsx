@@ -1,34 +1,10 @@
 import { useState } from "hono/jsx";
-
-interface SearchResult {
-  rakutenBooksId: string;
-  title: string;
-  authors: string[];
-  publisher: string;
-  publishedDate: string;
-  isbn: string;
-  pageCount: number;
-  description: string;
-  thumbnailUrl: string;
-  rakutenAffiliateUrl: string;
-}
-
-interface ApiResponse<T = unknown> {
-  success: boolean;
-  data?: T;
-  error?: { message: string };
-}
-
-interface SearchResponse {
-  results: SearchResult[];
-  hits: number;
-  pageCount: number;
-  currentPage: number;
-}
+import type { BookDto, BookSearchResultDto, SearchBooksResponseDto } from "../types/dto";
+import { readApiResponse } from "../lib/api-client";
 
 export default function BookSearchForm() {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SearchResult[]>([]);
+  const [results, setResults] = useState<BookSearchResultDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -44,9 +20,9 @@ export default function BookSearchForm() {
 
     try {
       const res = await fetch(`/api/search/books?query=${encodeURIComponent(query)}&page=1`);
-      const data = (await res.json()) as ApiResponse<SearchResponse>;
+      const data = await readApiResponse<SearchBooksResponseDto>(res);
 
-      if (data.success && data.data) {
+      if (data.success) {
         setResults(data.data.results);
         setHasMore(data.data.currentPage < data.data.pageCount);
         setCurrentPage(data.data.currentPage);
@@ -70,12 +46,12 @@ export default function BookSearchForm() {
       const res = await fetch(
         `/api/search/books?query=${encodeURIComponent(query)}&page=${nextPage}`,
       );
-      const data = (await res.json()) as ApiResponse<SearchResponse>;
+      const data = await readApiResponse<SearchBooksResponseDto>(res);
 
-      if (data.success && data.data) {
-        setResults((prev) => [...prev, ...data.data!.results]);
+      if (data.success) {
+        setResults((prev) => [...prev, ...data.data.results]);
         setCurrentPage(nextPage);
-        setHasMore(nextPage < data.data!.pageCount);
+        setHasMore(nextPage < data.data.pageCount);
       } else {
         setError(data.error?.message || "読み込みに失敗しました");
       }
@@ -86,7 +62,7 @@ export default function BookSearchForm() {
     }
   };
 
-  const handleSelect = async (book: SearchResult) => {
+  const handleSelect = async (book: BookSearchResultDto) => {
     try {
       const res = await fetch("/api/books", {
         method: "POST",
@@ -106,9 +82,9 @@ export default function BookSearchForm() {
         }),
       });
 
-      const data = (await res.json()) as ApiResponse<{ id: string }>;
+      const data = await readApiResponse<BookDto>(res);
 
-      if (data.success && data.data) {
+      if (data.success) {
         window.location.href = `/books/${data.data.id}`;
       } else {
         alert(data.error?.message || "登録に失敗しました");

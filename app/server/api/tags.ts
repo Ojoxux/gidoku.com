@@ -11,7 +11,7 @@ import {
   bookIdParamSchema,
 } from "./schemas";
 import type { CreateTagInput, UpdateTagInput, AddTagToBookInput } from "./schemas/tag";
-import { toTagInput, toTagResponse } from "../lib/mapper";
+import { toTagDto, toTagInput } from "../lib/mapper";
 import { successResponse } from "../lib/response";
 
 const app = new Hono<HonoContext>();
@@ -27,7 +27,7 @@ app.get("/", async (c) => {
   const userId = c.get("userId");
   const tags = await tagRepo.findByUserId(c.env.DB, userId);
 
-  return successResponse(c, tags.map(toTagResponse));
+  return successResponse(c, tags.map(toTagDto));
 });
 
 /**
@@ -41,7 +41,7 @@ app.post("/", validator("json", createTagSchema), async (c) => {
   const tagInput = toTagInput(data, userId);
   const tag = await tagRepo.create(c.env.DB, tagInput);
 
-  return successResponse(c, toTagResponse(tag), 201);
+  return successResponse(c, toTagDto(tag), 201);
 });
 
 /**
@@ -55,7 +55,7 @@ app.put("/:id", validator("param", tagIdSchema), validator("json", updateTagSche
 
   const tag = await tagRepo.update(c.env.DB, id, userId, data.name);
 
-  return successResponse(c, toTagResponse(tag));
+  return successResponse(c, toTagDto(tag));
 });
 
 /**
@@ -113,7 +113,7 @@ app.get("/books/:bookId", async (c) => {
 
   const tags = await bookTagRepo.findTagsByBookId(c.env.DB, bookId);
 
-  return successResponse(c, tags.map(toTagResponse));
+  return successResponse(c, tags.map(toTagDto));
 });
 
 export default app;

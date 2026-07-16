@@ -4,7 +4,7 @@ import { authMiddleware } from "../lib/auth";
 import { validator, getValidated } from "../lib/validator";
 import { rakutenSearchSchema, isbnSearchSchema } from "./schemas";
 import type { RakutenSearchInput } from "./schemas/auth";
-import { successResponse } from "../lib/response";
+import { errorResponse, successResponse } from "../lib/response";
 import { isValidISBN } from "../lib/validation";
 import * as rakutenService from "../services/rakuten";
 import { searchRateLimiter } from "../lib/rate-limit";
@@ -27,7 +27,7 @@ app.get("/books", validator("query", rakutenSearchSchema), async (c) => {
 
   // queryがundefinedの場合はエラーを返す
   if (!query) {
-    return c.json({ success: false, error: { message: "検索クエリが指定されていません" } }, 400);
+    return errorResponse(c, "検索クエリが指定されていません", "VALIDATION_ERROR", 400);
   }
 
   const { results, hits, pageCount } = await rakutenService.searchBooks(
@@ -54,17 +54,7 @@ app.get("/books", validator("query", rakutenSearchSchema), async (c) => {
 app.get("/isbn/:isbn", validator("param", isbnSearchSchema), async (c) => {
   const isbn = c.req.param("isbn");
   if (!isValidISBN(isbn)) {
-    return c.json(
-      {
-        success: false,
-        error: {
-          message: "Validation failed",
-          code: "VALIDATION_ERROR",
-          details: "Invalid ISBN",
-        },
-      },
-      400,
-    );
+    return errorResponse(c, "Validation failed", "VALIDATION_ERROR", 400, "Invalid ISBN");
   }
 
   const result = await rakutenService.searchByISBN(isbn, c.env.RAKUTEN_APP_ID);
