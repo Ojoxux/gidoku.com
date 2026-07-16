@@ -21,5 +21,8 @@
     "GITHUB_CLIENT_ID": "Ov23li1W8sYXe7C1fWlR",
     "GOOGLE_CLIENT_ID": "494336925174-ovnmt0b3ssdfqfvgtm1n28va40oau4n1.apps.googleusercontent.com",
     "APP_URL": "https://gidoku.com",
+    "RAKUTEN_APP_ID": "test-rakuten-app-id",
+    "RAKUTEN_ACCESS_KEY": "test-rakuten-access-key",
+    "RAKUTEN_REQUEST_ORIGIN": "https://gidoku.com",
   },
 }

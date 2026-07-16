@@ -1,5 +1,7 @@
 # Rakuten Books API
 RAKUTEN_APP_ID=your_rakuten_application_id
+RAKUTEN_ACCESS_KEY=your_rakuten_access_key
+RAKUTEN_REQUEST_ORIGIN=https://gidoku.com
 
 # GitHub OAuth
 GITHUB_CLIENT_ID=your_github_client_id
@@ -14,5 +16,3 @@ SESSION_SECRET=your_random_secret_key_min_32_chars
 
 # Application URL
 APP_URL=http://localhost:5173
-
-

@@ -8,10 +8,17 @@ describe("rakuten service", () => {
 
   it("should map search results and cap hits", async () => {
     let requestedUrl = "";
+    let requestedAccessKey = "";
+    let requestedOrigin = "";
+    let requestedReferer = "";
     vi.stubGlobal(
       "fetch",
-      vi.fn(async (input: RequestInfo | URL) => {
+      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
         requestedUrl = input.toString();
+        const headers = new Headers(init?.headers);
+        requestedAccessKey = headers.get("accessKey") ?? "";
+        requestedOrigin = headers.get("Origin") ?? "";
+        requestedReferer = headers.get("Referer") ?? "";
         return new Response(
           JSON.stringify({
             Items: [
@@ -37,8 +44,20 @@ describe("rakuten service", () => {
       }),
     );
 
-    const result = await searchBooks("query", "app-id", 20, 1);
+    const result = await searchBooks(
+      "query",
+      "app-id",
+      "access-key",
+      "https://gidoku.com/some/path",
+      20,
+      1,
+    );
     const url = new URL(requestedUrl);
+    expect(url.origin).toBe("https://openapi.rakuten.co.jp");
+    expect(url.searchParams.has("accessKey")).toBe(false);
+    expect(requestedAccessKey).toBe("access-key");
+    expect(requestedOrigin).toBe("https://gidoku.com");
+    expect(requestedReferer).toBe("https://gidoku.com/");
     expect(url.searchParams.get("hits")).toBe("10");
     expect(result.results[0].authors).toEqual(["Author A", "Author B"]);
     expect(result.results[0].pageCount).toBe(320);
@@ -57,7 +76,12 @@ describe("rakuten service", () => {
       ),
     );
 
-    const result = await searchByISBN("9780000000001", "app-id");
+    const result = await searchByISBN(
+      "9780000000001",
+      "app-id",
+      "access-key",
+      "https://gidoku.com",
+    );
     expect(result).toBeNull();
   });
 
@@ -91,16 +115,133 @@ describe("rakuten service", () => {
       ),
     );
 
-    const result = await searchByAuthor("Author", "app-id", 5);
+    const result = await searchByAuthor("Author", "app-id", "access-key", "https://gidoku.com", 5);
     expect(result).toHaveLength(1);
     expect(result[0].title).toBe("Author Book");
+  });
+
+  it.each([429, 503])("should retry a %i response and then succeed", async (status) => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            error: status === 429 ? "too_many_requests" : "service_unavailable",
+            error_description: status === 429 ? "try again soon" : "under maintenance",
+          }),
+          {
+            status,
+            headers: {
+              "Content-Type": "application/json",
+              "Retry-After": "0",
+            },
+          },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ Items: [], pageCount: 0, hits: 0 }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+    const logSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    const result = await searchBooks("query", "app-id", "access-key", "https://gidoku.com");
+
+    expect(result.results).toEqual([]);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining(`"status":${status}`));
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('"willRetry":true'));
+  });
+
+  it("should not retry a non-retryable response", async () => {
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            errors: {
+              errorCode: 400,
+              errorMessage: "accessKey must be present",
+            },
+          }),
+          { status: 400, headers: { "Content-Type": "application/json" } },
+        ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const logSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    await expect(
+      searchBooks("query", "app-id", "access-key", "https://gidoku.com"),
+    ).rejects.toMatchObject({
+      statusCode: 502,
+      code: "EXTERNAL_API_ERROR",
+      message: "Rakuten API returned 400",
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('"upstreamCode":"400"'));
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('"upstreamDescription":"accessKey must be present"'),
+    );
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('"willRetry":false'));
   });
 
   it("should sort by published date desc", () => {
     const sorted = sortByPublishedDateDesc([
       { title: "Old", publishedDate: "2020年1月1日" } as never,
       { title: "New", publishedDate: "2024年1月1日" } as never,
+      { title: "Unknown", publishedDate: "invalid" } as never,
     ]);
     expect(sorted[0].title).toBe("New");
+    expect(sorted[sorted.length - 1].title).toBe("Unknown");
+  });
+
+  it("should parse authors separated by Japanese comma", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        async () =>
+          new Response(
+            JSON.stringify({
+              Items: [
+                {
+                  Item: {
+                    isbn: "9780000000003",
+                    title: "Comma Book",
+                    author: "Author A、Author B",
+                    publisherName: "Publisher",
+                    salesDate: "2024年1月1日",
+                    size: "",
+                    itemCaption: "",
+                    largeImageUrl: "",
+                    affiliateUrl: "",
+                  },
+                },
+              ],
+              pageCount: 1,
+              hits: 1,
+            }),
+            { status: 200, headers: { "Content-Type": "application/json" } },
+          ),
+      ),
+    );
+
+    const result = await searchBooks("query", "app-id", "access-key", "https://gidoku.com");
+    expect(result.results[0].authors).toEqual(["Author A", "Author B"]);
+    expect(result.results[0].pageCount).toBe(0);
+  });
+
+  it("should throw ExternalApiError when API returns non-OK status", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response("error", { status: 500 })),
+    );
+
+    await expect(
+      searchBooks("query", "app-id", "access-key", "https://gidoku.com"),
+    ).rejects.toMatchObject({
+      name: "ExternalApiError",
+      statusCode: 502,
+    });
   });
 });
