@@ -13,21 +13,31 @@
   animation: slide-in 0.2s ease-out;
 }
 
+/*
+ * Mobile scroll chrome: hide the header with transform/opacity only.
+ * Never animate height — that resizes <main> mid-scroll and causes bounce.
+ */
 @media (max-width: 767px) {
   #main-layout header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    background-color: #fff;
     transition:
-      height 0.3s,
-      opacity 0.3s,
-      overflow 0s 0.3s;
+      transform 0.3s ease,
+      opacity 0.3s ease;
   }
+
+  #main-layout main {
+    /* Reserve header space so content never jumps when chrome hides */
+    padding-top: 4rem;
+  }
+
   #main-layout[data-scrolled="down"] header {
-    height: 0;
+    transform: translateY(-100%);
     opacity: 0;
-    overflow: hidden;
     pointer-events: none;
-    transition:
-      height 0.3s,
-      opacity 0.3s,
-      overflow 0s;
   }
 }
