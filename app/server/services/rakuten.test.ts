@@ -226,7 +226,7 @@ describe("rakuten service", () => {
       ),
     );
 
-    const result = await searchBooks("query", "app-id");
+    const result = await searchBooks("query", "app-id", "access-key", "https://gidoku.com");
     expect(result.results[0].authors).toEqual(["Author A", "Author B"]);
     expect(result.results[0].pageCount).toBe(0);
   });
@@ -237,7 +237,9 @@ describe("rakuten service", () => {
       vi.fn(async () => new Response("error", { status: 500 })),
     );
 
-    await expect(searchBooks("query", "app-id")).rejects.toMatchObject({
+    await expect(
+      searchBooks("query", "app-id", "access-key", "https://gidoku.com"),
+    ).rejects.toMatchObject({
       name: "ExternalApiError",
       statusCode: 502,
     });
