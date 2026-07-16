@@ -21,6 +21,8 @@ cp .dev.vars.example .dev.vars
 #### 以下の値を設定してください：
 
 - **RAKUTEN_APP_ID**
+- **RAKUTEN_ACCESS_KEY**
+- **RAKUTEN_REQUEST_ORIGIN**（楽天アプリの「許可するWebサイト」に登録したURLのオリジン）
 - **GITHUB_CLIENT_ID / SECRET / CallbackURL**
 - **GOOGLE_CLIENT_ID / SECRET / CallbackURL**
 

@@ -33,6 +33,8 @@ app.get("/books", validator("query", rakutenSearchSchema), async (c) => {
   const { results, hits, pageCount } = await rakutenService.searchBooks(
     query,
     c.env.RAKUTEN_APP_ID,
+    c.env.RAKUTEN_ACCESS_KEY,
+    c.env.RAKUTEN_REQUEST_ORIGIN,
     limit ?? 20,
     page ?? 1,
   );
@@ -57,7 +59,12 @@ app.get("/isbn/:isbn", validator("param", isbnSearchSchema), async (c) => {
     return errorResponse(c, "Validation failed", "VALIDATION_ERROR", 400, "Invalid ISBN");
   }
 
-  const result = await rakutenService.searchByISBN(isbn, c.env.RAKUTEN_APP_ID);
+  const result = await rakutenService.searchByISBN(
+    isbn,
+    c.env.RAKUTEN_APP_ID,
+    c.env.RAKUTEN_ACCESS_KEY,
+    c.env.RAKUTEN_REQUEST_ORIGIN,
+  );
 
   if (!result) {
     return successResponse(c, null);
