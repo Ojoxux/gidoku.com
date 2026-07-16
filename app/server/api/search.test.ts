@@ -123,7 +123,7 @@ describe("Search API Integration", () => {
     const body = (await res.json()) as ErrorResponseDto;
     expect(body.success).toBe(false);
     expect(body.error.code).toBe("VALIDATION_ERROR");
-    expect(body.error.details).toBe("Invalid ISBN");
+    expect(body.error.details).toContain("isbn must be matched");
   });
 
   it("should return null when ISBN search has no results", async () => {
