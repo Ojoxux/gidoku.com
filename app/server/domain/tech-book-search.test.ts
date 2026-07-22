@@ -4,13 +4,13 @@ import { calculateTechScore, rankTechBooks } from "./tech-book-search";
 
 const TEST_NOW = new Date(2026, 5, 29);
 
-function createBook(overrides: Partial<BookSearchResult>): BookSearchResult {
+function createBook(overrides: Partial<BookSearchResult> = {}): BookSearchResult {
   return {
     rakutenBooksId: "9780000000000",
     title: "Untitled",
     authors: [],
     publisher: "",
-    publishedDate: "2024年1月1日",
+    publishedDate: "",
     isbn: "9780000000000",
     pageCount: 200,
     description: "",
@@ -20,23 +20,15 @@ function createBook(overrides: Partial<BookSearchResult>): BookSearchResult {
   };
 }
 
-function publishedYearsAgo(years: number, now: Date = TEST_NOW): string {
-  const date = new Date(now);
-  date.setFullYear(date.getFullYear() - years);
-
-  return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
-}
-
 describe("calculateTechScore", () => {
   it("should add score reasons for technical publishers and keywords", () => {
-    const result = calculateTechScore(
-      createBook({
-        title: "詳解 TypeScript",
-        publisher: "技術評論社",
-        description: "JavaScriptとReactを使ったWeb開発を解説します",
-      }),
-      "typescript",
-    );
+    const book = createBook({
+      title: "詳解 TypeScript",
+      publisher: "技術評論社",
+      description: "JavaScriptとReactを使ったWeb開発を解説します",
+    });
+
+    const result = calculateTechScore(book, "typescript", { now: TEST_NOW });
 
     expect(result.techScore).toBeGreaterThan(0);
     expect(result.scoreReasons).toEqual(
@@ -47,99 +39,341 @@ describe("calculateTechScore", () => {
         { type: "description_keyword", label: "React", score: 6 },
       ]),
     );
-    expect(result.scoreReasons).not.toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ type: "description_keyword", label: "Java" }),
-      ]),
-    );
   });
 
-  it("should strongly prefer exact ISBN matches", () => {
-    const result = calculateTechScore(createBook({ isbn: "978-4-87311-565-8" }), "9784873115658");
+  it.each([
+    {
+      caseName: "hyphens in the stored ISBN",
+      isbn: "978-4-87311-565-8",
+      query: "9784873115658",
+    },
+    {
+      caseName: "hyphens in the search query",
+      isbn: "9784873115658",
+      query: "978-4-87311-565-8",
+    },
+    {
+      caseName: "spaces around ISBN groups",
+      isbn: "978 4 87311 565 8",
+      query: "9784873115658",
+    },
+  ])("should add 100 points for an exact ISBN match with $caseName", ({ isbn, query }) => {
+    const result = calculateTechScore(createBook({ isbn }), query, { now: TEST_NOW });
 
-    expect(result.techScore).toBeGreaterThanOrEqual(100);
-    expect(result.scoreReasons[0]).toEqual({
+    expect(result.scoreReasons).toContainEqual({
       type: "isbn_exact_match",
-      label: "978-4-87311-565-8",
+      label: isbn,
       score: 100,
     });
   });
 
-  it("should penalize non-technical signals", () => {
+  it("should not add an ISBN score when the query does not match", () => {
+    const result = calculateTechScore(createBook({ isbn: "9784873115658" }), "9784873119038", {
+      now: TEST_NOW,
+    });
+
+    expect(result.scoreReasons).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ type: "isbn_exact_match" })]),
+    );
+  });
+
+  it("should not treat empty ISBN values as an exact match", () => {
+    const result = calculateTechScore(createBook({ isbn: "" }), "", { now: TEST_NOW });
+
+    expect(result.scoreReasons).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ type: "isbn_exact_match" })]),
+    );
+  });
+
+  it.each([
+    { publisher: "技術評論社", expectedLabel: "技術評論社" },
+    { publisher: "技術 評論社", expectedLabel: "技術評論社" },
+    { publisher: "日経bp", expectedLabel: "日経BP" },
+  ])("should add 30 points for technical publisher $publisher", ({ publisher, expectedLabel }) => {
+    const result = calculateTechScore(createBook({ publisher }), "query", { now: TEST_NOW });
+
+    expect(result.scoreReasons).toContainEqual({
+      type: "tech_publisher",
+      label: expectedLabel,
+      score: 30,
+    });
+  });
+
+  it("should not add a publisher score for an unrelated publisher", () => {
+    const result = calculateTechScore(createBook({ publisher: "一般出版社" }), "query", {
+      now: TEST_NOW,
+    });
+
+    expect(result.scoreReasons).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ type: "tech_publisher" })]),
+    );
+  });
+
+  it.each([
+    {
+      caseName: "title",
+      overrides: { title: "Docker入門" },
+      expectedType: "title_keyword",
+      expectedScore: 15,
+    },
+    {
+      caseName: "description",
+      overrides: { description: "Dockerを使った開発" },
+      expectedType: "description_keyword",
+      expectedScore: 6,
+    },
+    {
+      caseName: "authors",
+      overrides: { authors: ["Docker研究会"] },
+      expectedType: "author_keyword",
+      expectedScore: 4,
+    },
+  ])(
+    "should detect a technical keyword in $caseName",
+    ({ overrides, expectedType, expectedScore }) => {
+      const result = calculateTechScore(createBook(overrides), "query", { now: TEST_NOW });
+
+      expect(result.scoreReasons).toContainEqual({
+        type: expectedType,
+        label: "Docker",
+        score: expectedScore,
+      });
+    },
+  );
+
+  it("should match ASCII keywords without case sensitivity", () => {
+    const result = calculateTechScore(createBook({ title: "docker入門" }), "query", {
+      now: TEST_NOW,
+    });
+
+    expect(result.scoreReasons).toContainEqual({
+      type: "title_keyword",
+      label: "Docker",
+      score: 15,
+    });
+  });
+
+  it.each([
+    { title: "Googleサービス仕事術", unrelatedKeyword: "Go" },
+    { title: "JavaScript入門", unrelatedKeyword: "Java" },
+  ])(
+    "should not match $unrelatedKeyword inside an unrelated word",
+    ({ title, unrelatedKeyword }) => {
+      const result = calculateTechScore(createBook({ title }), "query", { now: TEST_NOW });
+
+      expect(result.scoreReasons).not.toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ type: "title_keyword", label: unrelatedKeyword }),
+        ]),
+      );
+    },
+  );
+
+  it.each([
+    { keyword: "漫画", score: -40 },
+    { keyword: "小説", score: -40 },
+    { keyword: "レシピ", score: -40 },
+  ])("should penalize the non-technical title keyword $keyword", ({ keyword, score }) => {
+    const result = calculateTechScore(createBook({ title: `${keyword}入門` }), "query", {
+      now: TEST_NOW,
+    });
+
+    expect(result.scoreReasons).toContainEqual({
+      type: "negative_title_keyword",
+      label: keyword,
+      score,
+    });
+  });
+
+  it.each([
+    { keyword: "コミック", score: -15 },
+    { keyword: "料理", score: -15 },
+    { keyword: "ムック", score: -15 },
+  ])("should penalize the non-technical description keyword $keyword", ({ keyword, score }) => {
     const result = calculateTechScore(
-      createBook({
-        title: "人気漫画で学ぶ旅行レシピ",
-        description: "コミックと料理のムック",
-      }),
-      "旅行",
+      createBook({ description: `${keyword}として紹介` }),
+      "query",
+      {
+        now: TEST_NOW,
+      },
     );
 
-    expect(result.techScore).toBeLessThan(0);
+    expect(result.scoreReasons).toContainEqual({
+      type: "negative_description_keyword",
+      label: keyword,
+      score,
+    });
+  });
+
+  it("should sum positive and negative score rules", () => {
+    const result = calculateTechScore(createBook({ title: "Dockerレシピ" }), "query", {
+      now: TEST_NOW,
+    });
+
+    expect(result.techScore).toBe(-25);
     expect(result.scoreReasons).toEqual(
       expect.arrayContaining([
-        { type: "negative_title_keyword", label: "漫画", score: -40 },
+        { type: "title_keyword", label: "Docker", score: 15 },
         { type: "negative_title_keyword", label: "レシピ", score: -40 },
-        { type: "negative_description_keyword", label: "コミック", score: -15 },
       ]),
     );
   });
 
-  it("should not match short ascii keywords inside unrelated words", () => {
-    const result = calculateTechScore(
-      createBook({
-        title: "Googleサービス仕事術",
-        description: "",
-      }),
-      "google",
-    );
+  it("should penalize a missing page count", () => {
+    const result = calculateTechScore(createBook({ pageCount: 0 }), "query", { now: TEST_NOW });
 
-    expect(result.scoreReasons).not.toEqual(
-      expect.arrayContaining([expect.objectContaining({ type: "title_keyword", label: "Go" })]),
-    );
-  });
-
-  it("should add recency bonus and old publication penalty", () => {
-    const recent = calculateTechScore(
-      createBook({ publishedDate: publishedYearsAgo(0) }),
-      "query",
-      { now: TEST_NOW },
-    );
-    const old = calculateTechScore(createBook({ publishedDate: publishedYearsAgo(11) }), "query", {
-      now: TEST_NOW,
-    });
-
-    expect(recent.scoreReasons).toContainEqual({
-      type: "recent_publication",
-      label: "1年以内",
-      score: 12,
-    });
-    expect(old.scoreReasons).toContainEqual({
-      type: "old_publication",
-      label: "10年以上前",
+    expect(result.techScore).toBe(-5);
+    expect(result.scoreReasons).toContainEqual({
+      type: "missing_page_count",
+      label: "pageCount",
       score: -5,
     });
   });
+
+  it("should not penalize a book with a page count", () => {
+    const result = calculateTechScore(createBook({ pageCount: 1 }), "query", { now: TEST_NOW });
+
+    expect(result.techScore).toBe(0);
+    expect(result.scoreReasons).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ type: "missing_page_count" })]),
+    );
+  });
+
+  it("should return zero when the book has no scoring signals", () => {
+    const result = calculateTechScore(createBook(), "query", { now: TEST_NOW });
+
+    expect(result).toEqual({ techScore: 0, scoreReasons: [] });
+  });
+
+  it.each([
+    {
+      publishedDate: "2026年6月29日",
+      expectedReason: { type: "recent_publication", label: "1年以内", score: 12 },
+    },
+    {
+      publishedDate: "2025年6月30日",
+      expectedReason: { type: "recent_publication", label: "1年以内", score: 12 },
+    },
+    {
+      publishedDate: "2025年6月28日",
+      expectedReason: { type: "recent_publication", label: "3年以内", score: 8 },
+    },
+    {
+      publishedDate: "2023年6月30日",
+      expectedReason: { type: "recent_publication", label: "3年以内", score: 8 },
+    },
+    {
+      publishedDate: "2023年6月28日",
+      expectedReason: { type: "recent_publication", label: "5年以内", score: 4 },
+    },
+    {
+      publishedDate: "2021年6月30日",
+      expectedReason: { type: "recent_publication", label: "5年以内", score: 4 },
+    },
+    { publishedDate: "2020年6月29日", expectedReason: null },
+    {
+      publishedDate: "2016年6月28日",
+      expectedReason: { type: "old_publication", label: "10年以上前", score: -5 },
+    },
+  ])(
+    "should classify publication date $publishedDate at a recency boundary",
+    ({ publishedDate, expectedReason }) => {
+      const result = calculateTechScore(createBook({ publishedDate }), "query", {
+        now: TEST_NOW,
+      });
+
+      if (expectedReason) {
+        expect(result.scoreReasons).toContainEqual(expectedReason);
+      } else {
+        expect(result.scoreReasons).toEqual([]);
+      }
+    },
+  );
+
+  it.each(["", "unknown", "2026/06/29"])(
+    "should ignore unsupported publication date %s",
+    (publishedDate) => {
+      const result = calculateTechScore(createBook({ publishedDate }), "query", {
+        now: TEST_NOW,
+      });
+
+      expect(result.scoreReasons).not.toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            type: expect.stringMatching(/^(recent|old)_publication$/),
+          }),
+        ]),
+      );
+    },
+  );
 });
 
 describe("rankTechBooks", () => {
-  it("should rank technical books before newer non-technical books", () => {
-    const ranked = rankTechBooks(
-      [
-        createBook({
-          title: "新しい小説",
-          publisher: "一般出版社",
-          publishedDate: "2025年1月1日",
-        }),
-        createBook({
-          title: "React設計パターン",
-          publisher: "オライリー・ジャパン",
-          publishedDate: "2020年1月1日",
-        }),
-      ],
-      "react",
-    );
+  it("should rank a technical book before a newer non-technical book", () => {
+    const books = [
+      createBook({
+        title: "新しい小説",
+        publisher: "一般出版社",
+        publishedDate: "2025年1月1日",
+      }),
+      createBook({
+        title: "React設計パターン",
+        publisher: "オライリー・ジャパン",
+        publishedDate: "2020年1月1日",
+      }),
+    ];
+
+    const ranked = rankTechBooks(books, "react", { now: TEST_NOW });
 
     expect(ranked[0].title).toBe("React設計パターン");
+    expect(ranked[0].techScore).toBeGreaterThan(ranked[1].techScore);
+  });
+
+  it("should sort books by technical score in descending order", () => {
+    const books = [
+      createBook({ title: "Neutral Book" }),
+      createBook({ title: "Docker入門" }),
+      createBook({ title: "TypeScript入門", publisher: "技術評論社" }),
+    ];
+
+    const ranked = rankTechBooks(books, "query", { now: TEST_NOW });
+
+    expect(ranked.map((book) => book.title)).toEqual([
+      "TypeScript入門",
+      "Docker入門",
+      "Neutral Book",
+    ]);
+  });
+
+  it("should prefer the newer publication when technical scores are tied", () => {
+    const books = [
+      createBook({ title: "Older", publishedDate: "2019年1月1日" }),
+      createBook({ title: "Newer", publishedDate: "2020年1月1日" }),
+    ];
+
+    const ranked = rankTechBooks(books, "query", { now: TEST_NOW });
+
+    expect(ranked.map((book) => book.title)).toEqual(["Newer", "Older"]);
+    expect(ranked[0].techScore).toBe(ranked[1].techScore);
+  });
+
+  it("should place an unknown publication date after a valid date when scores are tied", () => {
+    const books = [
+      createBook({ title: "Unknown", publishedDate: "unknown" }),
+      createBook({ title: "Known", publishedDate: "2020年1月1日" }),
+    ];
+
+    const ranked = rankTechBooks(books, "query", { now: TEST_NOW });
+
+    expect(ranked.map((book) => book.title)).toEqual(["Known", "Unknown"]);
+  });
+
+  it("should omit score reasons by default", () => {
+    const ranked = rankTechBooks([createBook({ title: "Docker入門" })], "docker", {
+      now: TEST_NOW,
+    });
+
+    expect(ranked[0].techScore).toBeGreaterThan(0);
     expect(ranked[0].scoreReasons).toBeUndefined();
   });
 
@@ -147,7 +381,7 @@ describe("rankTechBooks", () => {
     const ranked = rankTechBooks(
       [createBook({ title: "Docker入門", publisher: "翔泳社" })],
       "docker",
-      { includeReasons: true },
+      { includeReasons: true, now: TEST_NOW },
     );
 
     expect(ranked[0].scoreReasons).toEqual(
@@ -158,25 +392,29 @@ describe("rankTechBooks", () => {
     );
   });
 
-  it("should prefer newer books when technical scores are otherwise similar", () => {
-    const ranked = rankTechBooks(
-      [
-        createBook({
-          title: "React設計パターン",
-          publisher: "技術評論社",
-          publishedDate: publishedYearsAgo(8),
-        }),
-        createBook({
-          title: "React設計パターン 改訂版",
-          publisher: "技術評論社",
-          publishedDate: publishedYearsAgo(0),
-        }),
-      ],
-      "react",
-      { now: TEST_NOW },
-    );
+  it("should not mutate the input array or its books", () => {
+    const books = [createBook({ title: "Neutral Book" }), createBook({ title: "Docker入門" })];
+    const originalBooks = structuredClone(books);
 
-    expect(ranked[0].title).toBe("React設計パターン 改訂版");
-    expect(ranked[0].techScore).toBeGreaterThan(ranked[1].techScore);
+    const ranked = rankTechBooks(books, "query", { now: TEST_NOW });
+
+    expect(books).toEqual(originalBooks);
+    expect(ranked).not.toBe(books);
+    expect(ranked.every((book) => !books.includes(book))).toBe(true);
+  });
+
+  it("should return an empty array for an empty search result", () => {
+    const ranked = rankTechBooks([], "query", { now: TEST_NOW });
+
+    expect(ranked).toEqual([]);
+  });
+
+  it("should add a technical score to a single book", () => {
+    const ranked = rankTechBooks([createBook({ title: "Docker入門" })], "query", {
+      now: TEST_NOW,
+    });
+
+    expect(ranked).toHaveLength(1);
+    expect(ranked[0]).toMatchObject({ title: "Docker入門", techScore: 15 });
   });
 });
