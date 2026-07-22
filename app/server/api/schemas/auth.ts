@@ -27,6 +27,7 @@ export const rakutenSearchSchema = type({
   query: "1 <= string <= 100",
   "limit?": "1 <= (number % 1) <= 10",
   "page?": "1 <= (number % 1) <= 1000", // 追加
+  "debug?": "'1' | 'true' | '0' | 'false'",
 });
 
 /**

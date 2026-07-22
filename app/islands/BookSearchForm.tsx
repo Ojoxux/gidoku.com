@@ -1,10 +1,11 @@
 import { useState } from "hono/jsx";
-import type { BookDto, BookSearchResultDto, SearchBooksResponseDto } from "../types/dto";
+import { mergeRankedSearchResults } from "../lib/book-search-ranking";
 import { readApiResponse } from "../lib/api-client";
+import type { BookDto, ScoredBookSearchResultDto, SearchBooksResponseDto } from "../types/dto";
 
 export default function BookSearchForm() {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<BookSearchResultDto[]>([]);
+  const [results, setResults] = useState<ScoredBookSearchResultDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -49,7 +50,7 @@ export default function BookSearchForm() {
       const data = await readApiResponse<SearchBooksResponseDto>(res);
 
       if (data.success) {
-        setResults((prev) => [...prev, ...data.data.results]);
+        setResults((currentResults) => mergeRankedSearchResults(currentResults, data.data.results));
         setCurrentPage(nextPage);
         setHasMore(nextPage < data.data.pageCount);
       } else {
@@ -62,7 +63,7 @@ export default function BookSearchForm() {
     }
   };
 
-  const handleSelect = async (book: BookSearchResultDto) => {
+  const handleSelect = async (book: ScoredBookSearchResultDto) => {
     try {
       const res = await fetch("/api/books", {
         method: "POST",
