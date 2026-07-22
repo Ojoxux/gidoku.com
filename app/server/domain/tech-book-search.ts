@@ -1,4 +1,5 @@
 import type { BookSearchResult } from "../services/rakuten";
+import { compareRankedSearchResults, parsePublishedDate } from "../../lib/book-search-ranking";
 
 export type ScoreReasonType =
   | "isbn_exact_match"
@@ -218,13 +219,7 @@ export function rankTechBooks(
 
       return scoredBook;
     })
-    .sort((before, after) => {
-      if (before.techScore !== after.techScore) {
-        return after.techScore - before.techScore;
-      }
-
-      return comparePublishedDateDesc(before.publishedDate, after.publishedDate);
-    });
+    .toSorted(compareRankedSearchResults);
 }
 
 export function calculateTechScore(
@@ -515,26 +510,4 @@ function getPublicationRecencyReason(publishedDate: string, now: Date): ScoreRea
 function yearsBetween(start: Date, end: Date): number {
   const millisecondsPerYear = 365.25 * 24 * 60 * 60 * 1000;
   return (end.getTime() - start.getTime()) / millisecondsPerYear;
-}
-
-function comparePublishedDateDesc(before: string, after: string): number {
-  const beforeDate = parsePublishedDate(before);
-  const afterDate = parsePublishedDate(after);
-
-  if (!beforeDate && !afterDate) return 0;
-  if (!beforeDate) return 1;
-  if (!afterDate) return -1;
-
-  return afterDate.getTime() - beforeDate.getTime();
-}
-
-function parsePublishedDate(publishedDate: string): Date | null {
-  if (!publishedDate) return null;
-
-  const match = publishedDate.match(/(\d{4})年(?:\s*(\d{1,2})月)?(?:\s*(\d{1,2})日)?/);
-  if (!match) return null;
-
-  const [, year, month, day] = match;
-
-  return new Date(Number(year), Number(month ?? 1) - 1, Number(day ?? 1));
 }

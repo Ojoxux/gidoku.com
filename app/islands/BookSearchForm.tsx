@@ -1,4 +1,5 @@
 import { useState } from "hono/jsx";
+import { mergeRankedSearchResults } from "../lib/book-search-ranking";
 
 interface SearchResult {
   rakutenBooksId: string;
@@ -11,6 +12,7 @@ interface SearchResult {
   description: string;
   thumbnailUrl: string;
   rakutenAffiliateUrl: string;
+  techScore: number;
 }
 
 interface ApiResponse<T = unknown> {
@@ -73,7 +75,9 @@ export default function BookSearchForm() {
       const data = (await res.json()) as ApiResponse<SearchResponse>;
 
       if (data.success && data.data) {
-        setResults((prev) => [...prev, ...data.data!.results]);
+        setResults((currentResults) =>
+          mergeRankedSearchResults(currentResults, data.data!.results),
+        );
         setCurrentPage(nextPage);
         setHasMore(nextPage < data.data!.pageCount);
       } else {
