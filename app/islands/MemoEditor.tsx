@@ -1,13 +1,10 @@
 import { useState } from "hono/jsx";
+import { getApiErrorMessage, readApiResponse } from "../lib/api-client";
+import type { BookDto } from "../types/dto";
 
 interface MemoEditorProps {
   bookId: string;
   initialMemo: string;
-}
-
-interface ApiResponse {
-  success: boolean;
-  error?: { message: string };
 }
 
 export default function MemoEditor({ bookId, initialMemo }: MemoEditorProps) {
@@ -32,8 +29,8 @@ export default function MemoEditor({ bookId, initialMemo }: MemoEditorProps) {
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);
       } else {
-        const data = (await res.json()) as ApiResponse;
-        alert(data.error?.message || "保存に失敗しました");
+        const data = await readApiResponse<BookDto>(res);
+        alert(getApiErrorMessage(data, "保存に失敗しました"));
       }
     } catch {
       alert("保存中にエラーが発生しました");

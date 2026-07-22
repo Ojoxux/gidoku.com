@@ -8,7 +8,7 @@ import {
   createTestTag,
 } from "../../test/helpers";
 import type { SuccessResponse } from "../lib/response";
-import type { TagResponse } from "../../types/database";
+import type { AddBookTagResponseDto, RemoveBookTagResponseDto, TagDto } from "../../types/dto";
 
 describe("Tags API Integration", () => {
   let userId: string;
@@ -36,7 +36,7 @@ describe("Tags API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<TagResponse[]>;
+      const body = (await res.json()) as SuccessResponse<TagDto[]>;
       expect(body.success).toBe(true);
       expect(body.data).toEqual([]);
     });
@@ -54,7 +54,7 @@ describe("Tags API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<TagResponse[]>;
+      const body = (await res.json()) as SuccessResponse<TagDto[]>;
       expect(body.data).toHaveLength(2);
     });
   });
@@ -75,7 +75,7 @@ describe("Tags API Integration", () => {
       );
 
       expect(res.status).toBe(201);
-      const body = (await res.json()) as SuccessResponse<TagResponse>;
+      const body = (await res.json()) as SuccessResponse<TagDto>;
       expect(body.success).toBe(true);
       expect(body.data.name).toBe("React");
     });
@@ -99,7 +99,7 @@ describe("Tags API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<TagResponse>;
+      const body = (await res.json()) as SuccessResponse<TagDto>;
       expect(body.data.name).toBe("NewName");
     });
   });
@@ -140,7 +140,7 @@ describe("Tags API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<TagResponse[]>;
+      const body = (await res.json()) as SuccessResponse<TagDto[]>;
       expect(body.data).toHaveLength(1);
     });
 
@@ -162,7 +162,7 @@ describe("Tags API Integration", () => {
       );
 
       expect(res.status).toBe(201);
-      const body = (await res.json()) as SuccessResponse<{ added: boolean }>;
+      const body = (await res.json()) as SuccessResponse<AddBookTagResponseDto>;
       expect(body.data.added).toBe(true);
     });
 
@@ -183,7 +183,7 @@ describe("Tags API Integration", () => {
       );
 
       expect(res.status).toBe(200);
-      const body = (await res.json()) as SuccessResponse<{ removed: boolean }>;
+      const body = (await res.json()) as SuccessResponse<RemoveBookTagResponseDto>;
       expect(body.data.removed).toBe(true);
     });
   });

@@ -1,4 +1,4 @@
-import type { BookSearchResult } from "../services/rakuten";
+import type { BookSearchResultDto as BookSearchResult } from "../../types/dto";
 import { compareRankedSearchResults, parsePublishedDate } from "../../lib/book-search-ranking";
 
 export type ScoreReasonType =

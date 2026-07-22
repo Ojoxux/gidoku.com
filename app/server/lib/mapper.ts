@@ -1,13 +1,5 @@
-import type {
-  Book,
-  BookInput,
-  BookResponse,
-  Tag,
-  TagInput,
-  TagResponse,
-  User,
-  UserResponse,
-} from "../../types/database";
+import type { Book, BookInput, Tag, TagInput, User } from "../../types/database";
+import type { BookDto, PublicBookDto, TagDto, UserDto } from "../../types/dto";
 import type { CreateBookInput, UpdateBookInput } from "../api/schemas/book";
 import type { CreateTagInput } from "../api/schemas/tag";
 import { removeUndefined } from "./utils";
@@ -64,7 +56,7 @@ export function toBookUpdateInput(data: UpdateBookInput): Partial<BookInput> {
 /**
  * DB形式のBookをAPI形式に変換
  */
-export function toBookResponse(book: Book): BookResponse {
+export function toBookDto(book: Book): BookDto {
   return {
     id: book.id,
     userId: book.user_id,
@@ -88,6 +80,29 @@ export function toBookResponse(book: Book): BookResponse {
 }
 
 /**
+ * DB形式のBookを公開プロフィール用のAPI形式に変換
+ */
+export function toPublicBookDto(book: Book): PublicBookDto {
+  return {
+    id: book.id,
+    title: book.title,
+    authors: JSON.parse(book.authors),
+    publisher: book.publisher,
+    publishedDate: book.published_date,
+    isbn: book.isbn,
+    pageCount: book.page_count,
+    description: book.description,
+    thumbnailUrl: book.thumbnail_url,
+    status: book.status,
+    currentPage: book.current_page,
+    memo: null,
+    finishedAt: book.finished_at,
+    createdAt: book.created_at,
+    updatedAt: book.updated_at,
+  };
+}
+
+/**
  * API入力からTagInputへ変換
  */
 export function toTagInput(data: CreateTagInput, userId: string): TagInput {
@@ -102,7 +117,7 @@ export function toTagInput(data: CreateTagInput, userId: string): TagInput {
 /**
  * DB形式のTagをAPI形式に変換
  */
-export function toTagResponse(tag: Tag): TagResponse {
+export function toTagDto(tag: Tag): TagDto {
   return {
     id: tag.id,
     userId: tag.user_id,
@@ -114,7 +129,7 @@ export function toTagResponse(tag: Tag): TagResponse {
 /**
  * DB形式のUserをAPI形式に変換
  */
-export function toUserResponse(user: User): UserResponse {
+export function toUserDto(user: User): UserDto {
   return {
     id: user.id,
     username: user.username,

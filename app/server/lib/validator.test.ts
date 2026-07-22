@@ -35,4 +35,28 @@ describe("validator middleware", () => {
     const body = (await res.json()) as { title: string };
     expect(body.title).toBe("Test");
   });
+
+  it("should return 400 when validation fails", async () => {
+    const app = new Hono();
+    const schema = type({ title: "string" });
+    app.post("/json", validator("json", schema), (c) => c.json(getValidated(c, "json")));
+
+    const res = await app.request(
+      "/json",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      },
+      env,
+    );
+    expect(res.status).toBe(400);
+
+    const body = (await res.json()) as {
+      success: boolean;
+      error: { code: string };
+    };
+    expect(body.success).toBe(false);
+    expect(body.error.code).toBe("VALIDATION_ERROR");
+  });
 });

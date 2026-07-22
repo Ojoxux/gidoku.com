@@ -180,11 +180,10 @@ describe("Book Repository", () => {
     it("should return zeros for user with no books", async () => {
       const stats = await bookRepo.getStats(env.DB, userId);
 
-      // D1 returns null for SUM of empty result, so we check for 0 or null
       expect(stats.total).toBe(0);
-      expect(stats.reading ?? 0).toBe(0);
-      expect(stats.completed ?? 0).toBe(0);
-      expect(stats.unread ?? 0).toBe(0);
+      expect(stats.reading).toBe(0);
+      expect(stats.completed).toBe(0);
+      expect(stats.unread).toBe(0);
     });
   });
 

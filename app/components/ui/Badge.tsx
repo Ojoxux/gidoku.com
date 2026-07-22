@@ -1,5 +1,5 @@
 import type { FC, PropsWithChildren } from "hono/jsx";
-import type { BookStatus } from "../../types/database";
+import type { BookStatus } from "../../types/book";
 
 type BadgeVariant = "default" | "success" | "warning" | "info" | "danger";
 

@@ -1,19 +1,7 @@
 import { ExternalApiError } from "../lib/errors";
+import type { BookSearchResultDto } from "../../types/dto";
 
-export interface BookSearchResult {
-  rakutenBooksId: string;
-  title: string;
-  authors: string[];
-  publisher: string;
-  publishedDate: string;
-  isbn: string;
-  pageCount: number;
-  description: string;
-  thumbnailUrl: string;
-  rakutenAffiliateUrl: string;
-}
-
-interface RakutenBookItem {
+interface RakutenBookApiItem {
   isbn: string;
   title: string;
   author: string;
@@ -25,13 +13,30 @@ interface RakutenBookItem {
   affiliateUrl: string;
 }
 
-interface RakutenBookResponse {
-  Items: Array<{ Item: RakutenBookItem }>;
+interface RakutenBookApiResponse {
+  Items: Array<{ Item: RakutenBookApiItem }>;
   pageCount: number;
   hits: number;
 }
 
-const RAKUTEN_API_BASE = "https://app.rakuten.co.jp/services/api/BooksBook/Search/20170404";
+interface RakutenApiErrorResponse {
+  error?: string;
+  error_description?: string;
+  errors?: {
+    errorCode?: number | string;
+    errorMessage?: string;
+  };
+}
+
+interface RakutenApiErrorDetails {
+  code?: string;
+  description?: string;
+}
+
+const RAKUTEN_API_BASE = "https://openapi.rakuten.co.jp/services/api/BooksBook/Search/20170404";
+const MAX_ATTEMPTS = 3;
+const MAX_RETRY_DELAY_MS = 5_000;
+const RETRYABLE_STATUSES = new Set([429, 503]);
 
 /**
  * 楽天ブックスAPIで書籍を検索
@@ -39,35 +44,25 @@ const RAKUTEN_API_BASE = "https://app.rakuten.co.jp/services/api/BooksBook/Searc
 export async function searchBooks(
   query: string,
   applicationId: string,
+  accessKey: string,
+  requestOrigin: string,
   limit: number = 20,
   page: number = 1,
-): Promise<{ results: BookSearchResult[]; hits: number; pageCount: number }> {
-  // 戻り値を変更
+): Promise<{ results: BookSearchResultDto[]; hits: number; pageCount: number }> {
   const url = new URL(RAKUTEN_API_BASE);
   url.searchParams.set("applicationId", applicationId);
   url.searchParams.set("title", query);
   url.searchParams.set("hits", String(Math.min(limit, 10)));
-  url.searchParams.set("page", String(page)); // 追加
+  url.searchParams.set("page", String(page));
   url.searchParams.set("format", "json");
 
-  try {
-    const response = await fetch(url.toString());
+  const data = await requestRakuten(url, accessKey, requestOrigin, "search_books");
 
-    if (!response.ok) {
-      throw new ExternalApiError(`Rakuten API returned ${response.status}`, "Rakuten");
-    }
-
-    const data: RakutenBookResponse = await response.json();
-
-    return {
-      results: data.Items.map((item) => mapRakutenItem(item.Item)),
-      hits: data.hits,
-      pageCount: data.pageCount,
-    };
-  } catch (error) {
-    if (error instanceof ExternalApiError) throw error;
-    throw new ExternalApiError("Failed to fetch from Rakuten API", "Rakuten", error);
-  }
+  return {
+    results: data.Items.map((item) => mapRakutenItem(item.Item)),
+    hits: data.hits,
+    pageCount: data.pageCount,
+  };
 }
 
 /**
@@ -76,30 +71,21 @@ export async function searchBooks(
 export async function searchByISBN(
   isbn: string,
   applicationId: string,
-): Promise<BookSearchResult | null> {
+  accessKey: string,
+  requestOrigin: string,
+): Promise<BookSearchResultDto | null> {
   const url = new URL(RAKUTEN_API_BASE);
   url.searchParams.set("applicationId", applicationId);
   url.searchParams.set("isbn", isbn);
   url.searchParams.set("format", "json");
 
-  try {
-    const response = await fetch(url.toString());
+  const data = await requestRakuten(url, accessKey, requestOrigin, "search_by_isbn");
 
-    if (!response.ok) {
-      throw new ExternalApiError(`Rakuten API returned ${response.status}`, "Rakuten");
-    }
-
-    const data: RakutenBookResponse = await response.json();
-
-    if (data.Items.length === 0) {
-      return null;
-    }
-
-    return mapRakutenItem(data.Items[0].Item);
-  } catch (error) {
-    if (error instanceof ExternalApiError) throw error;
-    throw new ExternalApiError("Failed to fetch from Rakuten API", "Rakuten", error);
+  if (data.Items.length === 0) {
+    return null;
   }
+
+  return mapRakutenItem(data.Items[0].Item);
 }
 
 /**
@@ -108,34 +94,115 @@ export async function searchByISBN(
 export async function searchByAuthor(
   author: string,
   applicationId: string,
+  accessKey: string,
+  requestOrigin: string,
   limit: number = 20,
-): Promise<BookSearchResult[]> {
+): Promise<BookSearchResultDto[]> {
   const url = new URL(RAKUTEN_API_BASE);
   url.searchParams.set("applicationId", applicationId);
   url.searchParams.set("author", author);
   url.searchParams.set("hits", String(Math.min(limit, 30)));
   url.searchParams.set("format", "json");
 
+  const data = await requestRakuten(url, accessKey, requestOrigin, "search_by_author");
+
+  return data.Items.map((item) => mapRakutenItem(item.Item));
+}
+
+async function requestRakuten(
+  url: URL,
+  accessKey: string,
+  requestOrigin: string,
+  operation: string,
+  attempt: number = 1,
+): Promise<RakutenBookApiResponse> {
+  let response: Response;
+
   try {
-    const response = await fetch(url.toString());
+    const origin = new URL(requestOrigin).origin;
 
-    if (!response.ok) {
-      throw new ExternalApiError(`Rakuten API returned ${response.status}`, "Rakuten");
-    }
-
-    const data: RakutenBookResponse = await response.json();
-
-    return data.Items.map((item) => mapRakutenItem(item.Item));
+    response = await fetch(url, {
+      headers: {
+        accessKey,
+        Origin: origin,
+        Referer: `${origin}/`,
+      },
+    });
   } catch (error) {
-    if (error instanceof ExternalApiError) throw error;
     throw new ExternalApiError("Failed to fetch from Rakuten API", "Rakuten", error);
   }
+
+  if (response.ok) {
+    try {
+      return (await response.json()) as RakutenBookApiResponse;
+    } catch (error) {
+      throw new ExternalApiError("Rakuten API returned an invalid response", "Rakuten", error);
+    }
+  }
+
+  const upstreamError = await readRakutenError(response);
+  const willRetry = RETRYABLE_STATUSES.has(response.status) && attempt < MAX_ATTEMPTS;
+
+  console.error(
+    JSON.stringify({
+      event: "rakuten_api_error",
+      operation,
+      status: response.status,
+      upstreamCode: upstreamError.code,
+      upstreamDescription: upstreamError.description,
+      attempt,
+      willRetry,
+    }),
+  );
+
+  if (!willRetry) {
+    throw new ExternalApiError(`Rakuten API returned ${response.status}`, "Rakuten");
+  }
+
+  await sleep(getRetryDelayMs(response, attempt));
+  return requestRakuten(url, accessKey, requestOrigin, operation, attempt + 1);
+}
+
+async function readRakutenError(response: Response): Promise<RakutenApiErrorDetails> {
+  try {
+    const body = (await response.json()) as RakutenApiErrorResponse;
+    const nestedCode = body.errors?.errorCode;
+
+    return {
+      code: body.error ?? (nestedCode === undefined ? undefined : String(nestedCode)),
+      description: body.error_description ?? body.errors?.errorMessage,
+    };
+  } catch {
+    return {};
+  }
+}
+
+function getRetryDelayMs(response: Response, attempt: number): number {
+  const retryAfter = response.headers.get("Retry-After");
+
+  if (retryAfter) {
+    const seconds = Number(retryAfter);
+    if (Number.isFinite(seconds) && seconds >= 0) {
+      return Math.min(seconds * 1_000, MAX_RETRY_DELAY_MS);
+    }
+
+    const retryAt = Date.parse(retryAfter);
+    if (!Number.isNaN(retryAt)) {
+      return Math.min(Math.max(0, retryAt - Date.now()), MAX_RETRY_DELAY_MS);
+    }
+  }
+
+  return 250 * 2 ** (attempt - 1);
+}
+
+function sleep(delayMs: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, delayMs));
 }
 
 /**
  * 楽天APIのレスポンスを内部形式にマッピング
  */
-function mapRakutenItem(item: RakutenBookItem): BookSearchResult {
+function mapRakutenItem(item: RakutenBookApiItem): BookSearchResultDto {
   return {
     rakutenBooksId: item.isbn,
     title: item.title,
@@ -194,7 +261,7 @@ function parsePublishedDate(publishedDate: string): Date | null {
 /**
  * 本の配列を、出版日が新しい順に並び替え
  */
-export function sortByPublishedDateDesc(books: BookSearchResult[]): BookSearchResult[] {
+export function sortByPublishedDateDesc(books: BookSearchResultDto[]): BookSearchResultDto[] {
   return [...books].sort((before, after) => {
     const beforeDate = parsePublishedDate(before.publishedDate);
     const afterDate = parsePublishedDate(after.publishedDate);

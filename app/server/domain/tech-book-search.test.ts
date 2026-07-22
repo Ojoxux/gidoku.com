@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { BookSearchResult } from "../services/rakuten";
+import type { BookSearchResultDto as BookSearchResult } from "../../types/dto";
 import { calculateTechScore, rankTechBooks } from "./tech-book-search";
 
 const TEST_NOW = new Date(2026, 5, 29);
