@@ -188,7 +188,7 @@ describe("calculateTechScore", () => {
   it.each([
     { keyword: "コミック", score: -15 },
     { keyword: "料理", score: -15 },
-    { keyword: "ムック", score: -15 },
+    { keyword: "雑誌", score: -15 },
   ])("should penalize the non-technical description keyword $keyword", ({ keyword, score }) => {
     const result = calculateTechScore(
       createBook({ description: `${keyword}として紹介` }),
@@ -202,6 +202,36 @@ describe("calculateTechScore", () => {
       type: "negative_description_keyword",
       label: keyword,
       score,
+    });
+  });
+
+  it.each([
+    { title: "Reactムック", technicalKeyword: "React" },
+    { title: "基本情報技術者 ポケット攻略本", technicalKeyword: "基本情報" },
+  ])("should not penalize the technical book title $title", ({ title, technicalKeyword }) => {
+    const result = calculateTechScore(createBook({ title }), "query", { now: TEST_NOW });
+
+    expect(result.techScore).toBe(15);
+    expect(result.scoreReasons).toContainEqual({
+      type: "title_keyword",
+      label: technicalKeyword,
+      score: 15,
+    });
+    expect(result.scoreReasons).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ type: "negative_title_keyword" })]),
+    );
+  });
+
+  it("should continue to penalize a game guide title", () => {
+    const result = calculateTechScore(createBook({ title: "ゲーム攻略本" }), "query", {
+      now: TEST_NOW,
+    });
+
+    expect(result.techScore).toBe(-40);
+    expect(result.scoreReasons).toContainEqual({
+      type: "negative_title_keyword",
+      label: "ゲーム攻略",
+      score: -40,
     });
   });
 

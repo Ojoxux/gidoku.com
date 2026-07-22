@@ -177,10 +177,8 @@ const NEGATIVE_KEYWORDS = [
   "筋トレ",
   "ダイエット",
   "写真集",
-  "攻略本",
   "ゲーム攻略",
   "雑誌",
-  "ムック",
 ];
 
 const SCORE_RULES: ScoreRule[] = [
