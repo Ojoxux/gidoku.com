@@ -170,6 +170,56 @@ describe("calculateTechScore", () => {
   );
 
   it.each([
+    { title: "Web開発入門", expectedKeyword: "Web開発", overlappingKeyword: "Web" },
+    { title: "生成AI入門", expectedKeyword: "生成AI", overlappingKeyword: "AI" },
+  ])(
+    "should prefer $expectedKeyword over the overlapping keyword $overlappingKeyword",
+    ({ title, expectedKeyword, overlappingKeyword }) => {
+      const result = calculateTechScore(createBook({ title }), "query", { now: TEST_NOW });
+
+      expect(result.techScore).toBe(15);
+      expect(result.scoreReasons).toContainEqual({
+        type: "title_keyword",
+        label: expectedKeyword,
+        score: 15,
+      });
+      expect(result.scoreReasons).not.toContainEqual({
+        type: "title_keyword",
+        label: overlappingKeyword,
+        score: 15,
+      });
+    },
+  );
+
+  it("should score distinct technical keywords independently", () => {
+    const result = calculateTechScore(createBook({ title: "React TypeScript入門" }), "query", {
+      now: TEST_NOW,
+    });
+
+    expect(result.techScore).toBe(30);
+    expect(result.scoreReasons).toEqual(
+      expect.arrayContaining([
+        { type: "title_keyword", label: "React", score: 15 },
+        { type: "title_keyword", label: "TypeScript", score: 15 },
+      ]),
+    );
+  });
+
+  it("should score a standalone keyword separately from an overlapping occurrence", () => {
+    const result = calculateTechScore(createBook({ title: "AIと生成AI" }), "query", {
+      now: TEST_NOW,
+    });
+
+    expect(result.techScore).toBe(30);
+    expect(result.scoreReasons).toEqual(
+      expect.arrayContaining([
+        { type: "title_keyword", label: "AI", score: 15 },
+        { type: "title_keyword", label: "生成AI", score: 15 },
+      ]),
+    );
+  });
+
+  it.each([
     { keyword: "漫画", score: -40 },
     { keyword: "小説", score: -40 },
     { keyword: "レシピ", score: -40 },

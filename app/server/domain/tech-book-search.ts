@@ -32,6 +32,12 @@ interface ScoreOptions {
   now?: Date;
 }
 
+interface KeywordMatch {
+  keyword: string;
+  start: number;
+  end: number;
+}
+
 type ScoreRule = (book: BookSearchResult, context: ScoreContext) => ScoreReason[];
 
 const SCORE = {
@@ -327,28 +333,122 @@ function getKeywordReasons(
   keywords: string[],
   reason: { type: ScoreReasonType; score: number },
 ): ScoreReason[] {
-  return keywords
-    .filter((keyword) => hasKeyword(text, keyword))
-    .map((keyword) => ({
-      type: reason.type,
-      label: keyword,
-      score: reason.score,
-    }));
+  return getNonOverlappingKeywordMatches(text, keywords).map((keyword) => ({
+    type: reason.type,
+    label: keyword.keyword,
+    score: reason.score,
+  }));
 }
 
-function hasKeyword(text: string, keyword: string): boolean {
-  if (!text || !keyword) return false;
+// 同じ位置で重なるキーワードから最長の一致だけを残す
+function getNonOverlappingKeywordMatches(text: string, keywords: string[]): KeywordMatch[] {
+  if (!text) return [];
+
+  const matches = keywords.flatMap((keyword) => findKeywordMatches(text, keyword));
+  const selectedMatches: KeywordMatch[] = [];
+  const selectedKeywords = new Set<string>();
+
+  const sortedMatches = matches.toSorted((before, after) => {
+    const lengthDifference =
+      normalizedKeywordLength(after.keyword) - normalizedKeywordLength(before.keyword);
+    if (lengthDifference !== 0) return lengthDifference;
+
+    return before.start - after.start;
+  });
+
+  for (const match of sortedMatches) {
+    if (selectedKeywords.has(match.keyword)) continue;
+    if (selectedMatches.some((selected) => matchesOverlap(match, selected))) continue;
+
+    selectedMatches.push(match);
+    selectedKeywords.add(match.keyword);
+  }
+
+  return selectedMatches.toSorted((before, after) => before.start - after.start);
+}
+
+function findKeywordMatches(text: string, keyword: string): KeywordMatch[] {
+  if (!keyword) return [];
 
   const normalizedKeyword = keyword.toLowerCase();
 
   if (isAsciiKeyword(normalizedKeyword)) {
-    return new RegExp(`(^|[^a-z0-9])${escapeRegExp(normalizedKeyword)}([^a-z0-9]|$)`).test(
-      text.toLowerCase(),
-    );
+    return findAsciiKeywordMatches(text, keyword, normalizedKeyword);
   }
 
-  const normalizedText = normalizeText(text);
-  return normalizedText.includes(normalizedKeyword);
+  return findNormalizedKeywordMatches(text, keyword);
+}
+
+function findAsciiKeywordMatches(
+  text: string,
+  keyword: string,
+  normalizedKeyword: string,
+): KeywordMatch[] {
+  const pattern = new RegExp(
+    `(^|[^a-z0-9])(${escapeRegExp(normalizedKeyword)})(?=[^a-z0-9]|$)`,
+    "g",
+  );
+
+  return [...text.toLowerCase().matchAll(pattern)].map((match) => {
+    const start = (match.index ?? 0) + match[1].length;
+
+    return {
+      keyword,
+      start,
+      end: start + match[2].length,
+    };
+  });
+}
+
+// 空白と大文字小文字を無視してキーワードの一致範囲を返す
+function findNormalizedKeywordMatches(text: string, keyword: string): KeywordMatch[] {
+  const normalizedKeyword = normalizeText(keyword);
+  const { normalizedText, originalIndexes } = normalizeTextWithIndexes(text);
+  const matches: KeywordMatch[] = [];
+  let searchFrom = 0;
+
+  while (searchFrom <= normalizedText.length - normalizedKeyword.length) {
+    const normalizedStart = normalizedText.indexOf(normalizedKeyword, searchFrom);
+    if (normalizedStart === -1) break;
+
+    const normalizedEnd = normalizedStart + normalizedKeyword.length;
+    matches.push({
+      keyword,
+      start: originalIndexes[normalizedStart],
+      end: originalIndexes[normalizedEnd - 1] + 1,
+    });
+    searchFrom = normalizedStart + 1;
+  }
+
+  return matches;
+}
+
+// 空白を除いて検索しても，一致範囲を元の文字列へ戻せるよう位置を保持する
+function normalizeTextWithIndexes(text: string): {
+  normalizedText: string;
+  originalIndexes: number[];
+} {
+  let normalizedText = "";
+  const originalIndexes: number[] = [];
+
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text[index];
+    if (/\s/.test(character)) continue;
+
+    const normalizedCharacter = character.toLowerCase();
+    normalizedText += normalizedCharacter;
+    originalIndexes.push(...Array.from({ length: normalizedCharacter.length }, () => index));
+  }
+
+  return { normalizedText, originalIndexes };
+}
+
+function normalizedKeywordLength(keyword: string): number {
+  return normalizeText(keyword).length;
+}
+
+function matchesOverlap(before: KeywordMatch, after: KeywordMatch): boolean {
+  return before.start < after.end && after.start < before.end;
 }
 
 function includesNormalized(text: string, query: string): boolean {
