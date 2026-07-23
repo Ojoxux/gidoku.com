@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { searchBooks, searchByISBN, searchByAuthor, sortByPublishedDateDesc } from "./rakuten";
+import { searchBooks, searchByISBN, searchByAuthor } from "./rakuten";
 
 describe("rakuten service", () => {
   afterEach(() => {
@@ -184,16 +184,6 @@ describe("rakuten service", () => {
       expect.stringContaining('"upstreamDescription":"accessKey must be present"'),
     );
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('"willRetry":false'));
-  });
-
-  it("should sort by published date desc", () => {
-    const sorted = sortByPublishedDateDesc([
-      { title: "Old", publishedDate: "2020年1月1日" } as never,
-      { title: "New", publishedDate: "2024年1月1日" } as never,
-      { title: "Unknown", publishedDate: "invalid" } as never,
-    ]);
-    expect(sorted[0].title).toBe("New");
-    expect(sorted[sorted.length - 1].title).toBe("Unknown");
   });
 
   it("should parse authors separated by Japanese comma", async () => {

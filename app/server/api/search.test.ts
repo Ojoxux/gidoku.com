@@ -109,7 +109,7 @@ describe("Search API Integration", () => {
     expect(body.data.pageCount).toBe(1);
   });
 
-  it("should include score reasons when debug is enabled", async () => {
+  it.each(["1", "true"])("should include score reasons when debug=%s", async (debug) => {
     const user = await createTestUser(env.DB);
     const sessionId = await createTestSession(env.KV, user.id);
 
@@ -145,7 +145,7 @@ describe("Search API Integration", () => {
     );
 
     const res = await api.request(
-      "/search/books?query=docker&debug=1",
+      `/search/books?query=docker&debug=${debug}`,
       {
         headers: { Cookie: `session_id=${sessionId}` },
       },
