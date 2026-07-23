@@ -1,4 +1,5 @@
 export interface RankedSearchResult {
+  isbn: string;
   techScore: number;
   publishedDate: string;
 }
@@ -7,7 +8,18 @@ export function mergeRankedSearchResults<T extends RankedSearchResult>(
   currentResults: T[],
   additionalResults: T[],
 ): T[] {
-  return [...currentResults, ...additionalResults].toSorted(compareRankedSearchResults);
+  const seenIsbns = new Set<string>();
+
+  return [...currentResults, ...additionalResults]
+    .filter((result) => {
+      const isbn = result.isbn.replace(/[-\s]/g, "");
+      if (!isbn) return true;
+      if (seenIsbns.has(isbn)) return false;
+
+      seenIsbns.add(isbn);
+      return true;
+    })
+    .toSorted(compareRankedSearchResults);
 }
 
 export function compareRankedSearchResults(
