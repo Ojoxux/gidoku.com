@@ -59,6 +59,8 @@ describe("rakuten service", () => {
     expect(requestedOrigin).toBe("https://gidoku.com");
     expect(requestedReferer).toBe("https://gidoku.com/");
     expect(url.searchParams.get("hits")).toBe("10");
+    expect(url.searchParams.get("booksGenreId")).toBe("001005");
+    expect(url.searchParams.get("title")).toBe("query");
     expect(result.results[0].authors).toEqual(["Author A", "Author B"]);
     expect(result.results[0].pageCount).toBe(320);
     expect(result.hits).toBe(1);
