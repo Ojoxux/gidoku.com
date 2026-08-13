@@ -2,6 +2,7 @@ import type { Context, MiddlewareHandler, Next } from "hono";
 import { getCookie } from "hono/cookie";
 import type { HonoContext } from "../../types/env";
 import { RateLimitError } from "./errors";
+import { validateSession } from "./session";
 
 interface RateLimitConfig {
   /** Wranglerで設定したRate Limiting binding名 */
@@ -10,8 +11,8 @@ interface RateLimitConfig {
   limit: number;
   /** ウィンドウサイズ（秒） */
   period: 10 | 60;
-  /** キー生成関数（デフォルト: セッションID、未認証時はIPアドレス） */
-  keyGenerator?: (c: Context<HonoContext>) => string;
+  /** キー生成関数（デフォルト: 検証済みユーザーID、未認証時はIPアドレス） */
+  keyGenerator?: (c: Context<HonoContext>) => string | Promise<string>;
 }
 
 /**
@@ -22,7 +23,8 @@ export function rateLimiter(config: RateLimitConfig): MiddlewareHandler<HonoCont
 
   return async (c: Context<HonoContext>, next: Next) => {
     const rateLimit = c.env[binding];
-    const { success } = await rateLimit.limit({ key: keyGenerator(c) });
+    const key = await keyGenerator(c);
+    const { success } = await rateLimit.limit({ key });
 
     c.header("X-RateLimit-Limit", String(limit));
 
@@ -37,11 +39,20 @@ export function rateLimiter(config: RateLimitConfig): MiddlewareHandler<HonoCont
 
 /**
  * デフォルトのキー生成関数
+ *
+ * session_idクッキーはクライアントが自由に設定できるため、
+ * 生の値をキーに使うとレート制限を回避できてしまう。
+ * 必ずKVで検証し、検証済みのユーザーIDのみをキーに採用する。
  */
-function defaultKeyGenerator(c: Context<HonoContext>): string {
+async function defaultKeyGenerator(c: Context<HonoContext>): Promise<string> {
   const sessionId = getCookie(c, "session_id");
   if (sessionId) {
-    return `session:${sessionId}`;
+    try {
+      const userId = await validateSession(c.env.KV, sessionId);
+      return `user:${userId}`;
+    } catch {
+      // 無効・期限切れのセッションはIPアドレスにフォールバック
+    }
   }
 
   const ip =
@@ -56,7 +67,7 @@ function defaultKeyGenerator(c: Context<HonoContext>): string {
 /**
  * 認証済みユーザーのキー生成関数
  */
-function authenticatedUserKeyGenerator(c: Context<HonoContext>): string {
+async function authenticatedUserKeyGenerator(c: Context<HonoContext>): Promise<string> {
   const userId = c.get("userId");
   return userId ? `user:${userId}` : defaultKeyGenerator(c);
 }

@@ -4,6 +4,7 @@ import { env } from "cloudflare:test";
 import type { HonoContext } from "../../types/env";
 import { rateLimiter } from "./rate-limit";
 import { errorHandler } from "./errors";
+import { createSession } from "./session";
 
 describe("rateLimiter middleware", () => {
   const errorSpy = vi.spyOn(console, "error");
@@ -57,7 +58,8 @@ describe("rateLimiter middleware", () => {
     expect(errorSpy).toHaveBeenCalled();
   });
 
-  it("should prefer a session identifier over an IP address", async () => {
+  it("should prefer a validated session's user id over an IP address", async () => {
+    const sessionId = await createSession(env.KV, "user-123");
     const limit = vi.fn<RateLimit["limit"]>().mockResolvedValue({ success: true });
     const app = new Hono<HonoContext>();
     app.use(
@@ -74,13 +76,40 @@ describe("rateLimiter middleware", () => {
       "/limited",
       {
         headers: {
-          Cookie: "session_id=test-session",
+          Cookie: `session_id=${sessionId}`,
           "CF-Connecting-IP": "1.1.1.1",
         },
       },
       { ...env, API_RATE_LIMITER: { limit } },
     );
 
-    expect(limit).toHaveBeenCalledWith({ key: "session:test-session" });
+    expect(limit).toHaveBeenCalledWith({ key: "user:user-123" });
+  });
+
+  it("should fall back to an IP address when the session cookie is forged", async () => {
+    const limit = vi.fn<RateLimit["limit"]>().mockResolvedValue({ success: true });
+    const app = new Hono<HonoContext>();
+    app.use(
+      "*",
+      rateLimiter({
+        binding: "API_RATE_LIMITER",
+        limit: 60,
+        period: 60,
+      }),
+    );
+    app.get("/limited", (c) => c.json({ ok: true }));
+
+    await app.request(
+      "/limited",
+      {
+        headers: {
+          Cookie: "session_id=attacker-controlled-value",
+          "CF-Connecting-IP": "1.1.1.1",
+        },
+      },
+      { ...env, API_RATE_LIMITER: { limit } },
+    );
+
+    expect(limit).toHaveBeenCalledWith({ key: "ip:1.1.1.1" });
   });
 });
