@@ -118,13 +118,14 @@ function isSafeToExposeDetails(err: AppError): boolean {
  * エラーハンドリングミドルウェア
  */
 export function errorHandler(err: Error, c: Context) {
-  // 明示的な開発環境でのみスタックトレースをログする
   const isDev = isDevelopment(c);
 
-  console.error("Error occurred:", {
+  // 障害調査に必要な情報はWorkers Logsへ残すが、detailsは記録しない
+  console.error({
+    event: "application_error",
     name: err.name,
     message: err.message,
-    ...(isDev ? { stack: err.stack } : {}),
+    stack: err.stack,
   });
 
   if (err instanceof AppError) {

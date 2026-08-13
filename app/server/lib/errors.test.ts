@@ -54,6 +54,12 @@ describe("errorHandler", () => {
     expect(body.error.message).toBe("Query failed");
     expect(body.error.code).toBe("DATABASE_ERROR");
     expect(body.error.details).toBeUndefined();
+    expect(errorSpy).toHaveBeenCalledWith({
+      event: "application_error",
+      name: "DatabaseError",
+      message: "Query failed",
+      stack: expect.any(String),
+    });
   });
 
   it("should hide sensitive details when environment is not configured", async () => {
@@ -70,9 +76,11 @@ describe("errorHandler", () => {
       error: { message: string; code: string; details?: unknown };
     };
     expect(body.error.details).toBeUndefined();
-    expect(errorSpy).toHaveBeenCalledWith("Error occurred:", {
+    expect(errorSpy).toHaveBeenCalledWith({
+      event: "application_error",
       name: "DatabaseError",
       message: "Query failed",
+      stack: expect.any(String),
     });
   });
 
@@ -91,10 +99,12 @@ describe("errorHandler", () => {
       error: { details?: unknown };
     };
     expect(body.error.details).toEqual({ sql: "SELECT * FROM users" });
-    expect(errorSpy).toHaveBeenCalledWith(
-      "Error occurred:",
-      expect.objectContaining({ stack: expect.any(String) }),
-    );
+    expect(errorSpy).toHaveBeenCalledWith({
+      event: "application_error",
+      name: "DatabaseError",
+      message: "Query failed",
+      stack: expect.any(String),
+    });
   });
 
   it("should expose validation details in production", async () => {
