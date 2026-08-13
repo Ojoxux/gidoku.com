@@ -56,6 +56,47 @@ describe("errorHandler", () => {
     expect(body.error.details).toBeUndefined();
   });
 
+  it("should hide sensitive details when environment is not configured", async () => {
+    const app = new Hono();
+    app.onError(errorHandler);
+    app.get("/db-error", () => {
+      throw new DatabaseError("Query failed", { sql: "SELECT * FROM users" });
+    });
+
+    const res = await app.request("/db-error", {}, env);
+    expect(res.status).toBe(500);
+
+    const body = (await res.json()) as {
+      error: { message: string; code: string; details?: unknown };
+    };
+    expect(body.error.details).toBeUndefined();
+    expect(errorSpy).toHaveBeenCalledWith("Error occurred:", {
+      name: "DatabaseError",
+      message: "Query failed",
+    });
+  });
+
+  it("should expose sensitive details only in development", async () => {
+    const app = new Hono();
+    app.onError(errorHandler);
+    app.get("/db-error", () => {
+      throw new DatabaseError("Query failed", { sql: "SELECT * FROM users" });
+    });
+
+    const developmentEnv = { ...env, ENVIRONMENT: "development" };
+    const res = await app.request("/db-error", {}, developmentEnv);
+    expect(res.status).toBe(500);
+
+    const body = (await res.json()) as {
+      error: { details?: unknown };
+    };
+    expect(body.error.details).toEqual({ sql: "SELECT * FROM users" });
+    expect(errorSpy).toHaveBeenCalledWith(
+      "Error occurred:",
+      expect.objectContaining({ stack: expect.any(String) }),
+    );
+  });
+
   it("should expose validation details in production", async () => {
     const app = new Hono();
     app.onError(errorHandler);

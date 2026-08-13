@@ -97,12 +97,13 @@ export class RateLimitError extends AppError {
 }
 
 /**
- * 本番環境かどうかを判定
+ * 開発環境かどうかを判定
+ *
+ * 環境変数が未設定・誤設定の場合は、本番相当の安全な挙動に倒す。
  */
-function isProduction(c: Context): boolean {
-  // CW環境では環境変数で判定
+function isDevelopment(c: Context): boolean {
   const env = c.env as { ENVIRONMENT?: string } | undefined;
-  return env?.ENVIRONMENT === "production";
+  return env?.ENVIRONMENT === "development";
 }
 
 /**
@@ -117,18 +118,18 @@ function isSafeToExposeDetails(err: AppError): boolean {
  * エラーハンドリングミドルウェア
  */
 export function errorHandler(err: Error, c: Context) {
-  // 本番環境ではスタックトレースをログしない
-  const isProd = isProduction(c);
+  // 明示的な開発環境でのみスタックトレースをログする
+  const isDev = isDevelopment(c);
 
   console.error("Error occurred:", {
     name: err.name,
     message: err.message,
-    ...(isProd ? {} : { stack: err.stack }),
+    ...(isDev ? { stack: err.stack } : {}),
   });
 
   if (err instanceof AppError) {
-    // 本番環境では、安全なエラー以外はdetailsを隠す
-    const shouldExposeDetails = !isProd || isSafeToExposeDetails(err);
+    // 明示的な開発環境、または公開して安全なエラーのみdetailsを返す
+    const shouldExposeDetails = isDev || isSafeToExposeDetails(err);
 
     return c.json(
       {

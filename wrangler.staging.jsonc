@@ -28,6 +28,7 @@
     },
   ],
   "vars": {
+    "ENVIRONMENT": "staging",
     "GITHUB_CLIENT_ID": "Ov23liq4okvsI8w6kVsC",
     "GOOGLE_CLIENT_ID": "494336925174-q3f41lih9r2o58unehpr312oncl3mdft.apps.googleusercontent.com",
     "APP_URL": "https://staging.gidoku.com",
