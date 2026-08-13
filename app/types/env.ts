@@ -1,10 +1,7 @@
 import type { SecureHeadersVariables } from "hono/secure-headers";
 import type { User } from "./database";
 
-export interface Env extends Cloudflare.Env {
-  // wrangler.jsonc に定義されていない環境変数
-  ENVIRONMENT?: "development" | "production";
-}
+export interface Env extends Cloudflare.Env {}
 
 /**
  * コンテキスト変数型
