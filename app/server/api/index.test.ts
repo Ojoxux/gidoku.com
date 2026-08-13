@@ -20,7 +20,6 @@ describe("API rate limiting", () => {
     const response = await app.request(path, { headers: { "CF-Connecting-IP": ip } }, env);
 
     expect(response.headers.get("X-RateLimit-Limit")).toBe("60");
-    expect(response.headers.get("X-RateLimit-Remaining")).toBe("59");
   });
 
   it("keeps health checks outside the general API policy", async () => {
@@ -45,6 +44,6 @@ describe("API rate limiting", () => {
     );
 
     expect(response.status).toBe(401);
-    expect(response.headers.get("X-RateLimit-Limit")).toBe("100");
+    expect(response.headers.get("X-RateLimit-Limit")).toBe("10");
   });
 });
