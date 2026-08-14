@@ -9,6 +9,7 @@ export default createRoute(async (c) => {
   }
   const user = authResult;
   const sidebarExpanded = getSidebarExpanded(c);
+  const bookId = c.req.query("id");
 
   return c.render(
     <Layout user={user} title="登録完了" sidebarExpanded={sidebarExpanded}>
@@ -28,12 +29,22 @@ export default createRoute(async (c) => {
             <p class="text-zinc-500 text-lg">本棚から登録した本を確認できます。</p>
           </div>
 
-          <a
-            href="/books"
-            class="inline-flex items-center justify-center px-6 py-3 text-sm font-bold text-white bg-zinc-900 rounded-full hover:bg-zinc-800 transition-all shadow-sm"
-          >
-            本棚へ戻る
-          </a>
+          <div class="flex items-center justify-center gap-3">
+            {bookId && (
+              <a
+                href={`/books/${bookId}`}
+                class="inline-flex items-center justify-center px-6 py-3 text-sm font-bold text-zinc-900 bg-white border border-zinc-200 rounded-full hover:bg-zinc-50 transition-all shadow-sm"
+              >
+                詳細を見る
+              </a>
+            )}
+            <a
+              href="/books"
+              class="inline-flex items-center justify-center px-6 py-3 text-sm font-bold text-white bg-zinc-900 rounded-full hover:bg-zinc-800 transition-all shadow-sm"
+            >
+              本棚へ戻る
+            </a>
+          </div>
         </div>
       </div>
     </Layout>,
