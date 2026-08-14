@@ -33,14 +33,14 @@ export default createRoute(async (c) => {
             {bookId && (
               <a
                 href={`/books/${bookId}`}
-                class="inline-flex items-center justify-center px-6 py-3 text-sm font-bold text-zinc-900 bg-white border border-zinc-200 rounded-full hover:bg-zinc-50 transition-all shadow-sm"
+                class="inline-flex items-center justify-center px-6 py-3 text-sm font-bold text-white bg-zinc-900 rounded-full hover:bg-zinc-800 transition-all shadow-sm"
               >
                 詳細を見る
               </a>
             )}
             <a
               href="/books"
-              class="inline-flex items-center justify-center px-6 py-3 text-sm font-bold text-white bg-zinc-900 rounded-full hover:bg-zinc-800 transition-all shadow-sm"
+              class="inline-flex items-center justify-center px-6 py-3 text-sm font-bold text-zinc-900 bg-white border border-zinc-200 rounded-full hover:bg-zinc-50 transition-all shadow-sm"
             >
               本棚へ戻る
             </a>
