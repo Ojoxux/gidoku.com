@@ -14,23 +14,12 @@ export default createRoute(async (c) => {
     <Layout user={user} title="登録完了" sidebarExpanded={sidebarExpanded}>
       <div class="max-w-xl mx-auto">
         <div class="bg-white rounded-2xl p-10 shadow-sm ring-1 ring-zinc-100 text-center space-y-6">
-          <div class="mx-auto flex items-center justify-center w-16 h-16 rounded-full bg-emerald-50">
-            <svg
-              aria-hidden="true"
-              class="w-8 h-8 text-emerald-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <title>登録完了</title>
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </div>
+          <lord-icon
+            src="/icons/success-icon.json"
+            trigger="in"
+            style="width:120px;height:120px"
+            class="mx-auto"
+          />
 
           <div class="space-y-2">
             <h1 class="text-2xl font-bold text-zinc-900 tracking-tight">書籍を登録しました</h1>
