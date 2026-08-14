@@ -58,14 +58,21 @@ export async function authMiddleware(
   next: Next,
 ): Promise<Response | void> {
   try {
-    const sessionId = getCookie(c, "session_id");
+    // レート制限ミドルウェアが同一セッションを検証済みならそれを再利用し、
+    // KVへの重複読み込みを避ける
+    let userId = c.get("userId");
 
-    if (!sessionId) {
-      throw new UnauthorizedError("No session found");
+    if (!userId) {
+      const sessionId = getCookie(c, "session_id");
+
+      if (!sessionId) {
+        throw new UnauthorizedError("No session found");
+      }
+
+      // セッションからユーザーIDを取得
+      userId = await validateSession(c.env.KV, sessionId);
+      c.set("userId", userId);
     }
-
-    // セッションからユーザーIDを取得
-    const userId = await validateSession(c.env.KV, sessionId);
 
     // キャッシュからユーザー情報を取得
     let user = await getCachedUser(c.env.KV, userId);
@@ -77,7 +84,6 @@ export async function authMiddleware(
     }
 
     // コンテキストにユーザー情報を設定
-    c.set("userId", userId);
     c.set("user", user);
 
     await next();
@@ -104,11 +110,19 @@ export async function authMiddleware(
  */
 export async function optionalAuthMiddleware(c: Context<HonoContext>, next: Next): Promise<void> {
   try {
-    const sessionId = getCookie(c, "session_id");
+    // レート制限ミドルウェアが同一セッションを検証済みならそれを再利用し、
+    // KVへの重複読み込みを避ける
+    let userId = c.get("userId");
 
-    if (sessionId) {
-      const userId = await validateSession(c.env.KV, sessionId);
+    if (!userId) {
+      const sessionId = getCookie(c, "session_id");
+      if (sessionId) {
+        userId = await validateSession(c.env.KV, sessionId);
+        c.set("userId", userId);
+      }
+    }
 
+    if (userId) {
       // キャッシュからユーザー情報を取得
       let user = await getCachedUser(c.env.KV, userId);
 
@@ -117,7 +131,6 @@ export async function optionalAuthMiddleware(c: Context<HonoContext>, next: Next
         await setCachedUser(c.env.KV, user);
       }
 
-      c.set("userId", userId);
       c.set("user", user);
     }
   } catch (error) {

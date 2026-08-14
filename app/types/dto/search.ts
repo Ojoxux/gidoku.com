@@ -11,8 +11,19 @@ export interface BookSearchResultDto {
   rakutenAffiliateUrl: string;
 }
 
+export interface ScoreReasonDto {
+  type: string;
+  label: string;
+  score: number;
+}
+
+export interface ScoredBookSearchResultDto extends BookSearchResultDto {
+  techScore: number;
+  scoreReasons?: ScoreReasonDto[];
+}
+
 export interface SearchBooksResponseDto {
-  results: BookSearchResultDto[];
+  results: ScoredBookSearchResultDto[];
   hits: number;
   pageCount: number;
   currentPage: number;

@@ -41,7 +41,7 @@ describe("Search API Integration", () => {
     expect(body.error.code).toBe("VALIDATION_ERROR");
   });
 
-  it("should return search results sorted by published date", async () => {
+  it("should return search results sorted by technical score and published date", async () => {
     const user = await createTestUser(env.DB);
     const sessionId = await createTestSession(env.KV, user.id);
 
@@ -50,12 +50,12 @@ describe("Search API Integration", () => {
         {
           Item: {
             isbn: "9780000000001",
-            title: "Older Book",
+            title: "Older React Book",
             author: "Author A",
-            publisherName: "Publisher A",
+            publisherName: "技術評論社",
             salesDate: "2023年12月1日",
             size: "200p",
-            itemCaption: "Older book description",
+            itemCaption: "React book description",
             largeImageUrl: "https://example.com/older.png",
             affiliateUrl: "https://example.com/older",
           },
@@ -63,12 +63,12 @@ describe("Search API Integration", () => {
         {
           Item: {
             isbn: "9780000000002",
-            title: "Newer Book",
+            title: "Newer Novel",
             author: "Author B",
             publisherName: "Publisher B",
             salesDate: "2024年1月2日",
             size: "320p",
-            itemCaption: "Newer book description",
+            itemCaption: "Newer novel description",
             largeImageUrl: "https://example.com/newer.png",
             affiliateUrl: "https://example.com/newer",
           },
@@ -101,10 +101,76 @@ describe("Search API Integration", () => {
     const body = (await res.json()) as SuccessResponseDto<SearchBooksResponseDto>;
     expect(body.success).toBe(true);
     expect(body.data.results).toHaveLength(2);
-    expect(body.data.results[0].title).toBe("Newer Book");
-    expect(body.data.results[0].publishedDate).toBe("2024年1月2日");
+    expect(body.data.results[0].title).toBe("Older React Book");
+    expect(body.data.results[0].publishedDate).toBe("2023年12月1日");
+    expect(body.data.results[0].techScore).toBeGreaterThan(body.data.results[1].techScore);
+    expect(body.data.results[0].scoreReasons).toBeUndefined();
     expect(body.data.hits).toBe(2);
     expect(body.data.pageCount).toBe(1);
+  });
+
+  it.each(["1", "true"])("should include score reasons when debug=%s", async (debug) => {
+    const user = await createTestUser(env.DB);
+    const sessionId = await createTestSession(env.KV, user.id);
+
+    const mockResponse = {
+      Items: [
+        {
+          Item: {
+            isbn: "9780000000003",
+            title: "Docker入門",
+            author: "Author C",
+            publisherName: "翔泳社",
+            salesDate: "2024年1月1日",
+            size: "240p",
+            itemCaption: "Linuxとコンテナの基礎",
+            largeImageUrl: "",
+            affiliateUrl: "",
+          },
+        },
+      ],
+      pageCount: 1,
+      hits: 1,
+    };
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        async () =>
+          new Response(JSON.stringify(mockResponse), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }),
+      ),
+    );
+
+    const res = await api.request(
+      `/search/books?query=docker&debug=${debug}`,
+      {
+        headers: { Cookie: `session_id=${sessionId}` },
+      },
+      env,
+    );
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      success: boolean;
+      data: {
+        results: Array<{
+          techScore: number;
+          scoreReasons?: Array<{ type: string; label: string; score: number }>;
+        }>;
+      };
+    };
+
+    expect(body.success).toBe(true);
+    expect(body.data.results[0].techScore).toBeGreaterThan(0);
+    expect(body.data.results[0].scoreReasons).toEqual(
+      expect.arrayContaining([
+        { type: "tech_publisher", label: "翔泳社", score: 30 },
+        { type: "title_keyword", label: "Docker", score: 15 },
+      ]),
+    );
   });
 
   it("should return 400 for invalid isbn", async () => {
