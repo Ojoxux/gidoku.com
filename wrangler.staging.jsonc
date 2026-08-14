@@ -27,6 +27,23 @@
       "id": "1378483b23f24cd59870e141a9634716",
     },
   ],
+  "ratelimits": [
+    {
+      "name": "AUTH_RATE_LIMITER",
+      "namespace_id": "819414001",
+      "simple": { "limit": 10, "period": 60 },
+    },
+    {
+      "name": "SEARCH_RATE_LIMITER",
+      "namespace_id": "819414002",
+      "simple": { "limit": 30, "period": 60 },
+    },
+    {
+      "name": "API_RATE_LIMITER",
+      "namespace_id": "819414003",
+      "simple": { "limit": 60, "period": 60 },
+    },
+  ],
   "vars": {
     "ENVIRONMENT": "staging",
     "GITHUB_CLIENT_ID": "Ov23liq4okvsI8w6kVsC",

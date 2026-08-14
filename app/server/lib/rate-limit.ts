@@ -1,78 +1,37 @@
 import type { Context, MiddlewareHandler, Next } from "hono";
+import { getCookie } from "hono/cookie";
 import type { HonoContext } from "../../types/env";
 import { RateLimitError } from "./errors";
+import { validateSession } from "./session";
 
 interface RateLimitConfig {
-  /** ウィンドウサイズ（秒） */
-  windowSec: number;
+  /** Wranglerで設定したRate Limiting binding名 */
+  binding: "AUTH_RATE_LIMITER" | "SEARCH_RATE_LIMITER" | "API_RATE_LIMITER";
   /** ウィンドウ内の最大リクエスト数 */
   limit: number;
-  /** レート制限のキープレフィックス */
-  keyPrefix: string;
-  /** キー生成関数（デフォルト: IPアドレス） */
-  keyGenerator?: (c: Context<HonoContext>) => string;
-}
-
-interface RateLimitEntry {
-  /** ウィンドウ内のリクエスト数 */
-  count: number;
-  /** ウィンドウのリセット時間 */
-  resetAt: number;
+  /** ウィンドウサイズ（秒） */
+  period: 10 | 60;
+  /** キー生成関数（デフォルト: 検証済みユーザーID、未認証時はIPアドレス） */
+  keyGenerator?: (c: Context<HonoContext>) => string | Promise<string>;
 }
 
 /**
- * レートリミット用ミドルウェア
+ * Cloudflare Rate Limiting binding用ミドルウェア
  */
 export function rateLimiter(config: RateLimitConfig): MiddlewareHandler<HonoContext> {
-  const { windowSec, limit, keyPrefix, keyGenerator = defaultKeyGenerator } = config;
+  const { binding, limit, period, keyGenerator = defaultKeyGenerator } = config;
 
   return async (c: Context<HonoContext>, next: Next) => {
-    const kv = c.env.KV;
-    const identifier = keyGenerator(c);
-    const key = `ratelimit:${keyPrefix}:${identifier}`;
-    const now = Math.floor(Date.now() / 1000);
-
-    // 現在のレート制限エントリを取得
-    const entryJson = await kv.get(key);
-    let entry: RateLimitEntry;
-
-    if (entryJson) {
-      entry = JSON.parse(entryJson);
-
-      // ウィンドウがリセットされている場合
-      if (now >= entry.resetAt) {
-        entry = {
-          count: 1,
-          resetAt: now + windowSec,
-        };
-      } else {
-        entry.count += 1;
-      }
-    } else {
-      entry = {
-        count: 1,
-        resetAt: now + windowSec,
-      };
-    }
-
-    // レート制限ヘッダーを設定
-    const remaining = Math.max(0, limit - entry.count);
-    const retryAfter = entry.resetAt - now;
+    const rateLimit = c.env[binding];
+    const key = await keyGenerator(c);
+    const { success } = await rateLimit.limit({ key });
 
     c.header("X-RateLimit-Limit", String(limit));
-    c.header("X-RateLimit-Remaining", String(remaining));
-    c.header("X-RateLimit-Reset", String(entry.resetAt));
 
-    // 制限を超えている場合
-    if (entry.count > limit) {
-      c.header("Retry-After", String(retryAfter));
-      throw new RateLimitError("Too many requests. Please try again later.", retryAfter);
+    if (!success) {
+      c.header("Retry-After", String(period));
+      throw new RateLimitError("Too many requests. Please try again later.", period);
     }
-
-    // エントリを更新（TTLをウィンドウサイズに設定）
-    await kv.put(key, JSON.stringify(entry), {
-      expirationTtl: windowSec + 1,
-    });
 
     await next();
   };
@@ -80,41 +39,66 @@ export function rateLimiter(config: RateLimitConfig): MiddlewareHandler<HonoCont
 
 /**
  * デフォルトのキー生成関数
+ *
+ * session_idクッキーはクライアントが自由に設定できるため、
+ * 生の値をキーに使うとレート制限を回避できてしまう。
+ * 必ずKVで検証し、検証済みのユーザーIDのみをキーに採用する。
+ * 検証結果はコンテキストに残し、後続のauthMiddleware/optionalAuthMiddlewareが
+ * 同じセッションをKVへ再度問い合わせずに済むようにする。
  */
-function defaultKeyGenerator(c: Context<HonoContext>): string {
-  // CF-Connecting-IP ヘッダーでクライアントIPを取得
+async function defaultKeyGenerator(c: Context<HonoContext>): Promise<string> {
+  const sessionId = getCookie(c, "session_id");
+  if (sessionId) {
+    try {
+      const userId = await validateSession(c.env.KV, sessionId);
+      c.set("userId", userId);
+      return `user:${userId}`;
+    } catch {
+      // 無効・期限切れのセッションはIPアドレスにフォールバック
+    }
+  }
+
   const ip =
     c.req.header("CF-Connecting-IP") ||
     c.req.header("X-Forwarded-For")?.split(",")[0]?.trim() ||
     c.req.header("X-Real-IP") ||
     "unknown";
 
-  return ip;
+  return `ip:${ip}`;
 }
 
 /**
- * 認証用のRate Limiter設定(15分間で100リクエストまで)
+ * 認証済みユーザーのキー生成関数
+ */
+async function authenticatedUserKeyGenerator(c: Context<HonoContext>): Promise<string> {
+  const userId = c.get("userId");
+  return userId ? `user:${userId}` : defaultKeyGenerator(c);
+}
+
+/**
+ * 認証用のRate Limiter設定(1分間で10リクエストまで)
  */
 export const authRateLimiter = rateLimiter({
-  windowSec: 15 * 60, // 15分
-  limit: 100,
-  keyPrefix: "auth",
+  binding: "AUTH_RATE_LIMITER",
+  limit: 10,
+  period: 60,
 });
 
 /**
  * 検索API用のRate Limiter設定(1分間で30リクエストまで)
  */
 export const searchRateLimiter = rateLimiter({
-  windowSec: 60, // 1分
+  binding: "SEARCH_RATE_LIMITER",
   limit: 30,
-  keyPrefix: "search",
+  period: 60,
+  keyGenerator: authenticatedUserKeyGenerator,
 });
 
 /**
  * 一般API用のRate Limiter設定(1分間で60リクエストまで)
  */
 export const apiRateLimiter = rateLimiter({
-  windowSec: 60, // 1分
+  binding: "API_RATE_LIMITER",
   limit: 60,
-  keyPrefix: "api",
+  period: 60,
 });

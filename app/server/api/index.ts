@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import type { HonoContext } from "../../types/env";
 import { errorHandler } from "../lib/errors";
+import { apiRateLimiter } from "../lib/rate-limit";
 import books from "./books";
 import tags from "./tags";
 import users from "./users";
@@ -11,6 +12,11 @@ const app = new Hono<HonoContext>();
 
 // エラーハンドリング
 app.onError(errorHandler);
+
+// 一般APIにRate Limiting適用
+app.use("/books/*", apiRateLimiter);
+app.use("/tags/*", apiRateLimiter);
+app.use("/users/*", apiRateLimiter);
 
 // ルーティング
 app.route("/books", books);

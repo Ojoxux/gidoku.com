@@ -28,6 +28,23 @@
       "preview_id": "fe6ec6f0a8c548509522d4fd958bb9fa",
     },
   ],
+  "ratelimits": [
+    {
+      "name": "AUTH_RATE_LIMITER",
+      "namespace_id": "819413001",
+      "simple": { "limit": 10, "period": 60 },
+    },
+    {
+      "name": "SEARCH_RATE_LIMITER",
+      "namespace_id": "819413002",
+      "simple": { "limit": 30, "period": 60 },
+    },
+    {
+      "name": "API_RATE_LIMITER",
+      "namespace_id": "819413003",
+      "simple": { "limit": 60, "period": 60 },
+    },
+  ],
   "vars": {
     "ENVIRONMENT": "production",
     "GITHUB_CLIENT_ID": "Ov23li1W8sYXe7C1fWlR",
