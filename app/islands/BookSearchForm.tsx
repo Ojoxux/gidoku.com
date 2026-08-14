@@ -86,7 +86,7 @@ export default function BookSearchForm() {
       const data = await readApiResponse<BookDto>(res);
 
       if (data.success) {
-        window.location.href = `/books/${data.data.id}`;
+        window.location.href = `/books/new/complete?id=${data.data.id}`;
       } else {
         alert(data.error?.message || "登録に失敗しました");
       }
