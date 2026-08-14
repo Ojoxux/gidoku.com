@@ -43,12 +43,15 @@ export function rateLimiter(config: RateLimitConfig): MiddlewareHandler<HonoCont
  * session_idクッキーはクライアントが自由に設定できるため、
  * 生の値をキーに使うとレート制限を回避できてしまう。
  * 必ずKVで検証し、検証済みのユーザーIDのみをキーに採用する。
+ * 検証結果はコンテキストに残し、後続のauthMiddleware/optionalAuthMiddlewareが
+ * 同じセッションをKVへ再度問い合わせずに済むようにする。
  */
 async function defaultKeyGenerator(c: Context<HonoContext>): Promise<string> {
   const sessionId = getCookie(c, "session_id");
   if (sessionId) {
     try {
       const userId = await validateSession(c.env.KV, sessionId);
+      c.set("userId", userId);
       return `user:${userId}`;
     } catch {
       // 無効・期限切れのセッションはIPアドレスにフォールバック

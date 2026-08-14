@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { env } from "cloudflare:test";
 import { Hono } from "hono";
 import type { HonoContext } from "../../types/env";
+import { createTestUser, createTestSession } from "../../test/helpers";
 import api from ".";
 
 describe("API rate limiting", () => {
@@ -45,5 +46,29 @@ describe("API rate limiting", () => {
 
     expect(response.status).toBe(401);
     expect(response.headers.get("X-RateLimit-Limit")).toBe("10");
+  });
+
+  it("validates a session against KV only once per request", async () => {
+    const user = await createTestUser(env.DB);
+    const sessionId = await createTestSession(env.KV, user.id);
+
+    const getSpy = vi.spyOn(env.KV, "get");
+
+    const app = new Hono<HonoContext>();
+    app.route("/api", api);
+
+    const response = await app.request(
+      "/api/books",
+      { headers: { Cookie: `session_id=${sessionId}` } },
+      env,
+    );
+
+    expect(response.status).toBe(200);
+    const sessionReads = getSpy.mock.calls.filter(
+      ([key]) => typeof key === "string" && key === `session:${sessionId}`,
+    );
+    expect(sessionReads).toHaveLength(1);
+
+    getSpy.mockRestore();
   });
 });
