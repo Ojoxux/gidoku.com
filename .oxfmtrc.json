@@ -14,6 +14,7 @@
     "worker-configuration.d.ts",
     "pnpm-lock.yaml",
     "*.md",
-    "public/icons/**"
+    "public/icons/**",
+    ".github/workflows/pullfrog.yml"
   ]
 }
