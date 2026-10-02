@@ -34,6 +34,8 @@ interface RakutenApiErrorDetails {
 }
 
 const RAKUTEN_API_BASE = "https://openapi.rakuten.co.jp/services/api/BooksBook/Search/20170404";
+/** 楽天ブックス「コンピュータ・情報処理」ジャンル */
+export const RAKUTEN_COMPUTER_BOOKS_GENRE_ID = "001005";
 const MAX_ATTEMPTS = 3;
 const MAX_RETRY_DELAY_MS = 5_000;
 const RETRYABLE_STATUSES = new Set([429, 503]);
@@ -52,6 +54,7 @@ export async function searchBooks(
   const url = new URL(RAKUTEN_API_BASE);
   url.searchParams.set("applicationId", applicationId);
   url.searchParams.set("title", query);
+  url.searchParams.set("booksGenreId", RAKUTEN_COMPUTER_BOOKS_GENRE_ID);
   url.searchParams.set("hits", String(Math.min(limit, 10)));
   url.searchParams.set("page", String(page));
   url.searchParams.set("format", "json");
