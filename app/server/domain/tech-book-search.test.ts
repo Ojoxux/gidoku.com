@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { BookSearchResultDto as BookSearchResult } from "../../types/dto";
-import { calculateTechScore, rankTechBooks } from "./tech-book-search";
+import {
+  calculateTechScore,
+  isLikelyTechBook,
+  rankTechBooks,
+  type ScoreReason,
+} from "./tech-book-search";
 
 const TEST_NOW = new Date(2026, 5, 29);
 
@@ -388,8 +393,41 @@ describe("calculateTechScore", () => {
   );
 });
 
+describe("isLikelyTechBook", () => {
+  it("should keep a book with technical evidence and a positive score", () => {
+    expect(isLikelyTechBook(15, [{ type: "title_keyword", label: "Docker", score: 15 }])).toBe(
+      true,
+    );
+  });
+
+  it("should reject a book that only has publication recency", () => {
+    expect(
+      isLikelyTechBook(12, [{ type: "recent_publication", label: "1年以内", score: 12 }]),
+    ).toBe(false);
+  });
+
+  it("should reject a book with no score reasons", () => {
+    expect(isLikelyTechBook(0, [])).toBe(false);
+  });
+
+  it("should reject a book whose net technical score is not positive", () => {
+    const reasons: ScoreReason[] = [
+      { type: "title_keyword", label: "Docker", score: 15 },
+      { type: "negative_title_keyword", label: "レシピ", score: -40 },
+    ];
+
+    expect(isLikelyTechBook(-25, reasons)).toBe(false);
+  });
+
+  it("should reject a book with only negative keywords", () => {
+    expect(
+      isLikelyTechBook(-40, [{ type: "negative_title_keyword", label: "小説", score: -40 }]),
+    ).toBe(false);
+  });
+});
+
 describe("rankTechBooks", () => {
-  it("should rank a technical book before a newer non-technical book", () => {
+  it("should exclude a newer non-technical book from ranked results", () => {
     const books = [
       createBook({
         title: "新しい小説",
@@ -405,11 +443,11 @@ describe("rankTechBooks", () => {
 
     const ranked = rankTechBooks(books, "react", { now: TEST_NOW });
 
-    expect(ranked[0].title).toBe("React設計パターン");
-    expect(ranked[0].techScore).toBeGreaterThan(ranked[1].techScore);
+    expect(ranked.map((book) => book.title)).toEqual(["React設計パターン"]);
+    expect(ranked[0].techScore).toBeGreaterThan(0);
   });
 
-  it("should sort books by technical score in descending order", () => {
+  it("should sort remaining technical books by technical score in descending order", () => {
     const books = [
       createBook({ title: "Neutral Book" }),
       createBook({ title: "Docker入門" }),
@@ -418,34 +456,46 @@ describe("rankTechBooks", () => {
 
     const ranked = rankTechBooks(books, "query", { now: TEST_NOW });
 
-    expect(ranked.map((book) => book.title)).toEqual([
-      "TypeScript入門",
-      "Docker入門",
-      "Neutral Book",
-    ]);
+    expect(ranked.map((book) => book.title)).toEqual(["TypeScript入門", "Docker入門"]);
+  });
+
+  it("should exclude books without technical evidence even if they are recent", () => {
+    const books = [
+      createBook({
+        title: "話題のエッセイ",
+        publisher: "一般出版社",
+        publishedDate: "2026年6月1日",
+      }),
+      createBook({ title: "漫画入門", publishedDate: "2026年5月1日" }),
+      createBook({ title: "Python実践入門", publishedDate: "2018年1月1日" }),
+    ];
+
+    const ranked = rankTechBooks(books, "python", { now: TEST_NOW });
+
+    expect(ranked.map((book) => book.title)).toEqual(["Python実践入門"]);
   });
 
   it("should prefer the newer publication when technical scores are tied", () => {
     const books = [
-      createBook({ title: "Older", publishedDate: "2019年1月1日" }),
-      createBook({ title: "Newer", publishedDate: "2020年1月1日" }),
+      createBook({ title: "Older Docker", publishedDate: "2019年1月1日" }),
+      createBook({ title: "Newer Docker", publishedDate: "2020年1月1日" }),
     ];
 
     const ranked = rankTechBooks(books, "query", { now: TEST_NOW });
 
-    expect(ranked.map((book) => book.title)).toEqual(["Newer", "Older"]);
+    expect(ranked.map((book) => book.title)).toEqual(["Newer Docker", "Older Docker"]);
     expect(ranked[0].techScore).toBe(ranked[1].techScore);
   });
 
   it("should place an unknown publication date after a valid date when scores are tied", () => {
     const books = [
-      createBook({ title: "Unknown", publishedDate: "unknown" }),
-      createBook({ title: "Known", publishedDate: "2020年1月1日" }),
+      createBook({ title: "Unknown Docker", publishedDate: "unknown" }),
+      createBook({ title: "Known Docker", publishedDate: "2020年1月1日" }),
     ];
 
     const ranked = rankTechBooks(books, "query", { now: TEST_NOW });
 
-    expect(ranked.map((book) => book.title)).toEqual(["Known", "Unknown"]);
+    expect(ranked.map((book) => book.title)).toEqual(["Known Docker", "Unknown Docker"]);
   });
 
   it("should omit score reasons by default", () => {

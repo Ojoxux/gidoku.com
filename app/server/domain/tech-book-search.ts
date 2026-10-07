@@ -41,6 +41,14 @@ interface KeywordMatch {
 
 type ScoreRule = (book: BookSearchResult, context: ScoreContext) => ScoreReason[];
 
+const TECH_EVIDENCE_TYPES = new Set<ScoreReasonType>([
+  "isbn_exact_match",
+  "tech_publisher",
+  "title_keyword",
+  "description_keyword",
+  "author_keyword",
+]);
+
 const SCORE = {
   isbnExactMatch: 100,
   techPublisher: 30,
@@ -206,8 +214,12 @@ export function rankTechBooks(
   options: { includeReasons?: boolean; now?: Date } = {},
 ): ScoredBookSearchResult[] {
   return books
-    .map((book) => {
+    .flatMap((book) => {
       const result = calculateTechScore(book, query, { now: options.now });
+      if (!isLikelyTechBook(result.techScore, result.scoreReasons)) {
+        return [];
+      }
+
       const scoredBook: ScoredBookSearchResult = {
         ...book,
         techScore: result.techScore,
@@ -217,9 +229,19 @@ export function rankTechBooks(
         scoredBook.scoreReasons = result.scoreReasons;
       }
 
-      return scoredBook;
+      return [scoredBook];
     })
     .toSorted(compareRankedSearchResults);
+}
+
+/**
+ * 技術書らしい候補かどうか。
+ * 出版日の新しさだけでは残さず、出版社・キーワード・ISBN などの技術シグナルが必要。
+ */
+export function isLikelyTechBook(techScore: number, scoreReasons: ScoreReason[]): boolean {
+  if (techScore <= 0) return false;
+
+  return scoreReasons.some((reason) => TECH_EVIDENCE_TYPES.has(reason.type));
 }
 
 export function calculateTechScore(

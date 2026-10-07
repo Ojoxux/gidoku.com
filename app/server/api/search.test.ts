@@ -100,13 +100,75 @@ describe("Search API Integration", () => {
     expect(res.status).toBe(200);
     const body = (await res.json()) as SuccessResponseDto<SearchBooksResponseDto>;
     expect(body.success).toBe(true);
-    expect(body.data.results).toHaveLength(2);
+    expect(body.data.results).toHaveLength(1);
     expect(body.data.results[0].title).toBe("Older React Book");
     expect(body.data.results[0].publishedDate).toBe("2023年12月1日");
-    expect(body.data.results[0].techScore).toBeGreaterThan(body.data.results[1].techScore);
+    expect(body.data.results[0].techScore).toBeGreaterThan(0);
     expect(body.data.results[0].scoreReasons).toBeUndefined();
     expect(body.data.hits).toBe(2);
     expect(body.data.pageCount).toBe(1);
+  });
+
+  it("should exclude non-technical books from search results", async () => {
+    const user = await createTestUser(env.DB);
+    const sessionId = await createTestSession(env.KV, user.id);
+
+    const mockResponse = {
+      Items: [
+        {
+          Item: {
+            isbn: "9780000000010",
+            title: "最近の小説",
+            author: "Author Novel",
+            publisherName: "一般出版社",
+            salesDate: "2026年1月1日",
+            size: "280p",
+            itemCaption: "話題のフィクション",
+            largeImageUrl: "https://example.com/novel.png",
+            affiliateUrl: "https://example.com/novel",
+          },
+        },
+        {
+          Item: {
+            isbn: "9780000000011",
+            title: "料理レシピ大全",
+            author: "Author Cook",
+            publisherName: "料理社",
+            salesDate: "2025年6月1日",
+            size: "180p",
+            itemCaption: "家庭の味",
+            largeImageUrl: "https://example.com/cook.png",
+            affiliateUrl: "https://example.com/cook",
+          },
+        },
+      ],
+      pageCount: 1,
+      hits: 2,
+    };
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        async () =>
+          new Response(JSON.stringify(mockResponse), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }),
+      ),
+    );
+
+    const res = await api.request(
+      "/search/books?query=react",
+      {
+        headers: { Cookie: `session_id=${sessionId}` },
+      },
+      env,
+    );
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as SuccessResponseDto<SearchBooksResponseDto>;
+    expect(body.success).toBe(true);
+    expect(body.data.results).toEqual([]);
   });
 
   it.each(["1", "true"])("should include score reasons when debug=%s", async (debug) => {
